@@ -24,6 +24,6 @@
     "webpack": "^1.12.1"
   },
   "dependencies": {
-    "eventsjs": "git+https://github.com/klidevaeld/eventsjs.git"
+    "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git"
   }
 }
