@@ -30,7 +30,6 @@ export interface ModelOptions {
 
     get id() {
       if (this.idAttribute in this._attributes) return this._attributes[this.idAttribute]
-      return this.uid
     }
 
 
