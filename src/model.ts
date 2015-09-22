@@ -1,4 +1,4 @@
-/// <reference path="interfaces" />
+
 import {BaseObject} from './object'
 import {IModel, ICollection} from './interfaces'
 import {uniqueId, equal} from 'utilities/lib/utils'

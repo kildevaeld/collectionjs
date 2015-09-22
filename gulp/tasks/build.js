@@ -9,7 +9,8 @@ const gulp = require('gulp'),
 	
 const project = typescript.createProject('tsconfig.json', {
 	 declaration: true,
-	 sortOutput: true
+	 sortOutput: true,
+	 typescript: require('typescript')
 });
 	
 gulp.task('build', function () {

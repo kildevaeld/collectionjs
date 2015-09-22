@@ -2,7 +2,7 @@
 import {BaseObject} from './object'
 import {IModel,ICollection, Silenceable} from './interfaces'
 import {Model} from './model'
-import  {extend} from 'utilities/lib/objects'
+import {extend} from 'utilities/lib/objects'
 import {sortBy, find, slice} from 'utilities/lib/arrays'
 import {callFunc} from 'utilities/lib/utils'
 
