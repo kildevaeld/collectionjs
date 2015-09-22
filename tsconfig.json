@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "target": "es5",
+        "module": "commonjs",
         "isolatedModules": false,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
@@ -22,7 +23,8 @@
       "./src/model.ts",
       "./src/nested-model.ts",
       "./src/collection.ts",
-      "./src/index.ts"
-      
+      "./src/index.ts",
+      "./src/object.ts"
+
     ]
 }

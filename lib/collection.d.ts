@@ -1,4 +1,4 @@
-import { EventEmitter } from 'eventsjs';
+import { BaseObject } from './object';
 import { IModel, ICollection, Silenceable } from './interfaces';
 export declare type SortFunction = <T>(a: T, b: T) => number;
 export interface CollectionOptions<U> {
@@ -23,7 +23,7 @@ export interface CollectionCreateOptions {
 export interface CollectionResetOptions extends Silenceable {
     previousModels?: IModel[];
 }
-export declare class Collection<U extends IModel> extends EventEmitter implements ICollection {
+export declare class Collection<U extends IModel> extends BaseObject implements ICollection {
     length: number;
     private _model;
     Model: new (attr: Object, options?: any) => U;

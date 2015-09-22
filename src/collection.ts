@@ -1,5 +1,5 @@
 /// <reference path="interfaces" />
-import {EventEmitter} from 'eventsjs'
+import {BaseObject} from './object'
 import {IModel,ICollection, Silenceable} from './interfaces'
 import {Model} from './model'
 import  {extend} from 'utilities/lib/objects'
@@ -9,7 +9,7 @@ import {callFunc} from 'utilities/lib/utils'
 var setOptions = {add: true, remove: true, merge: true};
 var addOptions = {add: true, remove: false};
 
-export type SortFunction = <T>(a:T, b:T) => number 
+export type SortFunction = <T>(a:T, b:T) => number
 
 
 export interface CollectionOptions<U> {
@@ -40,7 +40,7 @@ export interface CollectionResetOptions extends Silenceable {
   previousModels?: IModel[]
 }
 
-export class Collection<U extends IModel> extends EventEmitter implements ICollection {
+export class Collection<U extends IModel> extends BaseObject implements ICollection {
   /**
    * The length of the collection
    * @property {Number} length
@@ -49,15 +49,15 @@ export class Collection<U extends IModel> extends EventEmitter implements IColle
 		return this.models.length
 	}
 
-  private _model: new (attr:Object, options?:any) => U 
+  private _model: new (attr:Object, options?:any) => U
 	public get Model (): new (attr:Object, options?:any) => U {
    if (!this._model) {
      this._model = <any>Model
    }
-   
+
    return this._model
   }
-  
+
   public set Model (con:new (attr:Object, options?:any) => U) {
    this._model = con
   }
@@ -67,7 +67,7 @@ export class Collection<U extends IModel> extends EventEmitter implements IColle
   get models (): U[] {
     return this._models||(this._models=[]);
   }
-  
+
   comparator:string|SortFunction
 
   options: CollectionOptions<U>
@@ -75,11 +75,11 @@ export class Collection<U extends IModel> extends EventEmitter implements IColle
   constructor (models?:U[]|Object[], options:CollectionOptions<U>={}) {
 
     this.options = options;
-    
+
     if (this.options.model) {
       this.Model = this.options.model
     }
-    
+
     //this._byId = {};
     if (models) {
       this.add(models);
@@ -115,14 +115,14 @@ export class Collection<U extends IModel> extends EventEmitter implements IColle
     var toAdd = [], toRemove = [], modelMap = {};
     var add = options.add, merge = options.merge, remove = options.remove;
     var order = !sortable && add && remove ? [] : null;
-   
+
     // Turn bare objects into model references, and prevent invalid models
     // from being added.
     for (i = 0, l = (<U[]>models).length; i < l; i++) {
       model = models[i]
 
 			id = model.get(model.idAttribute)||model.uid
-      
+
       // If a duplicate is found, prevent it from being added and
       // optionally merge it into the existing model.
       if (existing = this.get(id)) {
@@ -180,7 +180,7 @@ export class Collection<U extends IModel> extends EventEmitter implements IColle
     // Unless silenced, it's time to fire all appropriate add/sort events.
     if (!options.silent) {
       for (i = 0, l = toAdd.length; i < l; i++) {
-        
+
         (model = toAdd[i]).trigger('add', model, this, options);
       }
       if (sort || (order && order.length)) this.trigger('sort', this, options);
@@ -303,7 +303,7 @@ export class Collection<U extends IModel> extends EventEmitter implements IColle
     return this.models.map(function (m) { return m.toJSON(); });
   }
 
-  
+
 
   private _removeReference (model:U, options?: any) {
     if (this === model.collection) delete model.collection;
@@ -312,7 +312,7 @@ export class Collection<U extends IModel> extends EventEmitter implements IColle
 
   private _addReference (model:IModel, options?:any) {
     if (!model.collection) model.collection = this;
-    
+
     this.listenTo(model, 'all', this._onModelEvent)
   }
 
@@ -323,19 +323,19 @@ export class Collection<U extends IModel> extends EventEmitter implements IColle
   private _onModelEvent (event, model, collection, options) {
     if ((event === 'add' || event === 'remove') && collection !== this) return;
     if (event === 'destroy') this.remove(model, options);
-    
+
     callFunc(this.trigger, this, slice(arguments))
   }
-  
+
   destroy () {
-    
+
     this.models.forEach( m => {
       if (typeof (<any>m).destroy === 'function' &&
          m.collection == this) (<any>m).destroy();
     });
-    
+
     super.destroy();
-    
+
   }
 
 }

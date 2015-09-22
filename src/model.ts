@@ -1,6 +1,6 @@
 /// <reference path="interfaces" />
-import {EventEmitter} from 'eventsjs'
-import {IModel,ICollection} from './interfaces'
+import {BaseObject} from './object'
+import {IModel, ICollection} from './interfaces'
 import {uniqueId, equal} from 'utilities/lib/utils'
 import {has, extend} from 'utilities/lib/objects'
 
@@ -17,7 +17,7 @@ export interface ModelOptions {
     silent?: boolean
   }
 
-  export class Model extends EventEmitter implements IModel {
+  export class Model extends BaseObject implements IModel {
     protected _attributes: any
     public uid: string
     public collection: ICollection

@@ -1,5 +1,5 @@
-/// <reference path="../node_modules/eventsjs/events" />
-/// <reference path="../node_modules/utilities/utils" />
+/// <reference path="../node_modules/eventsjs/events.d.ts" />
+/// <reference path="../node_modules/utilities/utilities.d.ts" />
 
 import {IEventEmitter} from 'eventsjs'
 
