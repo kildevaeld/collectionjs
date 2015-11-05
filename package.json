@@ -10,6 +10,10 @@
     "type": "git",
     "url": "https://github.com/kildevaeld/collectionjs.git"
   },
+  "jspm": {
+    "main": "dist/collection.js",
+    "format": "cjs"
+  },
   "homepage": "https://github.com/kildevaeld/collectionjs",
   "authors": [
     "Jeremy Ashkenas",

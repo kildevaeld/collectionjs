@@ -19,7 +19,7 @@ export interface IModelConstructor {
 	new (attr?:any, options?:IModelOptions): IModel
 }
 
-export interface ICollection extends IEventEmitter {
+export interface ICollection extends IEventEmitter, Array<IModel> {
 		length: number
 		indexOf: (item: IModel) => number
 		forEach(fn: (item: IModel, index?: number) => any)

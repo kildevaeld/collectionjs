@@ -25,7 +25,7 @@
       "./src/nested-model.ts",
       "./src/collection.ts",
       "./src/index.ts",
-      "./src/object.ts"
-
+      "./src/object.ts",
+      "./src/paginated-collection.ts"
     ]
 }
