@@ -192,6 +192,7 @@ export class NestedModel extends Model {
 		var alreadyTriggered = {}; // * @restorer
 		var separator = NestedModel.keyPathSeparator;
 		if (!this._nestedListener) this._nestedListener = {};
+		
 		// For each `set` attribute, update or delete the current value.
 		for (attr in attrs) {
 			val = attrs[attr];
