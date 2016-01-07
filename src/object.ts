@@ -1,4 +1,3 @@
-/// <reference path="interfaces" />
 import {EventEmitter} from 'eventsjs'
 import {inherits} from 'utilities/lib/utils'
 
