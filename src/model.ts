@@ -46,6 +46,8 @@ export interface ModelOptions {
 
     }
 
+
+
     set(key: string|Object, val?: any, options: ModelSetOptions = {}) {
       var attr, attrs: any = {}, unset, changes, silent, changing, prev, current;
       if (key == null) return this;

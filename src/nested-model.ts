@@ -42,7 +42,7 @@ function objToPaths(obj:Object, separator:string = ".") {
  * @return {mixed}                [description]
  */
 function getNested(obj, path, return_exists?, separator:string = ".") {
-	
+
 	var fields = path ? path.split(separator) : [];
 	var result = obj;
 	return_exists || (return_exists === false);
@@ -50,7 +50,7 @@ function getNested(obj, path, return_exists?, separator:string = ".") {
 		if (return_exists && !has(result, fields[i])) {
 			return false;
 		}
-		
+
 		result = result instanceof Model ? result.get(fields[i]) : result[fields[i]];
 
 		if (result == null && i < n - 1) {
@@ -122,8 +122,8 @@ function deleteNested(obj, path) {
 
 export class NestedModel extends Model {
 	static keyPathSeparator = '.'
-	
-	
+
+
 	// Override get
 	// Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
 	get (attr) {
@@ -190,7 +190,7 @@ export class NestedModel extends Model {
 		// Trigger all relevant attribute changes.
 		if (!silent) {
 			if (changes.length) (<any>this)._pending = true;
-			
+
 			//<custom code>
 			var separator = NestedModel.keyPathSeparator;
 			var alreadyTriggered = {}; // * @restorer
@@ -230,7 +230,7 @@ export class NestedModel extends Model {
 		if (!silent) {
 			while ((<any>this)._pending) {
 				(<any>this)._pending = false;
-				
+
 				this.trigger('change', this, options);
 			}
 		}
@@ -300,5 +300,5 @@ export class NestedModel extends Model {
 	// `"change"` event.
 	previousAttributes () {
 		return extend({}, (<any>this)._previousAttributes);
-	}	
+	}
 }
