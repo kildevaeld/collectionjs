@@ -13,6 +13,7 @@ export interface IModel extends IEventEmitter {
 		set(key: string|Object, value?: any): any
 		toJSON?: () => any
 		hasChanged(attr?): boolean
+		changed: {[key: string]: any}
 }
 
 export interface IModelConstructor {
@@ -24,6 +25,10 @@ export interface ICollection extends IEventEmitter {
 		indexOf: (item: IModel) => number
 		forEach(fn: (item: IModel, index?: number) => any)
 		push(item: IModel): any
+}
+
+export interface ICollectionConstructor {
+	new<T>(models?:any[], options?:any): ICollection
 }
 
 export interface Silenceable {

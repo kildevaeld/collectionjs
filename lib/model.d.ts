@@ -18,12 +18,12 @@ export declare class Model extends BaseObject implements IModel {
     private _pending;
     id: any;
     constructor(attributes?: Object, options?: ModelOptions);
-    set(key: string | Object, val?: any, options?: ModelSetOptions): Model;
+    set(key: string | Object, val?: any, options?: ModelSetOptions): this;
     get(key: any): any;
     unset(key: any, options: ModelSetOptions): void;
     has(attr: any): boolean;
     hasChanged(attr?: any): boolean;
-    clear(options?: any): Model;
+    clear(options?: any): this;
     changed: any;
     changedAttributes(diff: any): any;
     previous(attr: any): any;

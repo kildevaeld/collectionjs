@@ -5,9 +5,6 @@ import {uniqueId, equal} from 'utilities/lib/utils'
 import {has, extend} from 'utilities/lib/objects'
 
 
-
-
-
 export interface ModelOptions {
     collection?: ICollection
   }
@@ -35,7 +32,9 @@ export interface ModelOptions {
 
     constructor(attributes: Object = {}, options?: ModelOptions) {
       options = options || {}
-      this._attributes = attributes
+      this._attributes = {};
+      //this._attributes = attributes
+      this.set(attributes, null, {silent:true});
       this.uid = uniqueId('uid')
 
       this._changed = {};
@@ -45,8 +44,6 @@ export interface ModelOptions {
       super();
 
     }
-
-
 
     set(key: string|Object, val?: any, options: ModelSetOptions = {}) {
       var attr, attrs: any = {}, unset, changes, silent, changing, prev, current;

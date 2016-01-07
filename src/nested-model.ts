@@ -1,4 +1,4 @@
-/// <reference path="interfaces" />
+
 import {EventEmitter} from 'eventsjs'
 import {IModel,ICollection} from './interfaces'
 import {uniqueId, equal} from 'utilities/lib/utils'
@@ -32,6 +32,20 @@ function objToPaths(obj:Object, separator:string = ".") {
 	}
 
 	return ret;
+}
+
+function isOnNestedModel(obj:Object, path:string, separator:string = "."): boolean {
+	var fields = path ? path.split(separator) : [];
+	
+	var result = obj;
+	
+	for (let i = 0, n = fields.length; i < n; i++) {
+		if (result instanceof Model) return true
+		if (!result) return false;
+		result = result[fields[i]];
+	}
+	return false;
+	
 }
 
 /**
@@ -110,6 +124,13 @@ function setNested(obj, path, val, options?) {
 
 			//Move onto the next part of the path
 			result = result[field];
+			
+			// The field is a model - delegate...
+			if (result instanceof Model) {
+				let rest = fields.slice(i+1);
+				return result.set(rest.join('.'), val, options);
+			}
+			
 		}
 	}
 }
@@ -123,7 +144,7 @@ function deleteNested(obj, path) {
 export class NestedModel extends Model {
 	static keyPathSeparator = '.'
 
-
+	private _nestedListener: {[key: string]: Function} = {}
 	// Override get
 	// Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
 	get (attr) {
@@ -168,10 +189,12 @@ export class NestedModel extends Model {
 		//<custom code>
 		attrs = objToPaths(attrs);
 		//</custom code>
-
+		var alreadyTriggered = {}; // * @restorer
+		var separator = NestedModel.keyPathSeparator;
 		// For each `set` attribute, update or delete the current value.
 		for (attr in attrs) {
 			val = attrs[attr];
+		
 
 			//<custom code>: Using getNested, setNested and deleteNested
 			if (!equal(getNested(current, attr), val)) {
@@ -183,7 +206,36 @@ export class NestedModel extends Model {
 			} else {
 				deleteNested(this.changed, attr);
 			}
-			unset ? deleteNested(current, attr) : setNested(current, attr, val);
+			
+			if (unset) {
+				let nestedValue = getNested(current, attr);
+				if (nestedValue instanceof Model) {
+					let fn = this._nestedListener[attr]
+					if (fn) {
+						nestedValue.off('change', fn);
+						delete this._nestedListener[attr];
+					}
+				}
+				deleteNested(current, attr);
+			} else {
+				if (!isOnNestedModel(current, attr, separator)) {
+					if (val instanceof Model) {
+						let fn = (model) => {
+							for (let key in model.changed) {
+								this.trigger('change:' + attr + separator + key, model.changed[key])
+							} 
+							this.trigger('change', this, options);
+						}
+						this._nestedListener[attr] = fn;
+						val.on('change', fn);
+					}
+				} else {
+					alreadyTriggered[attr] = true;
+				}
+				setNested(current, attr, val);
+			}
+			
+			//unset ? deleteNested(current, attr) : setNested(current, attr, val);
 			//</custom code>
 		}
 
@@ -192,8 +244,8 @@ export class NestedModel extends Model {
 			if (changes.length) (<any>this)._pending = true;
 
 			//<custom code>
-			var separator = NestedModel.keyPathSeparator;
-			var alreadyTriggered = {}; // * @restorer
+			//var separator = NestedModel.keyPathSeparator;
+			//var alreadyTriggered = {}; // * @restorer
 
 			for (var i = 0, l = changes.length; i < l; i++) {
 				let key = changes[i];
@@ -291,6 +343,7 @@ export class NestedModel extends Model {
 		if (attr == null || !(<any>this)._previousAttributes) {
 			return null;
 		}
+	
 		//<custom code>
 		return getNested((<any>this)._previousAttributes, attr);
 		//</custom code>
@@ -300,5 +353,16 @@ export class NestedModel extends Model {
 	// `"change"` event.
 	previousAttributes () {
 		return extend({}, (<any>this)._previousAttributes);
+	}
+	
+	destroy () {
+		for (let key in this._nestedListener) {
+			let fn = this._nestedListener[key];
+			if (fn) {
+				let m = this.get(key);
+				if (m) m.off(key, fn);
+			}
+		}
+		super.destroy();
 	}
 }

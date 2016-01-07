@@ -38,14 +38,14 @@ export declare class Collection<U extends IModel> extends BaseObject implements 
     get(id: any): U;
     at(index: any): U;
     clone(options?: CollectionOptions<U>): any;
-    sort(options?: CollectionSortOptions): Collection<U>;
+    sort(options?: CollectionSortOptions): this;
     sortBy(key: string | Function, context?: any): U[];
     push(model: any, options?: {}): void;
     reset(models: any, options?: CollectionResetOptions): any;
     create(values?: any, options?: CollectionCreateOptions): IModel;
     parse(models: U | U[], options?: CollectionSetOptions): U | U[];
     find(nidOrFn: any): any;
-    forEach(iterator: (model: U, index?: number) => void, ctx?: any): Collection<U>;
+    forEach(iterator: (model: U, index?: number) => void, ctx?: any): this;
     indexOf(model: U): number;
     toJSON(): any[];
     private _removeReference(model, options?);
