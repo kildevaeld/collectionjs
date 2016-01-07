@@ -20,7 +20,7 @@ export class PaginatedCollection<U extends IModel> extends EventEmitter implemen
 	
 	
 	indexOf (item: IModel): number {
-		
+		return 0
 	}
 	
 	forEach(fn: (item: IModel, index?: number) => any) {

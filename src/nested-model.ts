@@ -144,7 +144,7 @@ function deleteNested(obj, path) {
 export class NestedModel extends Model {
 	static keyPathSeparator = '.'
 
-	private _nestedListener: {[key: string]: Function} = {}
+	private _nestedListener: {[key: string]: Function}
 	// Override get
 	// Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
 	get (attr) {
@@ -153,7 +153,7 @@ export class NestedModel extends Model {
 
 	// Override set
 	// Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
-	set (key:string|Object, val?:any, options?:ModelSetOptions): NestedModel {
+	set (key:string|Object, val?:any, options?:ModelSetOptions) {
 		var attr, attrs, unset, changes, silent, changing, prev, current;
 		if (key == null) return this;
 
@@ -191,6 +191,7 @@ export class NestedModel extends Model {
 		//</custom code>
 		var alreadyTriggered = {}; // * @restorer
 		var separator = NestedModel.keyPathSeparator;
+		if (!this._nestedListener) this._nestedListener = {};
 		// For each `set` attribute, update or delete the current value.
 		for (attr in attrs) {
 			val = attrs[attr];
