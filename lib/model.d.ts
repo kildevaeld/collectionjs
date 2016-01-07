@@ -13,7 +13,7 @@ export declare class Model extends BaseObject implements IModel {
     collection: ICollection;
     idAttribute: string;
     private _previousAttributes;
-    private _changed;
+    protected _changed: any;
     private _changing;
     private _pending;
     id: any;

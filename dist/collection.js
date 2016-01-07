@@ -1154,6 +1154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (val instanceof model_1.Model) {
 	                        var fn = function (model) {
 	                            for (var key_1 in model.changed) {
+	                                _this._changed[attr + separator + key_1] = model.changed[key_1];
 	                                _this.trigger('change:' + attr + separator + key_1, model.changed[key_1]);
 	                            }
 	                            _this.trigger('change', _this, options);

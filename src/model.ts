@@ -21,7 +21,7 @@ export interface ModelOptions {
     public idAttribute: string
 
     private _previousAttributes: any
-    private _changed: any
+    protected _changed: any
     private _changing: boolean
     private _pending: boolean
 

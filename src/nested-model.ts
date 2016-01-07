@@ -224,6 +224,7 @@ export class NestedModel extends Model {
 					if (val instanceof Model) {
 						let fn = (model) => {
 							for (let key in model.changed) {
+								this._changed[attr + separator + key] = model.changed[key];
 								this.trigger('change:' + attr + separator + key, model.changed[key])
 							} 
 							this.trigger('change', this, options);
