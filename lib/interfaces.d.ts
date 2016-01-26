@@ -18,6 +18,9 @@ export interface IModel extends IEventEmitter {
 export interface IModelConstructor {
     new (attr?: any, options?: IModelOptions): IModel;
 }
+export interface IPersistableModel extends IModel {
+    collection?: IPersistableCollection;
+}
 export interface ICollection extends IEventEmitter {
     length: number;
     indexOf: (item: IModel) => number;
@@ -26,6 +29,8 @@ export interface ICollection extends IEventEmitter {
 }
 export interface ICollectionConstructor {
     new <T>(models?: any[], options?: any): ICollection;
+}
+export interface IPersistableCollection extends ICollection {
 }
 export interface Silenceable {
     silent?: boolean;

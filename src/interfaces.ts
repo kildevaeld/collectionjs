@@ -1,4 +1,5 @@
-import {IEventEmitter} from 'eventsjs'
+import {IEventEmitter} from 'eventsjs';
+import {IPromise} from 'utilities/lib/promises';
 
 export interface IModelOptions {
     collection?: ICollection
@@ -20,6 +21,13 @@ export interface IModelConstructor {
 	new (attr?:any, options?:IModelOptions): IModel
 }
 
+export interface IPersistableModel extends IModel {
+	collection?:IPersistableCollection
+  fetch(): IPromise<IPersistableModel>;
+  save(): IPromise<IPersistableModel>;
+  destroy(): IPromise<void>
+}
+
 export interface ICollection extends IEventEmitter {
 		length: number
 		indexOf: (item: IModel) => number
@@ -30,6 +38,12 @@ export interface ICollection extends IEventEmitter {
 export interface ICollectionConstructor {
 	new<T>(models?:any[], options?:any): ICollection
 }
+
+export interface IPersistableCollection extends ICollection {
+
+}
+
+
 
 export interface Silenceable {
 		silent?: boolean

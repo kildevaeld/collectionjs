@@ -2,6 +2,7 @@ import { BaseObject } from './object';
 import { IModel, ICollection } from './interfaces';
 export interface ModelOptions {
     collection?: ICollection;
+    parse?: boolean;
 }
 export interface ModelSetOptions {
     unset?: boolean;
@@ -12,6 +13,7 @@ export declare class Model extends BaseObject implements IModel {
     uid: string;
     collection: ICollection;
     idAttribute: string;
+    options: ModelOptions;
     private _previousAttributes;
     protected _changed: any;
     private _changing;
@@ -30,4 +32,5 @@ export declare class Model extends BaseObject implements IModel {
     previousAttributes(): any;
     toJSON(): any;
     clone(): IModel;
+    parse(attr: any): any;
 }

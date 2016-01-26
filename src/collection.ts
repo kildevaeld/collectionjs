@@ -228,8 +228,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
 
   sort (options: CollectionSortOptions={}) {
     if (!this.comparator) throw new Error('Cannot sort a set without a comparator');
-
-
+    
     // Run sort based on type of `comparator`.
     if (typeof this.comparator === 'string' || this.comparator.length === 1) {
       this._models = this.sortBy((<any>this.comparator), this);
