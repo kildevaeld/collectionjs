@@ -1,6 +1,6 @@
 
 import {BaseObject} from './object'
-import {IModel, ICollection} from './interfaces'
+import {IModel, ICollection, ISerializable} from './interfaces'
 import {uniqueId, equal} from 'utilities/lib/utils'
 import {has, extend} from 'utilities/lib/objects'
 
@@ -15,7 +15,7 @@ export interface ModelSetOptions {
 	silent?: boolean
 }
 
-export class Model extends BaseObject implements IModel {
+export class Model extends BaseObject implements IModel, ISerializable {
 	protected _attributes: any
 	public uid: string
 	public collection: ICollection
@@ -29,6 +29,14 @@ export class Model extends BaseObject implements IModel {
 	get id() {
 		if (this.idAttribute in this._attributes) return this._attributes[this.idAttribute]
 	}
+    
+    get isNew (): boolean {
+        return this.id == null;
+    }
+    
+    get isDirty(): boolean {
+        return this.hasChanged();
+    }
 
 
 	constructor(attributes: Object = {}, options: ModelOptions = {}) {
@@ -49,7 +57,7 @@ export class Model extends BaseObject implements IModel {
 
 	}
 
-	set(key: string | Object, val?: any, options: ModelSetOptions = {}) {
+	set(key: string | Object, val?: any|ModelSetOptions, options: ModelSetOptions = {}) {
 		var attr, attrs: any = {}, unset, changes, silent, changing, prev, current;
 		if (key == null) return this;
 
@@ -181,7 +189,7 @@ export class Model extends BaseObject implements IModel {
 		return new ((<any>this).constructor)(this._attributes, this.options);
 	}
 
-	parse(attr:any): any {
+	parse(attr:any, options?:any): any {
 		return attr;
 	}
 

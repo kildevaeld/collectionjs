@@ -1,4 +1,8 @@
 import { IEventEmitter } from 'eventsjs';
+import { IPromise } from 'utilities/lib/promises';
+export interface ISerializable {
+    toJSON(): any;
+}
 export interface IModelOptions {
     collection?: ICollection;
 }
@@ -20,6 +24,9 @@ export interface IModelConstructor {
 }
 export interface IPersistableModel extends IModel {
     collection?: IPersistableCollection;
+    fetch(): IPromise<IPersistableModel>;
+    save(): IPromise<IPersistableModel>;
+    destroy(): IPromise<void>;
 }
 export interface ICollection extends IEventEmitter {
     length: number;
@@ -31,6 +38,7 @@ export interface ICollectionConstructor {
     new <T>(models?: any[], options?: any): ICollection;
 }
 export interface IPersistableCollection extends ICollection {
+    getURL(): string;
 }
 export interface Silenceable {
     silent?: boolean;

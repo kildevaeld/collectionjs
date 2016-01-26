@@ -1,6 +1,6 @@
 /// <reference path="interfaces" />
 import {BaseObject} from './object'
-import {IModel,ICollection, Silenceable} from './interfaces'
+import {IModel,ICollection, Silenceable, ISerializable} from './interfaces'
 import {Model} from './model'
 import {extend} from 'utilities/lib/objects'
 import {sortBy, find, slice} from 'utilities/lib/arrays'
@@ -40,7 +40,7 @@ export interface CollectionResetOptions extends Silenceable {
   previousModels?: IModel[]
 }
 
-export class Collection<U extends IModel> extends BaseObject implements ICollection {
+export class Collection<U extends IModel> extends BaseObject implements ICollection, ISerializable {
   /**
    * The length of the collection
    * @property {Number} length

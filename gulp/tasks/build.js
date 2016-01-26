@@ -32,10 +32,10 @@ gulp.task('build:bundle', ['build'], function () {
 			filename: 'collection.js',
 			libraryTarget: 'umd',
 			library: 'collection'
-		},
+		}/*,
 		externals: {
 			'eventsjs': 'eventsjs'
-		}
+		}*/
 	}))
 	.pipe(gulp.dest('dist'))
 	

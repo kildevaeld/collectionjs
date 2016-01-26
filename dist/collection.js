@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("eventsjs"));
+		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(["eventsjs"], factory);
+		define([], factory);
 	else if(typeof exports === 'object')
-		exports["collection"] = factory(require("eventsjs"));
+		exports["collection"] = factory();
 	else
-		root["collection"] = factory(root["eventsjs"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_3__) {
+		root["collection"] = factory();
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -372,7 +372,160 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
+	var idCounter = 0;
+	function getID() {
+	    return "" + (++idCounter);
+	}
+	function callFunc(fn, args) {
+	    if (args === void 0) { args = []; }
+	    var l = fn.length, i = -1, a1 = args[0], a2 = args[1], a3 = args[2], a4 = args[3];
+	    switch (args.length) {
+	        case 0:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx);
+	            return;
+	        case 1:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx, a1);
+	            return;
+	        case 2:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx, a1, a2);
+	            return;
+	        case 3:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx, a1, a2, a3);
+	            return;
+	        case 4:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx, a1, a2, a3, a4);
+	            return;
+	        default:
+	            while (++i < l)
+	                fn[i].handler.apply(fn[i].ctx, args);
+	            return;
+	    }
+	}
+	exports.callFunc = callFunc;
+	var EventEmitter = (function () {
+	    function EventEmitter() {
+	    }
+	    Object.defineProperty(EventEmitter.prototype, "listeners", {
+	        get: function () {
+	            return this._listeners;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    EventEmitter.prototype.on = function (event, fn, ctx, once) {
+	        if (once === void 0) { once = false; }
+	        var events = (this._listeners || (this._listeners = {}))[event] || (this._listeners[event] = []);
+	        events.push({
+	            name: event,
+	            once: once,
+	            handler: fn,
+	            ctx: ctx || this
+	        });
+	        return this;
+	    };
+	    EventEmitter.prototype.once = function (event, fn, ctx) {
+	        return this.on(event, fn, ctx, true);
+	    };
+	    EventEmitter.prototype.off = function (eventName, fn) {
+	        this._listeners = this._listeners || {};
+	        if (eventName == null) {
+	            this._listeners = {};
+	        }
+	        else if (this._listeners[eventName]) {
+	            var events = this._listeners[eventName];
+	            if (fn == null) {
+	                this._listeners[eventName] = [];
+	            }
+	            else {
+	                for (var i = 0; i < events.length; i++) {
+	                    var event_1 = events[i];
+	                    if (events[i].handler == fn) {
+	                        this._listeners[eventName].splice(i, 1);
+	                    }
+	                }
+	            }
+	        }
+	    };
+	    EventEmitter.prototype.trigger = function (eventName) {
+	        var args = [];
+	        for (var _i = 1; _i < arguments.length; _i++) {
+	            args[_i - 1] = arguments[_i];
+	        }
+	        var events = (this._listeners || (this._listeners = {}))[eventName] || (this._listeners[eventName] = [])
+	            .concat(this._listeners['all'] || []);
+	        if (EventEmitter.debugCallback)
+	            EventEmitter.debugCallback(this.constructor.name, this.name, eventName, args);
+	        var event, a, len = events.length, index, i;
+	        var calls = [];
+	        for (i = 0; i < events.length; i++) {
+	            event = events[i];
+	            a = args;
+	            if (event.name == 'all') {
+	                a = [eventName].concat(args);
+	                callFunc([event], a);
+	            }
+	            else {
+	                calls.push(event);
+	            }
+	            if (event.once === true) {
+	                index = this._listeners[event.name].indexOf(event);
+	                this._listeners[event.name].splice(index, 1);
+	            }
+	        }
+	        if (calls.length)
+	            this._executeListener(calls, args);
+	        return this;
+	    };
+	    EventEmitter.prototype._executeListener = function (func, args) {
+	        var executor = callFunc;
+	        if (this.constructor.executeListenerFunction) {
+	            executor = this.constructor.executeListenerFunction;
+	        }
+	        executor(func, args);
+	    };
+	    EventEmitter.prototype.listenTo = function (obj, event, fn, ctx, once) {
+	        if (once === void 0) { once = false; }
+	        var listeningTo, id, meth;
+	        listeningTo = this._listeningTo || (this._listeningTo = {});
+	        id = obj.listenId || (obj.listenId = getID());
+	        listeningTo[id] = obj;
+	        meth = once ? 'once' : 'on';
+	        obj[meth](event, fn, this);
+	        return this;
+	    };
+	    EventEmitter.prototype.listenToOnce = function (obj, event, fn, ctx) {
+	        return this.listenTo(obj, event, fn, ctx, true);
+	    };
+	    EventEmitter.prototype.stopListening = function (obj, event, callback) {
+	        var listeningTo = this._listeningTo;
+	        if (!listeningTo)
+	            return this;
+	        var remove = !event && !callback;
+	        if (!callback && typeof event === 'object')
+	            callback = this;
+	        if (obj)
+	            (listeningTo = {})[obj.listenId] = obj;
+	        for (var id in listeningTo) {
+	            obj = listeningTo[id];
+	            obj.off(event, callback, this);
+	            if (remove || !Object.keys(obj.listeners).length)
+	                delete this._listeningTo[id];
+	        }
+	        return this;
+	    };
+	    EventEmitter.prototype.destroy = function () {
+	        this.stopListening();
+	        this.off();
+	    };
+	    return EventEmitter;
+	})();
+	exports.EventEmitter = EventEmitter;
+
 
 /***/ },
 /* 4 */
@@ -761,11 +914,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.indexOf = indexOf;
 	function find(array, callback, ctx) {
-	    var i, v;
-	    for (i = 0; i < array.length; i++) {
-	        v = array[i];
-	        if (callback.call(ctx, v))
-	            return v;
+	    var v;
+	    for (var i = 0, ii = array.length; i < ii; i++) {
+	        if (callback.call(ctx, array[i]))
+	            return array[i];
 	    }
 	    return null;
 	}
@@ -791,8 +943,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    })
 	        .sort(function (left, right) {
-	        var a = left.criteria;
-	        var b = right.criteria;
+	        var a = left.criteria, b = right.criteria;
 	        if (a !== b) {
 	            if (a > b || a === void 0)
 	                return 1;
@@ -875,6 +1026,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        get: function () {
 	            if (this.idAttribute in this._attributes)
 	                return this._attributes[this.idAttribute];
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(Model.prototype, "isNew", {
+	        get: function () {
+	            return this.id == null;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(Model.prototype, "isDirty", {
+	        get: function () {
+	            return this.hasChanged();
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -987,7 +1152,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Model.prototype.clone = function () {
 	        return new (this.constructor)(this._attributes, this.options);
 	    };
-	    Model.prototype.parse = function (attr) {
+	    Model.prototype.parse = function (attr, options) {
 	        return attr;
 	    };
 	    return Model;

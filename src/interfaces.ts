@@ -1,6 +1,10 @@
 import {IEventEmitter} from 'eventsjs';
 import {IPromise} from 'utilities/lib/promises';
 
+export interface ISerializable {
+    toJSON(): any
+}
+
 export interface IModelOptions {
     collection?: ICollection
   }
@@ -40,7 +44,7 @@ export interface ICollectionConstructor {
 }
 
 export interface IPersistableCollection extends ICollection {
-
+    getURL(): string;
 }
 
 
