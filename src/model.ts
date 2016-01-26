@@ -192,5 +192,9 @@ export class Model extends BaseObject implements IModel, ISerializable {
 	parse(attr:any, options?:any): any {
 		return attr;
 	}
+    
+    remove(options?:any): any {
+        this.trigger('remove', this, this.collection, options);
+    }
 
 }

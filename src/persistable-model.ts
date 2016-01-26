@@ -20,10 +20,13 @@ export function normalize_path(url:string, id:string): string {
    return url + id + p;
 }
 
-export interface ModelSaveOptions {
+export interface ModelSaveOptions extends SyncOptions {
     changed?: boolean
 }
 
+export interface ModelRemoveOptions extends SyncOptions {
+    wait?: boolean;
+}
 
 export class PersistableModel extends Model implements IPersistableModel {
     idAttribute = 'id';
@@ -74,7 +77,7 @@ export class PersistableModel extends Model implements IPersistableModel {
  
     }
     
-    save(options?:any): IPromise<this> {
+    save(options?:any): IPromise<any> {
         options = options ? extend({}, options) : {};
         this.trigger('before:save', this, options);
         
@@ -93,14 +96,41 @@ export class PersistableModel extends Model implements IPersistableModel {
            return this; 
         }).catch((e) => {
             this.trigger('error', this, e);
-            if (e) throw e;
-            return this;
+            throw e;
+           
         });
         
     }
     
-    destroy(): IPromise<void> {
-        return null;
+    /**
+     * Remove the model from the server and collection
+     */
+    remove(options?:ModelRemoveOptions): IPromise<any> {
+        options = options ? extend({}, options) : {};
+        if (this.isNew) {
+            super.remove(options);
+            return Promise.resolve(this)
+        }
+        
+        let url = this.getURL(this.id);
+        if (url == null) return  Promise.reject(new Error('Url or rootURL no specified'));
+        
+        this.trigger('before:remove', this, options);
+        
+        if (!options.wait) super.remove(options);
+        
+        options.url = url;
+        
+        return this.sync(RestMethod.Delete, this, options)
+        .then((result) => {
+           super.remove(options);
+           return this; 
+        }).catch((e) => {
+            this.trigger('error', this, e);
+            throw e;
+           
+        });
+        
     }
     
     sync (method:RestMethod, model:ISerializable, options:SyncOptions): IPromise<any> {

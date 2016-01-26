@@ -123,5 +123,27 @@ describe('RestfulCollection', () => {
        
    });
    
+   
+   it('should remove', (done) => {
+      
+      var model = new Model({
+          name: 'Jack McGee',
+          id: 100
+      }, {url:'/test'});
+      
+      model.sync = function (method, s, o) {
+          method.should.equal(ps.RestMethod.Delete);
+          s.should.equal(model);
+          o.url.should.equal('/test/100')
+          return Promise.resolve(s.toJSON());
+      }
+      
+      model.remove().then((m) => {
+          done();
+      }).catch(done);
+       
+   });
+   
+  
     
 });

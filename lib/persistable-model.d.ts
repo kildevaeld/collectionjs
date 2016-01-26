@@ -7,8 +7,11 @@ export interface PersistableModelOptions extends ModelOptions {
     sync?: SyncFunc;
 }
 export declare function normalize_path(url: string, id: string): string;
-export interface ModelSaveOptions {
+export interface ModelSaveOptions extends SyncOptions {
     changed?: boolean;
+}
+export interface ModelRemoveOptions extends SyncOptions {
+    wait?: boolean;
 }
 export declare class PersistableModel extends Model implements IPersistableModel {
     idAttribute: string;
@@ -17,7 +20,7 @@ export declare class PersistableModel extends Model implements IPersistableModel
     constructor(attr?: any, options?: PersistableModelOptions);
     getURL(id?: string): string;
     fetch(options?: any): IPromise<this>;
-    save(options?: any): IPromise<this>;
-    destroy(): IPromise<void>;
+    save(options?: any): IPromise<any>;
+    remove(options?: ModelRemoveOptions): IPromise<any>;
     sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<any>;
 }

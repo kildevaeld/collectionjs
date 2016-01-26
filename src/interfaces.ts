@@ -29,7 +29,7 @@ export interface IPersistableModel extends IModel {
 	collection?:IPersistableCollection
   fetch(): IPromise<IPersistableModel>;
   save(): IPromise<IPersistableModel>;
-  destroy(): IPromise<void>
+  remove(): IPromise<any>
 }
 
 export interface ICollection extends IEventEmitter {

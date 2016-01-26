@@ -1155,6 +1155,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Model.prototype.parse = function (attr, options) {
 	        return attr;
 	    };
+	    Model.prototype.remove = function (options) {
+	        this.trigger('remove', this, this.collection, options);
+	    };
 	    return Model;
 	})(object_1.BaseObject);
 	exports.Model = Model;

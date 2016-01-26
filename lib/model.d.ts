@@ -35,4 +35,5 @@ export declare class Model extends BaseObject implements IModel, ISerializable {
     toJSON(): any;
     clone(): IModel;
     parse(attr: any, options?: any): any;
+    remove(options?: any): any;
 }
