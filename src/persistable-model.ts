@@ -55,17 +55,19 @@ export class PersistableModel extends Model implements IPersistableModel {
     
     fetch(options?:any): IPromise<this> {
         options = options ? extend({}, options) : {};
-        this.trigger('before:sync', this, options);
+        
+        
         let url = this.getURL();
         if (url == null) return Promise.reject(new Error('Url or rootURL no specified'));
         
-        return this.sync(RestMethod.Read, this, {
-            url: url,
-            params: null
-        })
+        options.url = url;
+        
+        this.trigger('before:fetch', this, options);
+        
+        return this.sync(RestMethod.Read, this, options)
         .then((result:any) => {
             if (result) this.set(this.parse(result, options), options);
-            this.trigger('sync', this, result, options);
+            this.trigger('fetch', this, result, options);
             return this;
         }).catch((e) => {
             this.trigger('error', this, e);
@@ -128,12 +130,10 @@ export class PersistableModel extends Model implements IPersistableModel {
         }).catch((e) => {
             this.trigger('error', this, e);
             throw e;
-           
         });
-        
     }
     
     sync (method:RestMethod, model:ISerializable, options:SyncOptions): IPromise<any> {
-        return null;
+        return sync(method, model, options);
     }
 }

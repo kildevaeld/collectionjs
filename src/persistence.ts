@@ -7,6 +7,8 @@ export enum RestMethod {
 export interface SyncOptions {
     url?:string;
     params?: Object|string;
+    headers?: {[key:string]: string};
+    progress?: (progress:number, total:number) => void;
 }
 
 export interface SyncFunc {

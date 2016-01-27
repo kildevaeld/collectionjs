@@ -5,7 +5,7 @@ import {PersistableModel} from './persistable-model';
 import {IModel, IPersistableModel, 
     IPersistableCollection, ISerializable} from './interfaces';
 
-import {IPromise} from 'utilities/lib/promises';
+import {IPromise, Promise} from 'utilities/lib/promises';
 import {RestMethod, SyncFunc, SyncOptions, sync} from './persistence';
 
 export interface PersistableCollectionOptions<T extends IPersistableModel> extends CollectionOptions<T> {
@@ -16,7 +16,7 @@ export interface PersistableCollectionOptions<T extends IPersistableModel> exten
 export interface CollectionFetchOptions extends CollectionSetOptions, SyncOptions {
     parse?: boolean;
     reset?: boolean;
-    progress?: (progress:number, total:number) => void;
+
 }
 
 
@@ -27,32 +27,38 @@ export class PersistableCollection<T extends IPersistableModel> extends Collecti
         return typeof this.url === 'function' ? (<(()=>string)>this.url)() : <string>this.url;
     }
     
-    
     constructor(models: any, options: PersistableCollectionOptions<T> = {}) {
         super(models, options);
-        
         if (options.url) this.url = options.url;
-        
     }
 
-    fetch(options?: CollectionFetchOptions): IPromise<this> {
+    fetch(options?: CollectionFetchOptions): IPromise<any> {
         options = options ? extend({}, options) : {};
+        
         let url = this.getURL();
+        if (url == null) return Promise.reject(new Error('Url or rootURL no specified'));
+        options.url = url;
+        
         this.trigger('before:sync');
         return this.sync(RestMethod.Read, this, options)
         .then((results) => {
             this[options.reset ? 'reset' : 'set'](results, options);
             this.trigger('sync');
             return this;
+        }).catch((e) => {
+            this.trigger('error', e);
+            throw e;
         });
-        
+    
+    }
+    
+    create(value:any, options?:CollectionCreateOptions): IPersistableModel {
+        return null;
     }
     
     sync(method:RestMethod, model:ISerializable, options:SyncOptions): IPromise<any> {
         return sync(method, model, options);
     }
 
-    create(value:any, options?:CollectionCreateOptions): IPersistableModel {
-        return null;
-    }
+    
 }

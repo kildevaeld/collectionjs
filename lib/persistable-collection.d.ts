@@ -9,13 +9,12 @@ export interface PersistableCollectionOptions<T extends IPersistableModel> exten
 export interface CollectionFetchOptions extends CollectionSetOptions, SyncOptions {
     parse?: boolean;
     reset?: boolean;
-    progress?: (progress: number, total: number) => void;
 }
 export declare class PersistableCollection<T extends IPersistableModel> extends Collection<T> implements IPersistableCollection {
     url: string | (() => string);
     getURL(): string;
     constructor(models: any, options?: PersistableCollectionOptions<T>);
-    fetch(options?: CollectionFetchOptions): IPromise<this>;
-    sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<any>;
+    fetch(options?: CollectionFetchOptions): IPromise<any>;
     create(value: any, options?: CollectionCreateOptions): IPersistableModel;
+    sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<any>;
 }
