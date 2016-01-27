@@ -1,12 +1,14 @@
-import { EventEmitter } from 'eventsjs';
-import { ICollection, IModel } from './interfaces';
-import { CollectionOptions } from './collection';
-export interface PaginatedCollectionOptions<U extends IModel> extends CollectionOptions<U> {
+import { IPersistableModel } from './interfaces';
+import { Collection } from './collection';
+import { RestCollection } from './rest-collection';
+import { IPromise } from 'utilities/lib/promises';
+export interface GetPageOptions {
 }
-export declare class PaginatedCollection<U extends IModel> extends EventEmitter implements ICollection {
-    length: number;
-    constructor(models: U[], options: PaginatedCollectionOptions<U>);
-    indexOf(item: IModel): number;
-    forEach(fn: (item: IModel, index?: number) => any): void;
-    push(item: IModel): any;
+export declare class PaginatedCollection<T extends IPersistableModel> extends RestCollection<T> {
+    private _page;
+    page: Collection<T>;
+    getPreviousPage(options?: GetPageOptions): IPromise<any>;
+    getNextPage(options?: GetPageOptions): IPromise<any>;
+    getPage(options?: GetPageOptions): IPromise<any>;
+    private _parseLinkHeaders(resp, header);
 }

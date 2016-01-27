@@ -91,8 +91,6 @@ export function sync (method: RestMethod, model:ISerializable, options:SyncOptio
          status: xhr.status,
          content: getData(options.headers['Accept'], xhr)
        };
-       
-       //response.content = getData(options.Accept, xhr);
       
        proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
        
