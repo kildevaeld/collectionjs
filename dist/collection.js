@@ -2023,16 +2023,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function PaginatedCollection(models, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this, models, options);
-	        this._state = { first: 1, last: -1, current: 1, size: 0 };
+	        this._state = { first: 1, last: -1, current: 1, size: 10 };
 	        this._link = {};
 	        this.queryParams = {
-	            page: 'page'
+	            page: 'page',
+	            size: 'pageSize'
 	        };
 	        if (options.queryParams) {
 	            objects_1.extend(this.queryParams, options.queryParams);
 	        }
 	        if (options.firstPage)
 	            this._state.first = options.firstPage;
+	        if (options.pageSize)
+	            this._state.size = options.pageSize;
 	        this._state.current = this._state.first;
 	        this._page = new collection_1.Collection();
 	        this._page.Model = this.Model;
@@ -2094,48 +2097,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	        options.params = params;
 	        options.url = url;
 	        this.trigger('before:fetch', this, options);
-	        var currentPage = options.page;
+	        params[this.queryParams.size] = this._state.size;
 	        if (!this._link[options.page + '']) {
 	            this._link[options.page] = url + request_1.queryParam({ page: options.page });
 	        }
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
 	            .then(function (resp) {
-	            var links = _this._parseLinkHeaders(resp);
-	            if (links.first)
-	                _this._link[_this._state.first] = links.first;
-	            if (links.prev)
-	                _this._link[currentPage - 1] = links.prev;
-	            if (links.next)
-	                _this._link[currentPage + 1] = links.next;
-	            if (links.last) {
-	                var last = links.last;
-	                var idx_1 = last.indexOf('?');
-	                if (idx_1 > -1) {
-	                    var params_1 = queryStringToParams(last.substr(idx_1 + 1));
-	                    if (objects_1.has(params_1, _this.queryParams.page)) {
-	                        _this._link[params_1[_this.queryParams.page]] = last;
-	                        _this._state.last = parseInt(params_1[_this.queryParams.page]);
-	                    }
-	                }
-	            }
-	            _this._state.current = currentPage;
-	            var data = resp.content;
-	            if (data && !Array.isArray(data))
-	                data = [data];
-	            if (!data)
-	                return _this;
-	            data = _this.parse(data);
-	            for (var i = 0, ii = data.length; i < ii; i++) {
-	                data[i] = new _this.Model(data[i], { parse: true });
-	            }
-	            _this[options.reset ? 'reset' : 'set'](data, options);
-	            _this.page.reset(data);
-	            _this.trigger('sync');
+	            _this._processResponse(resp, options);
+	            _this.trigger('sync', _this, resp, options);
 	            return _this;
 	        }).catch(function (e) {
 	            _this.trigger('error', e);
 	            throw e;
 	        });
+	    };
+	    PaginatedCollection.prototype._processResponse = function (resp, options) {
+	        var currentPage = options.page;
+	        var links = this._parseLinkHeaders(resp);
+	        if (links.first)
+	            this._link[this._state.first] = links.first;
+	        if (links.prev)
+	            this._link[currentPage - 1] = links.prev;
+	        if (links.next)
+	            this._link[currentPage + 1] = links.next;
+	        if (links.last) {
+	            var last = links.last;
+	            var idx = last.indexOf('?');
+	            if (idx > -1) {
+	                var params = queryStringToParams(last.substr(idx + 1));
+	                if (objects_1.has(params, this.queryParams.page)) {
+	                    this._link[params[this.queryParams.page]] = last;
+	                    this._state.last = parseInt(params[this.queryParams.page]);
+	                }
+	            }
+	        }
+	        this._state.current = currentPage;
+	        var data = resp.content;
+	        if (data && !Array.isArray(data))
+	            data = [data];
+	        if (!data)
+	            return this;
+	        data = this.parse(data);
+	        for (var i = 0, ii = data.length; i < ii; i++) {
+	            data[i] = new this.Model(data[i], { parse: true });
+	        }
+	        this[options.reset ? 'reset' : 'set'](data, options);
+	        this.page.reset(data);
+	        return this;
 	    };
 	    PaginatedCollection.prototype._parseLinkHeaders = function (resp) {
 	        var link = {};

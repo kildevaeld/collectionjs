@@ -8,9 +8,11 @@ export interface GetPageOptions extends CollectionFetchOptions {
 export interface PaginatedCollectionOptions<T extends IPersistableModel> extends RestCollectionOptions<T> {
     queryParams?: QueryParameters;
     firstPage?: number;
+    pageSize?: number;
 }
 export interface QueryParameters {
     page: string;
+    size: string;
 }
 export declare class PaginatedCollection<T extends IPersistableModel> extends RestCollection<T> {
     private _link;
@@ -23,5 +25,6 @@ export declare class PaginatedCollection<T extends IPersistableModel> extends Re
     getNextPage(options?: GetPageOptions): IPromise<any>;
     getPage(options?: GetPageOptions): IPromise<any>;
     fetch(options?: GetPageOptions): IPromise<any>;
+    private _processResponse(resp, options);
     private _parseLinkHeaders(resp);
 }

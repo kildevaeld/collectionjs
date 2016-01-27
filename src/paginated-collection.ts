@@ -31,6 +31,7 @@ export interface GetPageOptions extends CollectionFetchOptions {
 export interface PaginatedCollectionOptions<T extends IPersistableModel> extends RestCollectionOptions<T> {
   queryParams?: QueryParameters
   firstPage?: number
+  pageSize?:number
 }
 
 interface State {
@@ -49,6 +50,7 @@ interface Link {
 
 export interface QueryParameters {
   page: string;
+  size: string;
 }
 
 export class PaginatedCollection<T extends IPersistableModel> extends RestCollection<T> {
@@ -64,10 +66,11 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
   
   constructor(models?:any, options:PaginatedCollectionOptions<T> = {}) {
     super(models, options);
-    this._state = {first:1, last:-1, current:1, size:0}
+    this._state = {first:1, last:-1, current:1, size:10}
     this._link = {};
     this.queryParams = {
-      page: 'page'
+      page: 'page',
+      size: 'pageSize'
     };
     
     if (options.queryParams) {
@@ -75,6 +78,7 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     } 
     
     if (options.firstPage) this._state.first = options.firstPage;
+    if (options.pageSize) this._state.size = options.pageSize;
     this._state.current = this._state.first;
     
     this._page = new Collection<T>();
@@ -141,7 +145,7 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     options.url = url;
     this.trigger('before:fetch', this, options);
     
-    let currentPage = options.page;
+    params[this.queryParams.size] = this._state.size;
     
     if (!this._link[options.page + '']) {
       this._link[options.page] = url + queryParam({page:options.page})
@@ -149,8 +153,18 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     
     return this.sync(RestMethod.Read, this, options)
     .then((resp) => {
-      
-      let links = this._parseLinkHeaders(resp);
+      this._processResponse(resp, options);
+      this.trigger('sync', this, resp, options);
+      return this;   
+    }).catch((e) => {
+      this.trigger('error', e);
+      throw e;
+    })
+  }
+  
+  private _processResponse (resp: SyncResponse, options: GetPageOptions) {
+    let currentPage = options.page;
+    let links = this._parseLinkHeaders(resp);
       
       if (links.first) this._link[this._state.first] = links.first;
       if (links.prev) this._link[currentPage - 1] = links.prev;
@@ -189,16 +203,10 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
       this[options.reset ? 'reset' : 'set'](data, options);
       
       this.page.reset(data);
-      this.trigger('sync');
+      
       
       return this;
-      
-    }).catch((e) => {
-      this.trigger('error', e);
-      throw e;
-    })
   }
-  
   
   private _parseLinkHeaders (resp:SyncResponse): Link  {
     var link: Link = {}; 
