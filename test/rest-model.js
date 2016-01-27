@@ -1,6 +1,6 @@
 /*global describe:true, it:true, before:true */
 'use strict';
-const Model = require('../lib/persistable-model').PersistableModel;
+const Model = require('../lib/rest-model').RestModel;
 const ps = require('../lib/persistence');
 
 require('should');
@@ -57,8 +57,11 @@ describe('RestfulModel', () => {
         method.should.equal(ps.RestMethod.Read);
         s.should.equal(model);
         return Promise.resolve({
-          name: 'MC Hammer',
-          id: 200
+          method: method,
+          content: {
+            name: 'MC Hammer',
+            id: 200
+          }
         });
       }
 
@@ -94,7 +97,10 @@ describe('RestfulModel', () => {
       o.url.should.equal('/test');
       s.should.equal(model);
       model.set('id', 100);
-      return Promise.resolve(s.toJSON());
+      return Promise.resolve({
+        method: method,
+        content: s.toJSON()
+      });
     }
 
     model.save().then((m) => {

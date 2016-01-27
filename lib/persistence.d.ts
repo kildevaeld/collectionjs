@@ -9,13 +9,21 @@ export declare enum RestMethod {
 }
 export interface SyncOptions {
     url?: string;
+    contentType?: string;
     params?: Object | string;
     headers?: {
         [key: string]: string;
     };
     progress?: (progress: number, total: number) => void;
+    beforeSend?: (xhr: XMLHttpRequest) => void;
 }
 export interface SyncFunc {
-    (method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<any>;
+    (method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse>;
 }
-export declare function sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<any>;
+export interface SyncResponse {
+    method: RestMethod;
+    status: number;
+    content: any;
+    [key: string]: any;
+}
+export declare function sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse>;

@@ -62,7 +62,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(9));
 	__export(__webpack_require__(10));
 	__export(__webpack_require__(11));
-	__export(__webpack_require__(14));
+	__export(__webpack_require__(12));
 
 
 /***/ },
@@ -504,10 +504,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.listenTo(obj, event, fn, ctx, true);
 	    };
 	    EventEmitter.prototype.stopListening = function (obj, event, callback) {
-	        var listeningTo = this._listeningTo || {};
+	        var listeningTo = this._listeningTo;
+	        if (!listeningTo)
+	            return this;
 	        var remove = !event && !callback;
+	        if (!callback && typeof event === 'object')
+	            callback = this;
 	        if (obj)
-	            listeningTo[obj.listenId] = obj;
+	            (listeningTo = {})[obj.listenId] = obj;
 	        for (var id in listeningTo) {
 	            obj = listeningTo[id];
 	            obj.off(event, callback, this);
@@ -912,11 +916,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.indexOf = indexOf;
 	function find(array, callback, ctx) {
-	    var i, v;
-	    for (i = 0; i < array.length; i++) {
-	        v = array[i];
-	        if (callback.call(ctx, v))
-	            return v;
+	    var v;
+	    for (var i = 0, ii = array.length; i < ii; i++) {
+	        if (callback.call(ctx, array[i]))
+	            return array[i];
 	    }
 	    return null;
 	}
@@ -942,8 +945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    })
 	        .sort(function (left, right) {
-	        var a = left.criteria;
-	        var b = right.criteria;
+	        var a = left.criteria, b = right.criteria;
 	        if (a !== b) {
 	            if (a > b || a === void 0)
 	                return 1;
@@ -1452,20 +1454,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var objects_1 = __webpack_require__(5);
 	var collection_1 = __webpack_require__(1);
-	var promises_1 = __webpack_require__(12);
-	var persistence_1 = __webpack_require__(13);
-	var PersistableCollection = (function (_super) {
-	    __extends(PersistableCollection, _super);
-	    function PersistableCollection(models, options) {
+	var rest_model_1 = __webpack_require__(12);
+	var promises_1 = __webpack_require__(13);
+	var persistence_1 = __webpack_require__(14);
+	var RestCollection = (function (_super) {
+	    __extends(RestCollection, _super);
+	    function RestCollection(models, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this, models, options);
 	        if (options.url)
 	            this.url = options.url;
 	    }
-	    PersistableCollection.prototype.getURL = function () {
+	    RestCollection.prototype.getURL = function () {
 	        return typeof this.url === 'function' ? this.url() : this.url;
 	    };
-	    PersistableCollection.prototype.fetch = function (options) {
+	    RestCollection.prototype.fetch = function (options) {
 	        var _this = this;
 	        options = options ? objects_1.extend({}, options) : {};
 	        var url = this.getURL();
@@ -1475,7 +1478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.trigger('before:sync');
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
 	            .then(function (results) {
-	            _this[options.reset ? 'reset' : 'set'](results, options);
+	            _this[options.reset ? 'reset' : 'set'](results.content, options);
 	            _this.trigger('sync');
 	            return _this;
 	        }).catch(function (e) {
@@ -1483,19 +1486,164 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw e;
 	        });
 	    };
-	    PersistableCollection.prototype.create = function (value, options) {
-	        return null;
+	    RestCollection.prototype.create = function (value, options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        var model;
+	        var url = this.getURL();
+	        if (url == null)
+	            throw new Error('Url or rootURL no specified');
+	        options.url = url;
+	        if (value instanceof rest_model_1.RestModel) {
+	            model = value;
+	        }
+	        else {
+	            model = new this.Model(value, { parse: true });
+	        }
+	        if (options.wait === void 0)
+	            options.wait = true;
+	        if (!options.wait)
+	            this.add(model, options);
+	        this.trigger('before:create', this, model, value, options);
+	        model.save().then(function () {
+	            if (!options.wait)
+	                _this.add(model, options);
+	            _this.trigger('create', _this, model, value, options);
+	            if (options.complete)
+	                options.complete(null, model);
+	        }).catch(function (e) {
+	            _this.trigger('error', e);
+	            if (options.complete)
+	                options.complete(e, null);
+	        });
+	        return model;
 	    };
-	    PersistableCollection.prototype.sync = function (method, model, options) {
+	    RestCollection.prototype.sync = function (method, model, options) {
 	        return persistence_1.sync(method, model, options);
 	    };
-	    return PersistableCollection;
+	    return RestCollection;
 	})(collection_1.Collection);
-	exports.PersistableCollection = PersistableCollection;
+	exports.RestCollection = RestCollection;
 
 
 /***/ },
 /* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var objects_1 = __webpack_require__(5);
+	var promises_1 = __webpack_require__(13);
+	var model_1 = __webpack_require__(8);
+	var persistence_1 = __webpack_require__(14);
+	function normalize_path(url, id) {
+	    var i, p = "";
+	    if ((i = url.indexOf('?')) >= 0) {
+	        p = url.substr(i);
+	        url = url.substr(0, i);
+	    }
+	    if (url[url.length - 1] !== '/')
+	        url += '/';
+	    return url + id + p;
+	}
+	exports.normalize_path = normalize_path;
+	var RestModel = (function (_super) {
+	    __extends(RestModel, _super);
+	    function RestModel(attr, options) {
+	        if (options === void 0) { options = {}; }
+	        _super.call(this, attr, options);
+	        this.idAttribute = 'id';
+	        if (options.url) {
+	            this.rootURL = options.url;
+	        }
+	    }
+	    RestModel.prototype.getURL = function (id) {
+	        var url = this.rootURL;
+	        if (this.collection && this.collection.getURL()) {
+	            url = this.collection.getURL();
+	        }
+	        if (id && url) {
+	            url = normalize_path(url, this.id);
+	        }
+	        return url;
+	    };
+	    RestModel.prototype.fetch = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        var url = this.getURL();
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        options.url = url;
+	        this.trigger('before:fetch', this, options);
+	        return this.sync(persistence_1.RestMethod.Read, this, options)
+	            .then(function (result) {
+	            if (result)
+	                _this.set(_this.parse(result.content, options), options);
+	            _this.trigger('fetch', _this, result, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', _this, e);
+	            if (e) {
+	                throw e;
+	            }
+	            return _this;
+	        });
+	    };
+	    RestModel.prototype.save = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        this.trigger('before:save', this, options);
+	        var method = persistence_1.RestMethod[this.isNew ? 'Create' : options.changed ? 'Patch' : "Update"];
+	        var url = this.getURL(this.id);
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        options.url = url;
+	        return this.sync(method, this, options)
+	            .then(function (result) {
+	            _this.set(result.content, options);
+	            _this.trigger('save', _this, result, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', _this, e);
+	            throw e;
+	        });
+	    };
+	    RestModel.prototype.remove = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        if (this.isNew) {
+	            _super.prototype.remove.call(this, options);
+	            return promises_1.Promise.resolve(this);
+	        }
+	        var url = this.getURL(this.id);
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        this.trigger('before:remove', this, options);
+	        if (!options.wait)
+	            _super.prototype.remove.call(this, options);
+	        options.url = url;
+	        return this.sync(persistence_1.RestMethod.Delete, this, options)
+	            .then(function (result) {
+	            _super.prototype.remove.call(_this, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', _this, e);
+	            throw e;
+	        });
+	    };
+	    RestModel.prototype.sync = function (method, model, options) {
+	        return persistence_1.sync(method, model, options);
+	    };
+	    return RestModel;
+	})(model_1.Model);
+	exports.RestModel = RestModel;
+
+
+/***/ },
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var objects_1 = __webpack_require__(5);
@@ -1638,9 +1786,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 13 */
-/***/ function(module, exports) {
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
 
+	var promises_1 = __webpack_require__(13);
+	var utils_1 = __webpack_require__(4);
+	var request_1 = __webpack_require__(15);
 	(function (RestMethod) {
 	    RestMethod[RestMethod["Create"] = 0] = "Create";
 	    RestMethod[RestMethod["Update"] = 1] = "Update";
@@ -1650,126 +1801,185 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(exports.RestMethod || (exports.RestMethod = {}));
 	var RestMethod = exports.RestMethod;
 	;
+	var xmlRe = /^(?:application|text)\/xml/;
+	var jsonRe = /^application\/json/;
+	var getData = function (accepts, xhr) {
+	    if (accepts == null)
+	        accepts = xhr.getResponseHeader('content-type');
+	    if (xmlRe.test(accepts)) {
+	        return xhr.responseXML;
+	    }
+	    else if (jsonRe.test(accepts) && xhr.responseText !== '') {
+	        return JSON.parse(xhr.responseText);
+	    }
+	    else {
+	        return xhr.responseText;
+	    }
+	};
+	var isValid = function (xhr) {
+	    return (xhr.status >= 200 && xhr.status < 300) ||
+	        (xhr.status === 304) ||
+	        (xhr.status === 0 && window.location.protocol === 'file:');
+	};
 	function sync(method, model, options) {
-	    return null;
+	    var http;
+	    switch (method) {
+	        case RestMethod.Create:
+	            http = 'POST';
+	            break;
+	        case RestMethod.Update:
+	            http = "PUT";
+	            break;
+	        case RestMethod.Patch:
+	            http = "PATCH";
+	            break;
+	        case RestMethod.Delete:
+	            http = "DELETE";
+	            break;
+	        case RestMethod.Read:
+	            http = "GET";
+	            break;
+	        default:
+	            return promises_1.Promise.reject(new Error("Sync: does not recognise method: " + method));
+	    }
+	    var xhr = utils_1.ajax();
+	    var query, url = options.url;
+	    if (options.params)
+	        query = request_1.queryParam(options.params);
+	    if (query) {
+	        var sep = (options.url.indexOf('?') === -1) ? '?' : '&';
+	        url += sep + query.substring(1);
+	    }
+	    return new promises_1.Promise(function (resolve, reject) {
+	        xhr.onreadystatechange = function () {
+	            if (xhr.readyState !== 4)
+	                return;
+	            var response = {
+	                method: method,
+	                status: xhr.status,
+	                content: getData(options.headers['Accept'], xhr)
+	            };
+	            utils_1.proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
+	            if (isValid(xhr)) {
+	                return resolve(response);
+	            }
+	            else {
+	                var error = new Error('Server responded with status of ' + xhr.statusText);
+	                return reject(error);
+	            }
+	        };
+	        xhr.open(http, url, true);
+	        if (!(options.headers && options.headers['Accept'])) {
+	            options.headers = {
+	                Accept: "*/*"
+	            };
+	        }
+	        if (options.headers)
+	            for (var key in options.headers) {
+	                xhr.setRequestHeader(key, options.headers[key]);
+	            }
+	        if (options.beforeSend)
+	            options.beforeSend(xhr);
+	        xhr.send(model.toJSON());
+	    });
 	}
 	exports.sync = sync;
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var objects_1 = __webpack_require__(5);
-	var promises_1 = __webpack_require__(12);
-	var model_1 = __webpack_require__(8);
-	var persistence_1 = __webpack_require__(13);
-	function normalize_path(url, id) {
-	    var i, p = "";
-	    if ((i = url.indexOf('?')) >= 0) {
-	        p = url.substr(i);
-	        url = url.substr(0, i);
-	    }
-	    if (url[url.length - 1] !== '/')
-	        url += '/';
-	    return url + id + p;
+	var utils_1 = __webpack_require__(4);
+	var promises_1 = __webpack_require__(13);
+	var xmlRe = /^(?:application|text)\/xml/, jsonRe = /^application\/json/, fileProto = /^file:/;
+	function queryParam(obj) {
+	    return '?' + Object.keys(obj).reduce(function (a, k) { a.push(k + '=' + encodeURIComponent(obj[k])); return a; }, []).join('&');
 	}
-	exports.normalize_path = normalize_path;
-	var PersistableModel = (function (_super) {
-	    __extends(PersistableModel, _super);
-	    function PersistableModel(attr, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, attr, options);
-	        this.idAttribute = 'id';
-	        if (options.url) {
-	            this.rootURL = options.url;
-	        }
+	exports.queryParam = queryParam;
+	var isValid = function (xhr, url) {
+	    return (xhr.status >= 200 && xhr.status < 300) ||
+	        (xhr.status === 304) ||
+	        (xhr.status === 0 && fileProto.test(url)) ||
+	        (xhr.status === 0 && window.location.protocol === 'file:');
+	};
+	var Request = (function () {
+	    function Request(_method, _url) {
+	        this._method = _method;
+	        this._url = _url;
+	        this._xhr = utils_1.ajax();
 	    }
-	    PersistableModel.prototype.getURL = function (id) {
-	        var url = this.rootURL;
-	        if (this.collection && this.collection.getURL()) {
-	            url = this.collection.getURL();
-	        }
-	        if (id && url) {
-	            url = normalize_path(url, this.id);
-	        }
-	        return url;
+	    Request.prototype.send = function (data) {
+	        this._data = data;
+	        return this;
 	    };
-	    PersistableModel.prototype.fetch = function (options) {
+	    Request.prototype.withCredentials = function (ret) {
+	        this._xhr.withCredentials = ret;
+	        return this;
+	    };
+	    Request.prototype.end = function (data) {
 	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        var url = this.getURL();
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        this.trigger('before:fetch', this, options);
-	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (result) {
-	            if (result)
-	                _this.set(_this.parse(result, options), options);
-	            _this.trigger('fetch', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            if (e) {
-	                throw e;
+	        this._data = data || this._data;
+	        var defer = promises_1.deferred();
+	        this._xhr.addEventListener('readystatechange', function () {
+	            if (_this._xhr.readyState !== XMLHttpRequest.DONE)
+	                return;
+	            if (!isValid(_this._xhr, _this._url)) {
+	                return defer.reject(new Error('server responded with: ' + _this._xhr.status));
 	            }
-	            return _this;
+	            defer.resolve(_this._xhr.responseText);
 	        });
-	    };
-	    PersistableModel.prototype.save = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        this.trigger('before:save', this, options);
-	        var method = persistence_1.RestMethod[this.isNew ? 'Create' : options.changed ? 'Patch' : "Update"];
-	        var url = this.getURL(this.id);
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        return this.sync(method, this, options)
-	            .then(function (result) {
-	            _this.set(result, options);
-	            _this.trigger('save', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            throw e;
-	        });
-	    };
-	    PersistableModel.prototype.remove = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        if (this.isNew) {
-	            _super.prototype.remove.call(this, options);
-	            return promises_1.Promise.resolve(this);
+	        data = this._data;
+	        var url = this._url;
+	        if (data && data === Object(data)) {
+	            var d = queryParam(data);
+	            url += d;
 	        }
-	        var url = this.getURL(this.id);
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        this.trigger('before:remove', this, options);
-	        if (!options.wait)
-	            _super.prototype.remove.call(this, options);
-	        options.url = url;
-	        return this.sync(persistence_1.RestMethod.Delete, this, options)
-	            .then(function (result) {
-	            _super.prototype.remove.call(_this, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            throw e;
+	        this._xhr.open(this._method, url, true);
+	        this._xhr.send(data);
+	        return defer.promise;
+	    };
+	    Request.prototype.json = function (data) {
+	        var _this = this;
+	        return this.end(data)
+	            .then(function (str) {
+	            var accepts = _this._xhr.getResponseHeader('content-type');
+	            if (jsonRe.test(accepts) && str !== '') {
+	                var json = JSON.parse(str);
+	                return json;
+	            }
+	            else {
+	                throw new Error('json');
+	            }
 	        });
 	    };
-	    PersistableModel.prototype.sync = function (method, model, options) {
-	        return persistence_1.sync(method, model, options);
+	    Request.prototype.progress = function (fn) {
+	        this._xhr.addEventListener('progress', fn);
+	        return this;
 	    };
-	    return PersistableModel;
-	})(model_1.Model);
-	exports.PersistableModel = PersistableModel;
+	    Request.prototype.header = function (field, value) {
+	        this._xhr.setRequestHeader(field, value);
+	        return this;
+	    };
+	    return Request;
+	})();
+	exports.Request = Request;
+	(function (HttpMethod) {
+	    HttpMethod[HttpMethod["Get"] = 0] = "Get";
+	    HttpMethod[HttpMethod["Post"] = 1] = "Post";
+	    HttpMethod[HttpMethod["Put"] = 2] = "Put";
+	    HttpMethod[HttpMethod["Delete"] = 3] = "Delete";
+	    HttpMethod[HttpMethod["Patch"] = 4] = "Patch";
+	    HttpMethod[HttpMethod["Head"] = 5] = "Head";
+	})(exports.HttpMethod || (exports.HttpMethod = {}));
+	var HttpMethod = exports.HttpMethod;
+	exports.request = {};
+	['get', 'post', 'put', 'delete', 'patch', 'head']
+	    .forEach(function (m) {
+	    exports.request[m === 'delete' ? 'del' : m] = function (url) {
+	        return new Request(m.toUpperCase(), url);
+	    };
+	});
 
 
 /***/ }

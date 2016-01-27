@@ -17,8 +17,7 @@ export interface CollectionRemoveOptions extends Silenceable {
 }
 export interface CollectionSortOptions extends Silenceable {
 }
-export interface CollectionCreateOptions {
-    add?: boolean;
+export interface CollectionCreateOptions extends CollectionSetOptions {
 }
 export interface CollectionResetOptions extends Silenceable {
     previousModels?: IModel[];

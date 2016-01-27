@@ -3,9 +3,9 @@ import {extend} from 'utilities/lib/objects';
 import {IPromise, Promise} from 'utilities/lib/promises';
 import {Model, ModelOptions} from './model';
 import {IPersistableModel, IPersistableCollection, ISerializable} from './interfaces';
-import {RestMethod, SyncFunc, SyncOptions, sync} from './persistence';
+import {RestMethod, SyncFunc, SyncOptions, sync, SyncResponse} from './persistence';
 
-export interface PersistableModelOptions extends ModelOptions {
+export interface RestModelOptions extends ModelOptions {
     url?:string
     sync?: SyncFunc
 }
@@ -28,12 +28,14 @@ export interface ModelRemoveOptions extends SyncOptions {
     wait?: boolean;
 }
 
-export class PersistableModel extends Model implements IPersistableModel {
+
+
+export class RestModel extends Model implements IPersistableModel {
     idAttribute = 'id';
     collection: IPersistableCollection;
     rootURL: string;
     
-    constructor(attr?:any, options: PersistableModelOptions = {}) {
+    constructor(attr?:any, options: RestModelOptions = {}) {
         super(attr, options);
         if (options.url) {
             this.rootURL = options.url;
@@ -65,8 +67,8 @@ export class PersistableModel extends Model implements IPersistableModel {
         this.trigger('before:fetch', this, options);
         
         return this.sync(RestMethod.Read, this, options)
-        .then((result:any) => {
-            if (result) this.set(this.parse(result, options), options);
+        .then((result:SyncResponse) => {
+            if (result) this.set(this.parse(result.content, options), options);
             this.trigger('fetch', this, result, options);
             return this;
         }).catch((e) => {
@@ -79,7 +81,10 @@ export class PersistableModel extends Model implements IPersistableModel {
  
     }
     
-    save(options?:any): IPromise<any> {
+    /**
+     * Save the model to the server
+     */
+    save(options?:ModelSaveOptions): IPromise<any> {
         options = options ? extend({}, options) : {};
         this.trigger('before:save', this, options);
         
@@ -93,7 +98,7 @@ export class PersistableModel extends Model implements IPersistableModel {
         
         return this.sync(method, this, options)
         .then((result) => {
-           this.set(result, options);
+           this.set(result.content, options);
            this.trigger('save', this, result, options);
            return this; 
         }).catch((e) => {
@@ -133,7 +138,7 @@ export class PersistableModel extends Model implements IPersistableModel {
         });
     }
     
-    sync (method:RestMethod, model:ISerializable, options:SyncOptions): IPromise<any> {
+    sync (method:RestMethod, model:ISerializable, options:SyncOptions): IPromise<SyncResponse> {
         return sync(method, model, options);
     }
 }

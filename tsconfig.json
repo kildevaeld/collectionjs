@@ -27,7 +27,7 @@
       "./src/index.ts",
       "./src/object.ts",
       "./src/persistence.ts",
-      "./src/persistable-model.ts",
-      "./src/persistable-collection.ts"
+      "./src/rest-model.ts",
+      "./src/rest-collection.ts"
     ]
 }

@@ -1,8 +1,8 @@
 import { IPromise } from 'utilities/lib/promises';
 import { Model, ModelOptions } from './model';
 import { IPersistableModel, IPersistableCollection, ISerializable } from './interfaces';
-import { RestMethod, SyncFunc, SyncOptions } from './persistence';
-export interface PersistableModelOptions extends ModelOptions {
+import { RestMethod, SyncFunc, SyncOptions, SyncResponse } from './persistence';
+export interface RestModelOptions extends ModelOptions {
     url?: string;
     sync?: SyncFunc;
 }
@@ -13,14 +13,14 @@ export interface ModelSaveOptions extends SyncOptions {
 export interface ModelRemoveOptions extends SyncOptions {
     wait?: boolean;
 }
-export declare class PersistableModel extends Model implements IPersistableModel {
+export declare class RestModel extends Model implements IPersistableModel {
     idAttribute: string;
     collection: IPersistableCollection;
     rootURL: string;
-    constructor(attr?: any, options?: PersistableModelOptions);
+    constructor(attr?: any, options?: RestModelOptions);
     getURL(id?: string): string;
     fetch(options?: any): IPromise<this>;
     save(options?: ModelSaveOptions): IPromise<any>;
     remove(options?: ModelRemoveOptions): IPromise<any>;
-    sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<any>;
+    sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse>;
 }
