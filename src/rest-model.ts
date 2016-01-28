@@ -35,6 +35,7 @@ export class RestModel extends Model implements IPersistableModel {
     collection: IPersistableCollection;
     rootURL: string;
     
+    
     constructor(attr?:any, options: RestModelOptions = {}) {
         super(attr, options);
         if (options.url) {
