@@ -24,7 +24,7 @@ export interface SyncResponse {
   method: RestMethod;
   status: number;
   content: any;
-  
+
   [key: string]: any;
 }
 
@@ -69,54 +69,54 @@ export function sync (method: RestMethod, model:ISerializable, options:SyncOptio
       default:
         return Promise.reject(new Error(`Sync: does not recognise method: ${method}`));
     }
-    
-   
+
+
    let xhr = ajax();
-   
+
    let query: string, url = options.url;
    if (options.params) query = queryParam(options.params);
-   
+
    if (query) {
     var sep = (options.url.indexOf('?') === -1) ? '?' : '&';
     url += sep + query.substring(1);
    }
-   
+
    return new Promise((resolve, reject) => {
-     
+
      xhr.onreadystatechange = function () {
        if (xhr.readyState !== 4) return;
-       
+
        let response: SyncResponse = {
          method: method,
          status: xhr.status,
          content: getData(options.headers['Accept'], xhr)
        };
-      
+
        proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
-       
+
        if (isValid(xhr)) {
          return resolve(response)
        } else {
          var error = new Error('Server responded with status of ' + xhr.statusText);
          return reject(error);
        }
-       
+
      }
-     
+
      xhr.open(http, url, true);
-     
+
      if (!(options.headers && options.headers['Accept'])) {
         options.headers = {
-          Accept: "*/*"
+          Accept: "application/json"
         }
      }
-     
+
      if (options.headers) for (var key in options.headers) {
         xhr.setRequestHeader(key, options.headers[key]);
       }
-     
+
      if (options.beforeSend) options.beforeSend(xhr);
      xhr.send(model.toJSON());
-   
+
    });
 }
