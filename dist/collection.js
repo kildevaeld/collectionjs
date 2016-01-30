@@ -1803,6 +1803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var xmlRe = /^(?:application|text)\/xml/;
 	var jsonRe = /^application\/json/;
 	var getData = function (accepts, xhr) {
+	    console.log('accepts', accepts, xhr.getResponseHeader('content-type'), jsonRe.test(xhr.getResponseHeader('content-type')));
 	    if (accepts == null)
 	        accepts = xhr.getResponseHeader('content-type');
 	    if (xmlRe.test(accepts)) {

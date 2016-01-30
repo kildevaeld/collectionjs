@@ -47,6 +47,7 @@ export declare class Collection<U extends IModel> extends BaseObject implements 
     forEach(iterator: (model: U, index?: number) => void, ctx?: any): this;
     indexOf(model: U): number;
     toJSON(): any[];
+    private _prepareModel(value);
     private _removeReference(model, options?);
     private _addReference(model, options?);
     private _reset();

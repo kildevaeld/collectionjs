@@ -32,6 +32,7 @@ const xmlRe = /^(?:application|text)\/xml/;
 const jsonRe = /^application\/json/;
 
 var getData = function(accepts, xhr) {
+
   if (accepts == null) accepts = xhr.getResponseHeader('content-type');
   if (xmlRe.test(accepts)) {
     return xhr.responseXML;
@@ -102,6 +103,7 @@ export function sync (method: RestMethod, model:ISerializable, options:SyncOptio
        }
 
      }
+
 
      xhr.open(http, url, true);
 

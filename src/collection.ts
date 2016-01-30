@@ -2,7 +2,7 @@
 import {BaseObject} from './object'
 import {IModel,ICollection, Silenceable, ISerializable} from './interfaces'
 import {Model} from './model'
-import {extend} from 'utilities/lib/objects'
+import {extend,isObject} from 'utilities/lib/objects'
 import {sortBy, find, slice} from 'utilities/lib/arrays'
 import {callFunc} from 'utilities/lib/utils'
 
@@ -33,7 +33,7 @@ export interface CollectionRemoveOptions extends Silenceable {
 export interface CollectionSortOptions extends Silenceable { }
 
 export interface CollectionCreateOptions extends CollectionSetOptions {
-  
+
 }
 
 export interface CollectionResetOptions extends Silenceable {
@@ -90,11 +90,11 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
   add (models:U|U[]|Object|Object[], options:CollectionSetOptions={}) {
     if (!Array.isArray(models)) {
       if (!(models instanceof this.Model)) {
-        models = this.create(models, { add: false })
+        models = this._prepareModel(<any>models);
       }
     } else {
       models = (<any[]>models).map<U>( (item) => {
-        return (item instanceof this.Model) ? item : this.create(item, { add: false })
+        return (item instanceof this.Model) ? item : <any>(this._prepareModel(item));
       });
     }
     this.set(<U|U[]>models, extend({merge:false}, options, addOptions));
@@ -120,6 +120,8 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     // from being added.
     for (i = 0, l = (<U[]>models).length; i < l; i++) {
       model = models[i]
+
+      model = this._prepareModel(model);
 
 			id = model.get(model.idAttribute)||model.uid
 
@@ -228,7 +230,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
 
   sort (options: CollectionSortOptions={}) {
     if (!this.comparator) throw new Error('Cannot sort a set without a comparator');
-    
+
     // Run sort based on type of `comparator`.
     if (typeof this.comparator === 'string' || this.comparator.length === 1) {
       this._models = this.sortBy((<any>this.comparator), this);
@@ -303,6 +305,11 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
   }
 
 
+  private _prepareModel(value:any): U {
+    if (value instanceof Model) return value;
+    if (isObject(value)) return new this.Model(value);
+    throw new Error('value not an Object or an instance of a model, but was: ' + typeof value);
+  }
 
   private _removeReference (model:U, options?: any) {
     if (this === model.collection) delete model.collection;
