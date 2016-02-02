@@ -80,6 +80,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
       this.Model = this.options.model
     }
 
+
     //this._byId = {};
     if (models) {
       this.add(models);
@@ -308,7 +309,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
   private _prepareModel(value:any): U {
     if (value instanceof Model) return value;
     if (isObject(value)) return new this.Model(value);
-    throw new Error('value not an Object or an instance of a model, but was: ' + typeof value);
+    throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
   }
 
   private _removeReference (model:U, options?: any) {
@@ -318,7 +319,6 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
 
   private _addReference (model:IModel, options?:any) {
     if (!model.collection) model.collection = this;
-
     this.listenTo(model, 'all', this._onModelEvent)
   }
 

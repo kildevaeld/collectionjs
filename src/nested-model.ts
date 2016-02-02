@@ -36,16 +36,16 @@ function objToPaths(obj:Object, separator:string = ".") {
 
 function isOnNestedModel(obj:Object, path:string, separator:string = "."): boolean {
 	var fields = path ? path.split(separator) : [];
-	
+
 	var result = obj;
-	
+
 	for (let i = 0, n = fields.length; i < n; i++) {
 		if (result instanceof Model) return true
 		if (!result) return false;
 		result = result[fields[i]];
 	}
 	return false;
-	
+
 }
 
 /**
@@ -124,13 +124,13 @@ function setNested(obj, path, val, options?) {
 
 			//Move onto the next part of the path
 			result = result[field];
-			
+
 			// The field is a model - delegate...
 			if (result instanceof Model) {
 				let rest = fields.slice(i+1);
 				return result.set(rest.join('.'), val, options);
 			}
-			
+
 		}
 	}
 }
@@ -192,14 +192,15 @@ export class NestedModel extends Model {
 		var alreadyTriggered = {}; // * @restorer
 		var separator = NestedModel.keyPathSeparator;
 		if (!this._nestedListener) this._nestedListener = {};
-		
+
 		// For each `set` attribute, update or delete the current value.
 		for (attr in attrs) {
 			val = attrs[attr];
-		
+
 
 			//<custom code>: Using getNested, setNested and deleteNested
-			if (!equal(getNested(current, attr), val)) {
+      let curVal = getNested(current, attr);
+			if (!equal(curVal, val)) {
 				changes.push(attr);
 				(<any>this)._changed[attr] = val
 			}
@@ -208,25 +209,27 @@ export class NestedModel extends Model {
 			} else {
 				deleteNested(this.changed, attr);
 			}
-			
+
+			if (curVal instanceof Model) {
+          let fn = this._nestedListener[attr]
+          if (fn) {
+              curVal.off('change', fn);
+              delete this._nestedListener[attr];
+          }
+			}
+
 			if (unset) {
-				let nestedValue = getNested(current, attr);
-				if (nestedValue instanceof Model) {
-					let fn = this._nestedListener[attr]
-					if (fn) {
-						nestedValue.off('change', fn);
-						delete this._nestedListener[attr];
-					}
-				}
 				deleteNested(current, attr);
+
 			} else {
 				if (!isOnNestedModel(current, attr, separator)) {
 					if (val instanceof Model) {
 						let fn = (model) => {
+              if (model.changed == undefined || isEmpty(model.changed)) return;
 							for (let key in model.changed) {
 								this._changed[attr + separator + key] = model.changed[key];
 								this.trigger('change:' + attr + separator + key, model.changed[key])
-							} 
+							}
 							this.trigger('change', this, options);
 						}
 						this._nestedListener[attr] = fn;
@@ -237,7 +240,7 @@ export class NestedModel extends Model {
 				}
 				setNested(current, attr, val);
 			}
-			
+
 			//</custom code>
 		}
 
@@ -345,7 +348,7 @@ export class NestedModel extends Model {
 		if (attr == null || !(<any>this)._previousAttributes) {
 			return null;
 		}
-	
+
 		//<custom code>
 		return getNested((<any>this)._previousAttributes, attr);
 		//</custom code>
@@ -356,7 +359,7 @@ export class NestedModel extends Model {
 	previousAttributes () {
 		return extend({}, (<any>this)._previousAttributes);
 	}
-	
+
 	destroy () {
 		for (let key in this._nestedListener) {
 			let fn = this._nestedListener[key];

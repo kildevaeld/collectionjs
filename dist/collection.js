@@ -127,12 +127,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (options === void 0) { options = {}; }
 	        if (!Array.isArray(models)) {
 	            if (!(models instanceof this.Model)) {
-	                models = this.create(models, { add: false });
+	                models = this._prepareModel(models);
 	            }
 	        }
 	        else {
 	            models = models.map(function (item) {
-	                return (item instanceof _this.Model) ? item : _this.create(item, { add: false });
+	                return (item instanceof _this.Model) ? item : (_this._prepareModel(item));
 	            });
 	        }
 	        this.set(models, objects_1.extend({ merge: false }, options, addOptions));
@@ -153,6 +153,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var order = !sortable && add && remove ? [] : null;
 	        for (i = 0, l = models.length; i < l; i++) {
 	            model = models[i];
+	            model = this._prepareModel(model);
 	            id = model.get(model.idAttribute) || model.uid;
 	            if (existing = this.get(id)) {
 	                if (remove)
@@ -312,6 +313,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Collection.prototype.toJSON = function () {
 	        return this.models.map(function (m) { return m.toJSON(); });
+	    };
+	    Collection.prototype._prepareModel = function (value) {
+	        if (value instanceof model_1.Model)
+	            return value;
+	        if (objects_1.isObject(value))
+	            return new this.Model(value);
+	        throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
 	    };
 	    Collection.prototype._removeReference = function (model, options) {
 	        if (this === model.collection)
@@ -1021,6 +1029,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.uid = utils_1.uniqueId('uid');
 	        this._changed = {};
 	        this.collection = options.collection;
+	        this.idAttribute = options.idAttribute || this.idAttribute || 'id';
 	        _super.call(this);
 	    }
 	    Object.defineProperty(Model.prototype, "id", {
@@ -1304,7 +1313,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._nestedListener = {};
 	        for (attr in attrs) {
 	            val = attrs[attr];
-	            if (!utils_1.equal(getNested(current, attr), val)) {
+	            var curVal = getNested(current, attr);
+	            if (!utils_1.equal(curVal, val)) {
 	                changes.push(attr);
 	                this._changed[attr] = val;
 	            }
@@ -1314,21 +1324,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            else {
 	                deleteNested(this.changed, attr);
 	            }
-	            if (unset) {
-	                var nestedValue = getNested(current, attr);
-	                if (nestedValue instanceof model_1.Model) {
-	                    var fn = this._nestedListener[attr];
-	                    if (fn) {
-	                        nestedValue.off('change', fn);
-	                        delete this._nestedListener[attr];
-	                    }
+	            if (curVal instanceof model_1.Model) {
+	                var fn = this._nestedListener[attr];
+	                if (fn) {
+	                    curVal.off('change', fn);
+	                    delete this._nestedListener[attr];
 	                }
+	            }
+	            if (unset) {
 	                deleteNested(current, attr);
 	            }
 	            else {
 	                if (!isOnNestedModel(current, attr, separator)) {
 	                    if (val instanceof model_1.Model) {
 	                        var fn = function (model) {
+	                            if (model.changed == undefined || objects_1.isEmpty(model.changed))
+	                                return;
 	                            for (var key_1 in model.changed) {
 	                                _this._changed[attr + separator + key_1] = model.changed[key_1];
 	                                _this.trigger('change:' + attr + separator + key_1, model.changed[key_1]);
@@ -1803,7 +1814,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var xmlRe = /^(?:application|text)\/xml/;
 	var jsonRe = /^application\/json/;
 	var getData = function (accepts, xhr) {
-	    console.log('accepts', accepts, xhr.getResponseHeader('content-type'), jsonRe.test(xhr.getResponseHeader('content-type')));
 	    if (accepts == null)
 	        accepts = xhr.getResponseHeader('content-type');
 	    if (xmlRe.test(accepts)) {

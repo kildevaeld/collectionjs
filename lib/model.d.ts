@@ -3,6 +3,7 @@ import { IModel, ICollection, ISerializable } from './interfaces';
 export interface ModelOptions {
     collection?: ICollection;
     parse?: boolean;
+    idAttribute?: string;
 }
 export interface ModelSetOptions {
     unset?: boolean;

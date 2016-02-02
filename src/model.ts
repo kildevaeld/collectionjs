@@ -7,7 +7,8 @@ import {has, extend} from 'utilities/lib/objects'
 export interface ModelOptions {
 	collection?: ICollection;
 	parse?: boolean;
-    
+	idAttribute?: string
+
 }
 
 export interface ModelSetOptions {
@@ -29,11 +30,11 @@ export class Model extends BaseObject implements IModel, ISerializable {
 	get id() {
 		if (this.idAttribute in this._attributes) return this._attributes[this.idAttribute]
 	}
-    
+
     get isNew (): boolean {
         return this.id == null;
     }
-    
+
     get isDirty(): boolean {
         return this.hasChanged();
     }
@@ -52,6 +53,8 @@ export class Model extends BaseObject implements IModel, ISerializable {
 		this._changed = {};
 
 		this.collection = options.collection;
+
+    this.idAttribute = options.idAttribute || this.idAttribute || 'id';
 
 		super();
 
@@ -192,7 +195,7 @@ export class Model extends BaseObject implements IModel, ISerializable {
 	parse(attr:any, options?:any): any {
 		return attr;
 	}
-    
+
     remove(options?:any): any {
         this.trigger('remove', this, this.collection, options);
     }
