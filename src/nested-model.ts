@@ -236,6 +236,7 @@ export class NestedModel extends Model {
 						val.on('change', fn);
 					}
 				} else {
+					// Gets triggered when set on nested model
 					alreadyTriggered[attr] = true;
 				}
 				setNested(current, attr, val);
