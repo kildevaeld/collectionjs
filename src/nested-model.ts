@@ -13,6 +13,7 @@ import {Model, ModelSetOptions} from './model'
  */
 function objToPaths(obj:Object, separator:string = ".") {
 	var ret = {};
+  if (!obj) return obj;
 
 	for (var key in obj) {
 		var val = obj[key];
@@ -37,6 +38,8 @@ function objToPaths(obj:Object, separator:string = ".") {
 function isOnNestedModel(obj:Object, path:string, separator:string = "."): boolean {
 	var fields = path ? path.split(separator) : [];
 
+  if (!obj) return false;
+
 	var result = obj;
 
 	for (let i = 0, n = fields.length; i < n; i++) {
@@ -56,6 +59,7 @@ function isOnNestedModel(obj:Object, path:string, separator:string = "."): boole
  * @return {mixed}                [description]
  */
 function getNested(obj, path, return_exists?, separator:string = ".") {
+  if (!obj) return null;
 
 	var fields = path ? path.split(separator) : [];
 	var result = obj;
@@ -95,6 +99,8 @@ function getNested(obj, path, return_exists?, separator:string = ".") {
  */
 function setNested(obj, path, val, options?) {
 	options = options || {};
+
+  if (!obj) return null;
 
 	var separator = options.separator || "."
 

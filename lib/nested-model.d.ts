@@ -6,7 +6,7 @@ export declare class NestedModel extends Model {
     set(key: string | Object, val?: any, options?: ModelSetOptions): this;
     clear(options: any): this;
     hasChanged(attr?: any): boolean;
-    changedAttributes(diff: any): {};
+    changedAttributes(diff: any): Object;
     previous(attr: any): any;
     previousAttributes(): any;
     destroy(): void;

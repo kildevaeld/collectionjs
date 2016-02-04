@@ -1188,6 +1188,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function objToPaths(obj, separator) {
 	    if (separator === void 0) { separator = "."; }
 	    var ret = {};
+	    if (!obj)
+	        return obj;
 	    for (var key in obj) {
 	        var val = obj[key];
 	        if (val && (val.constructor === Object || val.constructor === Array) && !objects_1.isEmpty(val)) {
@@ -1206,6 +1208,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function isOnNestedModel(obj, path, separator) {
 	    if (separator === void 0) { separator = "."; }
 	    var fields = path ? path.split(separator) : [];
+	    if (!obj)
+	        return false;
 	    var result = obj;
 	    for (var i = 0, n = fields.length; i < n; i++) {
 	        if (result instanceof model_1.Model)
@@ -1218,6 +1222,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	function getNested(obj, path, return_exists, separator) {
 	    if (separator === void 0) { separator = "."; }
+	    if (!obj)
+	        return null;
 	    var fields = path ? path.split(separator) : [];
 	    var result = obj;
 	    return_exists || (return_exists === false);
@@ -1243,6 +1249,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	function setNested(obj, path, val, options) {
 	    options = options || {};
+	    if (!obj)
+	        return null;
 	    var separator = options.separator || ".";
 	    var fields = path ? path.split(separator) : [];
 	    var result = obj;
