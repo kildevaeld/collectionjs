@@ -229,7 +229,7 @@ export class NestedModel extends Model {
 				deleteNested(current, attr);
 
 			} else {
-				/*if (!isOnNestedModel(current, attr, separator)) {
+				if (!isOnNestedModel(current, attr, separator)) {
 					if (val instanceof Model) {
 						let fn = (model) => {
               if (model.changed == undefined || isEmpty(model.changed)) return;
@@ -245,7 +245,7 @@ export class NestedModel extends Model {
 				} else {
 					// Gets triggered when set on nested model
 					alreadyTriggered[attr] = true;
-				}*/
+				}
 				setNested(current, attr, val);
 			}
 
