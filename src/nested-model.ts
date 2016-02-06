@@ -13,6 +13,7 @@ import {Model, ModelSetOptions} from './model'
  */
 function objToPaths(obj:Object, separator:string = ".") {
 	var ret = {};
+
   if (!obj) return obj;
 
 	for (var key in obj) {
@@ -184,7 +185,7 @@ export class NestedModel extends Model {
 		(<any>this)._changing = true;
 
 		if (!changing) {
-			(<any>this)._previousAttributes = extend({}, this._attributes); //<custom>: Replaced _.clone with _.deepClone
+			(<any>this)._previousAttributes = extend({}, this._attributes);
 			(<any>this)._changed = {};
 		}
 		current = this._attributes, prev = (<any>this)._previousAttributes;
@@ -228,7 +229,7 @@ export class NestedModel extends Model {
 				deleteNested(current, attr);
 
 			} else {
-				if (!isOnNestedModel(current, attr, separator)) {
+				/*if (!isOnNestedModel(current, attr, separator)) {
 					if (val instanceof Model) {
 						let fn = (model) => {
               if (model.changed == undefined || isEmpty(model.changed)) return;
@@ -244,7 +245,7 @@ export class NestedModel extends Model {
 				} else {
 					// Gets triggered when set on nested model
 					alreadyTriggered[attr] = true;
-				}
+				}*/
 				setNested(current, attr, val);
 			}
 
