@@ -306,9 +306,9 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
   }
 
 
-  private _prepareModel(value:any): U {
+  protected _prepareModel(value:any): U {
     if (value instanceof Model) return value;
-    if (isObject(value)) return new this.Model(value);
+    if (isObject(value)) return new this.Model(value, {parse: true});
     throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
   }
 

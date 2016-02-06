@@ -42,11 +42,11 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
     if (url == null) return Promise.reject(new Error('Url or rootURL no specified'));
     options.url = url;
 
-    this.trigger('before:sync');
+    this.trigger('before:fetch');
     return this.sync(RestMethod.Read, this, options)
       .then((results) => {
         this[options.reset ? 'reset' : 'set'](results.content, options);
-        this.trigger('sync');
+        this.trigger('fetch');
         return this;
       }).catch((e) => {
         this.trigger('error', e);

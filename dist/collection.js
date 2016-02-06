@@ -318,7 +318,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (value instanceof model_1.Model)
 	            return value;
 	        if (objects_1.isObject(value))
-	            return new this.Model(value);
+	            return new this.Model(value, { parse: true });
 	        throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
 	    };
 	    Collection.prototype._removeReference = function (model, options) {
@@ -513,10 +513,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.listenTo(obj, event, fn, ctx, true);
 	    };
 	    EventEmitter.prototype.stopListening = function (obj, event, callback) {
-	        var listeningTo = this._listeningTo || {};
+	        var listeningTo = this._listeningTo;
+	        if (!listeningTo)
+	            return this;
 	        var remove = !event && !callback;
+	        if (!callback && typeof event === 'object')
+	            callback = this;
 	        if (obj)
-	            listeningTo[obj.listenId] = obj;
+	            (listeningTo = {})[obj.listenId] = obj;
 	        for (var id in listeningTo) {
 	            obj = listeningTo[id];
 	            obj.off(event, callback, this);
@@ -921,11 +925,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.indexOf = indexOf;
 	function find(array, callback, ctx) {
-	    var i, v;
-	    for (i = 0; i < array.length; i++) {
-	        v = array[i];
-	        if (callback.call(ctx, v))
-	            return v;
+	    var v;
+	    for (var i = 0, ii = array.length; i < ii; i++) {
+	        if (callback.call(ctx, array[i]))
+	            return array[i];
 	    }
 	    return null;
 	}
@@ -951,8 +954,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    })
 	        .sort(function (left, right) {
-	        var a = left.criteria;
-	        var b = right.criteria;
+	        var a = left.criteria, b = right.criteria;
 	        if (a !== b) {
 	            if (a > b || a === void 0)
 	                return 1;
@@ -1493,11 +1495,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (url == null)
 	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
 	        options.url = url;
-	        this.trigger('before:sync');
+	        this.trigger('before:fetch');
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
 	            .then(function (results) {
 	            _this[options.reset ? 'reset' : 'set'](results.content, options);
-	            _this.trigger('sync');
+	            _this.trigger('fetch');
 	            return _this;
 	        }).catch(function (e) {
 	            _this.trigger('error', e);
@@ -1982,25 +1984,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Request;
 	})();
 	exports.Request = Request;
-	var request;
-	(function (request) {
-	    function get(url) {
-	        return new Request('GET', url);
-	    }
-	    request.get = get;
-	    function post(url) {
-	        return new Request('POST', url);
-	    }
-	    request.post = post;
-	    function put(url) {
-	        return new Request('PUT', url);
-	    }
-	    request.put = put;
-	    function del(url) {
-	        return new Request('DELETE', url);
-	    }
-	    request.del = del;
-	})(request = exports.request || (exports.request = {}));
+	(function (HttpMethod) {
+	    HttpMethod[HttpMethod["Get"] = 0] = "Get";
+	    HttpMethod[HttpMethod["Post"] = 1] = "Post";
+	    HttpMethod[HttpMethod["Put"] = 2] = "Put";
+	    HttpMethod[HttpMethod["Delete"] = 3] = "Delete";
+	    HttpMethod[HttpMethod["Patch"] = 4] = "Patch";
+	    HttpMethod[HttpMethod["Head"] = 5] = "Head";
+	})(exports.HttpMethod || (exports.HttpMethod = {}));
+	var HttpMethod = exports.HttpMethod;
+	exports.request = {};
+	['get', 'post', 'put', 'delete', 'patch', 'head']
+	    .forEach(function (m) {
+	    exports.request[m === 'delete' ? 'del' : m] = function (url) {
+	        return new Request(m.toUpperCase(), url);
+	    };
+	});
 
 
 /***/ },
@@ -2124,7 +2123,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
 	            .then(function (resp) {
 	            _this._processResponse(resp, options);
-	            _this.trigger('sync', _this, resp, options);
+	            _this.trigger('fetch', _this, resp, options);
 	            return _this;
 	        }).catch(function (e) {
 	            _this.trigger('error', e);
@@ -2159,8 +2158,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        data = this.parse(data);
 	        for (var i = 0, ii = data.length; i < ii; i++) {
-	            data[i] = new this.Model(data[i], { parse: true });
+	            data[i] = this._prepareModel(data[i]);
 	        }
+	        console.log('using method', options.reset ? 'reset' : 'set', options);
 	        this[options.reset ? 'reset' : 'set'](data, options);
 	        this.page.reset(data);
 	        return this;

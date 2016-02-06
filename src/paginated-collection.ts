@@ -85,6 +85,18 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     this._page.Model = this.Model;
     
   }
+
+  public hasNext(): boolean {
+    return this.hasPage(this._state.current + 1);
+  }
+
+  public hasPage(page:number): boolean {
+    if (this._state.last > -1) {
+      return page <= this._state.last;
+    }
+    return false;
+
+  }
   
   public getPreviousPage (options?:GetPageOptions): IPromise<any> {
     options = options ? extend({}, options) : {};
@@ -128,12 +140,12 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     if (!url) {
       url = this.getURL();
     }
-   
+    
     if (!url) return Promise.reject(new Error("no url specified"));
     
     let idx = url.indexOf('?');
     if (idx > -1) {
-      params = extend(params, queryStringToParams(url.substr(0, idx + 1)));
+      params = extend(params, queryStringToParams(url.substr(idx + 1)));
       url = url.substr(0, idx);
     }
     
@@ -144,6 +156,7 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     options.params = params;
     options.url = url;
     this.trigger('before:fetch', this, options);
+
     
     params[this.queryParams.size] = this._state.size;
     
@@ -154,7 +167,7 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     return this.sync(RestMethod.Read, this, options)
     .then((resp) => {
       this._processResponse(resp, options);
-      this.trigger('sync', this, resp, options);
+      this.trigger('fetch', this, resp, options);
       return this;   
     }).catch((e) => {
       this.trigger('error', e);
@@ -197,11 +210,10 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
       data = this.parse(data);
     
       for ( let i = 0, ii = data.length; i < ii; i++ ) {
-        data[i] = new this.Model(data[i], { parse: true });
+        data[i] = this._prepareModel(data[i]); //new this.Model(data[i], { parse: true });
       }
-      
-      this[options.reset ? 'reset' : 'set'](data, options);
-      
+      //this[options.reset ? 'reset' : 'set'](data, options);
+      this.add(data);
       this.page.reset(data);
       
       
