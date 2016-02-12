@@ -2066,6 +2066,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        enumerable: true,
 	        configurable: true
 	    });
+	    PaginatedCollection.prototype.hasNext = function () {
+	        return this.hasPage(this._state.current + 1);
+	    };
+	    PaginatedCollection.prototype.hasPage = function (page) {
+	        if (this._state.last > -1) {
+	            return page <= this._state.last;
+	        }
+	        return false;
+	    };
 	    PaginatedCollection.prototype.getPreviousPage = function (options) {
 	        options = options ? objects_1.extend({}, options) : {};
 	        options.page = this._state.current - 1;
@@ -2107,7 +2116,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return promises_1.Promise.reject(new Error("no url specified"));
 	        var idx = url.indexOf('?');
 	        if (idx > -1) {
-	            params = objects_1.extend(params, queryStringToParams(url.substr(0, idx + 1)));
+	            params = objects_1.extend(params, queryStringToParams(url.substr(idx + 1)));
 	            url = url.substr(0, idx);
 	        }
 	        if (!objects_1.has(params, this.queryParams.page)) {
@@ -2160,7 +2169,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var i = 0, ii = data.length; i < ii; i++) {
 	            data[i] = this._prepareModel(data[i]);
 	        }
-	        console.log('using method', options.reset ? 'reset' : 'set', options);
 	        this[options.reset ? 'reset' : 'set'](data, options);
 	        this.page.reset(data);
 	        return this;
