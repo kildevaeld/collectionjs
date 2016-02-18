@@ -513,14 +513,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.listenTo(obj, event, fn, ctx, true);
 	    };
 	    EventEmitter.prototype.stopListening = function (obj, event, callback) {
-	        var listeningTo = this._listeningTo;
-	        if (!listeningTo)
-	            return this;
+	        var listeningTo = this._listeningTo || {};
 	        var remove = !event && !callback;
-	        if (!callback && typeof event === 'object')
-	            callback = this;
 	        if (obj)
-	            (listeningTo = {})[obj.listenId] = obj;
+	            listeningTo[obj.listenId] = obj;
 	        for (var id in listeningTo) {
 	            obj = listeningTo[id];
 	            obj.off(event, callback, this);
@@ -925,10 +921,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.indexOf = indexOf;
 	function find(array, callback, ctx) {
-	    var v;
-	    for (var i = 0, ii = array.length; i < ii; i++) {
-	        if (callback.call(ctx, array[i]))
-	            return array[i];
+	    var i, v;
+	    for (i = 0; i < array.length; i++) {
+	        v = array[i];
+	        if (callback.call(ctx, v))
+	            return v;
 	    }
 	    return null;
 	}
@@ -954,7 +951,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    })
 	        .sort(function (left, right) {
-	        var a = left.criteria, b = right.criteria;
+	        var a = left.criteria;
+	        var b = right.criteria;
 	        if (a !== b) {
 	            if (a > b || a === void 0)
 	                return 1;
@@ -1557,7 +1555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var objects_1 = __webpack_require__(5);
 	var promises_1 = __webpack_require__(13);
-	var model_1 = __webpack_require__(8);
+	var nested_model_1 = __webpack_require__(9);
 	var persistence_1 = __webpack_require__(14);
 	function normalize_path(url, id) {
 	    var i, p = "";
@@ -1658,7 +1656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return persistence_1.sync(method, model, options);
 	    };
 	    return RestModel;
-	})(model_1.Model);
+	})(nested_model_1.NestedModel);
 	exports.RestModel = RestModel;
 
 
@@ -1984,22 +1982,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Request;
 	})();
 	exports.Request = Request;
-	(function (HttpMethod) {
-	    HttpMethod[HttpMethod["Get"] = 0] = "Get";
-	    HttpMethod[HttpMethod["Post"] = 1] = "Post";
-	    HttpMethod[HttpMethod["Put"] = 2] = "Put";
-	    HttpMethod[HttpMethod["Delete"] = 3] = "Delete";
-	    HttpMethod[HttpMethod["Patch"] = 4] = "Patch";
-	    HttpMethod[HttpMethod["Head"] = 5] = "Head";
-	})(exports.HttpMethod || (exports.HttpMethod = {}));
-	var HttpMethod = exports.HttpMethod;
-	exports.request = {};
-	['get', 'post', 'put', 'delete', 'patch', 'head']
-	    .forEach(function (m) {
-	    exports.request[m === 'delete' ? 'del' : m] = function (url) {
-	        return new Request(m.toUpperCase(), url);
-	    };
-	});
+	var request;
+	(function (request) {
+	    function get(url) {
+	        return new Request('GET', url);
+	    }
+	    request.get = get;
+	    function post(url) {
+	        return new Request('POST', url);
+	    }
+	    request.post = post;
+	    function put(url) {
+	        return new Request('PUT', url);
+	    }
+	    request.put = put;
+	    function del(url) {
+	        return new Request('DELETE', url);
+	    }
+	    request.del = del;
+	})(request = exports.request || (exports.request = {}));
 
 
 /***/ },
@@ -2066,6 +2067,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        enumerable: true,
 	        configurable: true
 	    });
+	    PaginatedCollection.prototype.hasNext = function () {
+	        return this.hasPage(this._state.current + 1);
+	    };
+	    PaginatedCollection.prototype.hasPage = function (page) {
+	        if (this._state.last > -1) {
+	            return page <= this._state.last;
+	        }
+	        return false;
+	    };
 	    PaginatedCollection.prototype.getPreviousPage = function (options) {
 	        options = options ? objects_1.extend({}, options) : {};
 	        options.page = this._state.current - 1;
@@ -2107,7 +2117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return promises_1.Promise.reject(new Error("no url specified"));
 	        var idx = url.indexOf('?');
 	        if (idx > -1) {
-	            params = objects_1.extend(params, queryStringToParams(url.substr(0, idx + 1)));
+	            params = objects_1.extend(params, queryStringToParams(url.substr(idx + 1)));
 	            url = url.substr(0, idx);
 	        }
 	        if (!objects_1.has(params, this.queryParams.page)) {
@@ -2160,8 +2170,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var i = 0, ii = data.length; i < ii; i++) {
 	            data[i] = this._prepareModel(data[i]);
 	        }
-	        console.log('using method', options.reset ? 'reset' : 'set', options);
-	        this[options.reset ? 'reset' : 'set'](data, options);
+	        this.add(data);
 	        this.page.reset(data);
 	        return this;
 	    };

@@ -1,5 +1,6 @@
 import { IPromise } from 'utilities/lib/promises';
-import { Model, ModelOptions } from './model';
+import { ModelOptions } from './model';
+import { NestedModel } from './nested-model';
 import { IPersistableModel, IPersistableCollection, ISerializable } from './interfaces';
 import { RestMethod, SyncFunc, SyncOptions, SyncResponse } from './persistence';
 export interface RestModelOptions extends ModelOptions {
@@ -13,7 +14,7 @@ export interface ModelSaveOptions extends SyncOptions {
 export interface ModelRemoveOptions extends SyncOptions {
     wait?: boolean;
 }
-export declare class RestModel extends Model implements IPersistableModel {
+export declare class RestModel extends NestedModel implements IPersistableModel {
     idAttribute: string;
     collection: IPersistableCollection;
     rootURL: string;
