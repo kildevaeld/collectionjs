@@ -2170,7 +2170,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var i = 0, ii = data.length; i < ii; i++) {
 	            data[i] = this._prepareModel(data[i]);
 	        }
-	        this.add(data);
+	        this[options.reset ? 'reset' : 'set'](data, options);
 	        this.page.reset(data);
 	        return this;
 	    };
