@@ -22,6 +22,7 @@ export declare class PaginatedCollection<T extends IPersistableModel> extends Re
     queryParams: QueryParameters;
     constructor(models?: any, options?: PaginatedCollectionOptions<T>);
     hasNext(): boolean;
+    hasPrevious(): boolean;
     hasPage(page: number): boolean;
     getPreviousPage(options?: GetPageOptions): IPromise<any>;
     getNextPage(options?: GetPageOptions): IPromise<any>;

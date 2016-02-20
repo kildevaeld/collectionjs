@@ -191,7 +191,7 @@ export class NestedModel extends Model {
 		current = this._attributes, prev = (<any>this)._previousAttributes;
 
 		// Check for changes of `id`.
-		if (this.idAttribute in attrs) this.id = attrs[this.idAttribute];
+		//if (this.idAttribute in attrs) this.id = attrs[this.idAttribute];
 
 		//<custom code>
 		attrs = objToPaths(attrs);

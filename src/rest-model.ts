@@ -132,7 +132,7 @@ export class RestModel extends NestedModel implements IPersistableModel {
 
         return this.sync(RestMethod.Delete, this, options)
         .then((result) => {
-           super.remove(options);
+           if (!options.wait) super.remove(options);
            return this;
         }).catch((e) => {
             this.trigger('error', this, e);

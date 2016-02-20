@@ -90,6 +90,10 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     return this.hasPage(this._state.current + 1);
   }
 
+  public hasPrevious(): boolean {
+    return this.hasPage(this._state.current - 1);
+  }
+
   public hasPage(page:number): boolean {
     if (this._state.last > -1) {
       return page <= this._state.last;
