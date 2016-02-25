@@ -87,6 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    __extends(Collection, _super);
 	    function Collection(models, options) {
 	        if (options === void 0) { options = {}; }
+	        _super.call(this);
 	        this.options = options;
 	        if (this.options.model) {
 	            this.Model = this.options.model;
@@ -94,7 +95,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (models) {
 	            this.add(models);
 	        }
-	        _super.call(this);
 	    }
 	    Object.defineProperty(Collection.prototype, "length", {
 	        get: function () {
@@ -1007,6 +1007,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports) {
 
+	function isString(a) {
+	    return typeof a === 'string';
+	}
+	exports.isString = isString;
 	function camelcase(input) {
 	    return input.toLowerCase().replace(/-(.)/g, function (match, group1) {
 	        return group1.toUpperCase();
@@ -1056,6 +1060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Model(attributes, options) {
 	        if (attributes === void 0) { attributes = {}; }
 	        if (options === void 0) { options = {}; }
+	        _super.call(this);
 	        options = options || {};
 	        this._attributes = {};
 	        this.options = options;
@@ -1066,7 +1071,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._changed = {};
 	        this.collection = options.collection;
 	        this.idAttribute = options.idAttribute || this.idAttribute || 'id';
-	        _super.call(this);
 	    }
 	    Object.defineProperty(Model.prototype, "id", {
 	        get: function () {
@@ -1511,6 +1515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _super.call(this, models, options);
 	        if (options.url)
 	            this.url = options.url;
+	        this.options.queryParameter = this.options.queryParameter || 'q';
 	    }
 	    RestCollection.prototype.getURL = function () {
 	        return typeof this.url === 'function' ? this.url() : this.url;
@@ -1564,6 +1569,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	                options.complete(e, null);
 	        });
 	        return model;
+	    };
+	    RestCollection.prototype.query = function (term, options) {
+	        var _this = this;
+	        var params = (_a = {}, _a[this.options.queryParameter] = term, _a);
+	        var url = this.getURL();
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        options.url = url;
+	        objects_1.extend(options.params || {}, params);
+	        this.trigger('before:query');
+	        return this.sync(persistence_1.RestMethod.Read, this, options)
+	            .then(function (results) {
+	            _this.reset(results.content, options);
+	            _this.trigger('query');
+	            return _this.models;
+	        }).catch(function (e) {
+	            _this.trigger('error', e);
+	            throw e;
+	        });
+	        var _a;
 	    };
 	    RestCollection.prototype.sync = function (method, model, options) {
 	        return persistence_1.sync(method, model, options);
@@ -1941,8 +1966,29 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var utils_1 = __webpack_require__(4);
+	var strings_1 = __webpack_require__(7);
+	var objects_1 = __webpack_require__(5);
 	var promises_1 = __webpack_require__(12);
 	var xmlRe = /^(?:application|text)\/xml/, jsonRe = /^application\/json/, fileProto = /^file:/;
+	function queryStringToParams(qs) {
+	    var kvp, k, v, ls, params = {}, decode = decodeURIComponent;
+	    var kvps = qs.split('&');
+	    for (var i = 0, l = kvps.length; i < l; i++) {
+	        var param = kvps[i];
+	        kvp = param.split('='), k = kvp[0], v = kvp[1];
+	        if (v == null)
+	            v = true;
+	        k = decode(k), v = decode(v), ls = params[k];
+	        if (Array.isArray(ls))
+	            ls.push(v);
+	        else if (ls)
+	            params[k] = [ls, v];
+	        else
+	            params[k] = v;
+	    }
+	    return params;
+	}
+	exports.queryStringToParams = queryStringToParams;
 	function queryParam(obj) {
 	    return '?' + Object.keys(obj).reduce(function (a, k) { a.push(k + '=' + encodeURIComponent(obj[k])); return a; }, []).join('&');
 	}
@@ -1957,6 +2003,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Request(_method, _url) {
 	        this._method = _method;
 	        this._url = _url;
+	        this._headers = {};
+	        this._params = {};
 	        this._xhr = utils_1.ajax();
 	    }
 	    Request.prototype.send = function (data) {
@@ -1981,16 +2029,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        data = this._data;
 	        var url = this._url;
-	        if (data && data === Object(data)) {
+	        if (data && data === Object(data) && this._method == 'GET') {
 	            var d = queryParam(data);
 	            url += d;
 	        }
+	        url = this._apply_params(url);
 	        this._xhr.open(this._method, url, true);
+	        for (var key in this._headers) {
+	            this._xhr.setRequestHeader(key, this._headers[key]);
+	        }
 	        this._xhr.send(data);
 	        return defer.promise;
 	    };
 	    Request.prototype.json = function (data) {
 	        var _this = this;
+	        this.header('content-type', 'application/json; charset=utf-8');
+	        if (!strings_1.isString(data)) {
+	            data = JSON.stringify(data);
+	        }
 	        return this.end(data)
 	            .then(function (str) {
 	            var accepts = _this._xhr.getResponseHeader('content-type');
@@ -2008,8 +2064,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this;
 	    };
 	    Request.prototype.header = function (field, value) {
-	        this._xhr.setRequestHeader(field, value);
+	        if (strings_1.isString(field) && strings_1.isString(value)) {
+	            this._headers[field] = value;
+	        }
+	        else if (objects_1.isObject(field)) {
+	            objects_1.extend(this._headers, field);
+	        }
 	        return this;
+	    };
+	    Request.prototype.params = function (value) {
+	        objects_1.extend(this._params, value);
+	        return this;
+	    };
+	    Request.prototype._apply_params = function (url) {
+	        var params = {};
+	        var idx = url.indexOf('?');
+	        if (idx > -1) {
+	            params = objects_1.extend(params, queryStringToParams(url.substr(idx + 1)));
+	            url = url.substr(0, idx);
+	        }
+	        objects_1.extend(params, this._params);
+	        if (!objects_1.isEmpty(params)) {
+	            var sep = (url.indexOf('?') === -1) ? '?' : '&';
+	            url += sep + queryParam(params);
+	        }
+	        return url;
 	    };
 	    return Request;
 	})();

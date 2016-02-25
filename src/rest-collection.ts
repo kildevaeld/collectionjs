@@ -11,6 +11,7 @@ import {RestMethod, SyncFunc, SyncOptions, sync, SyncResponse} from './persisten
 export interface RestCollectionOptions<T extends IPersistableModel> extends CollectionOptions<T> {
   url?: string
   sync?: (method: RestMethod) => IPromise<any>
+  queryParameter?: string
 }
 
 export interface CollectionFetchOptions extends CollectionSetOptions, SyncOptions {
@@ -26,6 +27,7 @@ export interface RestCollectionCreateOptions extends CollectionCreateOptions, Sy
 
 export class RestCollection<T extends IPersistableModel> extends Collection<T> implements IPersistableCollection {
   url: string | (() => string);
+  options: RestCollectionOptions<T>;
   getURL(): string {
     return typeof this.url === 'function' ? (<(() => string)>this.url)() : <string>this.url;
   }
@@ -33,6 +35,8 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
   constructor(models: any, options: RestCollectionOptions<T> = {}) {
     super(models, options);
     if (options.url) this.url = options.url;
+
+    this.options.queryParameter = this.options.queryParameter||'q';
   }
 
   fetch(options?: CollectionFetchOptions): IPromise<any> {
@@ -58,12 +62,12 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
   create(value: any, options?: RestCollectionCreateOptions): IPersistableModel {
     options = options ? extend({}, options) : {};
     let model: IPersistableModel
-    
+
     let url = this.getURL();
     if (url == null) throw new Error('Url or rootURL no specified');
-    
+
     options.url = url;
-    
+
     if (value instanceof RestModel) {
       model = value;
     } else {
@@ -73,23 +77,46 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
     if (options.wait === void 0) options.wait = true;
 
     if (!options.wait) this.add(model, options);
-    
+
     this.trigger('before:create', this, model, value, options);
 
     model.save().then(() => {
 
-     if (!options.wait) this.add(model, options); 
+     if (!options.wait) this.add(model, options);
 
      this.trigger('create', this, model, value, options);
-     
-     if (options.complete) options.complete(null,model);     
-      
+
+     if (options.complete) options.complete(null,model);
+
     }).catch((e) => {
       this.trigger('error', e);
       if (options.complete) options.complete(e, null);
     })
-    
+
     return model;
+  }
+
+  query(term:string, options:CollectionFetchOptions): IPromise<T[]> {
+
+    let params = {[this.options.queryParameter]: term};
+
+    let url = this.getURL();
+    if (url == null) return Promise.reject(new Error('Url or rootURL no specified'));
+    options.url = url;
+    extend(options.params||{}, params);
+
+    this.trigger('before:query');
+    return <any>this.sync(RestMethod.Read, this, options)
+      .then((results) => {
+        this.reset(results.content, options);
+        this.trigger('query');
+        return this.models;
+      }).catch((e) => {
+        this.trigger('error', e);
+        throw e;
+      });
+
+
   }
 
   sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse> {

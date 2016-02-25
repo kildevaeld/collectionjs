@@ -41,7 +41,7 @@ export class Model extends BaseObject implements IModel, ISerializable {
 
 
 	constructor(attributes: Object = {}, options: ModelOptions = {}) {
-
+		super();
 		options = options || {}
 		this._attributes = {};
 		this.options = options;
@@ -56,7 +56,7 @@ export class Model extends BaseObject implements IModel, ISerializable {
 
     this.idAttribute = options.idAttribute || this.idAttribute || 'id';
 
-		super();
+
 
 	}
 

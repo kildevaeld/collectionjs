@@ -73,7 +73,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
   options: CollectionOptions<U>
 
   constructor (models?:U[]|Object[], options:CollectionOptions<U>={}) {
-
+    super();
     this.options = options;
 
     if (this.options.model) {
@@ -85,7 +85,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     if (models) {
       this.add(models);
     }
-		super();
+
   }
 
   add (models:U|U[]|Object|Object[], options:CollectionSetOptions={}) {
