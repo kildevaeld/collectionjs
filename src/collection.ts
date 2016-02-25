@@ -297,6 +297,14 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     return this;
   }
 
+  filter(fn:(model:U, index?:number) => boolean): U[] {
+    let out = [];
+    this.forEach((m, i) => {
+      if (fn(m,i)) out.push(m);
+    });
+    return out;
+  }
+
   indexOf (model:U): number {
     return this.models.indexOf(model)
   }

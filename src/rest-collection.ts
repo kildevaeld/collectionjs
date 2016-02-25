@@ -96,14 +96,15 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
     return model;
   }
 
-  query(term:string, options:CollectionFetchOptions): IPromise<T[]> {
+  query(term:string, options:CollectionFetchOptions={}): IPromise<T[]> {
 
     let params = {[this.options.queryParameter]: term};
 
     let url = this.getURL();
     if (url == null) return Promise.reject(new Error('Url or rootURL no specified'));
     options.url = url;
-    extend(options.params||{}, params);
+    if (!options.params) options.params = {};
+    extend(options.params, params);
 
     this.trigger('before:query');
     return <any>this.sync(RestMethod.Read, this, options)

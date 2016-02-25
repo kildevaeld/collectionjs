@@ -22,6 +22,6 @@ export declare class RestCollection<T extends IPersistableModel> extends Collect
     constructor(models: any, options?: RestCollectionOptions<T>);
     fetch(options?: CollectionFetchOptions): IPromise<any>;
     create(value: any, options?: RestCollectionCreateOptions): IPersistableModel;
-    query(term: string, options: CollectionFetchOptions): IPromise<T[]>;
+    query(term: string, options?: CollectionFetchOptions): IPromise<T[]>;
     sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse>;
 }

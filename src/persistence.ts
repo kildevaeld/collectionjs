@@ -104,7 +104,6 @@ export function sync (method: RestMethod, model:ISerializable, options:SyncOptio
 
      }
 
-
      xhr.open(http, url, true);
 
      if (!(options.headers && options.headers['Accept'])) {
@@ -118,7 +117,7 @@ export function sync (method: RestMethod, model:ISerializable, options:SyncOptio
       }
 
      if (options.beforeSend) options.beforeSend(xhr);
-     xhr.send(model.toJSON());
+     xhr.send(JSON.stringify(model.toJSON()));
 
    });
 }

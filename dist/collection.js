@@ -309,6 +309,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this;
 	    };
+	    Collection.prototype.filter = function (fn) {
+	        var out = [];
+	        this.forEach(function (m, i) {
+	            if (fn(m, i))
+	                out.push(m);
+	        });
+	        return out;
+	    };
 	    Collection.prototype.indexOf = function (model) {
 	        return this.models.indexOf(model);
 	    };
@@ -1572,12 +1580,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    RestCollection.prototype.query = function (term, options) {
 	        var _this = this;
+	        if (options === void 0) { options = {}; }
 	        var params = (_a = {}, _a[this.options.queryParameter] = term, _a);
 	        var url = this.getURL();
 	        if (url == null)
 	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
 	        options.url = url;
-	        objects_1.extend(options.params || {}, params);
+	        if (!options.params)
+	            options.params = {};
+	        objects_1.extend(options.params, params);
 	        this.trigger('before:query');
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
 	            .then(function (results) {
@@ -1955,7 +1966,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        if (options.beforeSend)
 	            options.beforeSend(xhr);
-	        xhr.send(model.toJSON());
+	        xhr.send(JSON.stringify(model.toJSON()));
 	    });
 	}
 	exports.sync = sync;
