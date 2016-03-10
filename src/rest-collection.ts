@@ -28,12 +28,14 @@ export interface RestCollectionCreateOptions extends CollectionCreateOptions, Sy
 export class RestCollection<T extends IPersistableModel> extends Collection<T> implements IPersistableCollection {
   url: string | (() => string);
   options: RestCollectionOptions<T>;
+
   getURL(): string {
     return typeof this.url === 'function' ? (<(() => string)>this.url)() : <string>this.url;
   }
 
   constructor(models: any, options: RestCollectionOptions<T> = {}) {
     super(models, options);
+
     if (options.url) this.url = options.url;
 
     this.options.queryParameter = this.options.queryParameter||'q';

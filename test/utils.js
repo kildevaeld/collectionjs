@@ -1,6 +1,6 @@
 /*global describe:true, it:true, before:true */
 'use strict';
-const np = require('../lib/persistable-model').normalize_path;
+const np = require('../lib/rest-model').normalize_path;
 require('should');
 
 describe('Utils', () => {

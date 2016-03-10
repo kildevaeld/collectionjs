@@ -49,6 +49,9 @@ export class RestModel extends NestedModel implements IPersistableModel {
         if (this.collection && this.collection.getURL()) {
             url = this.collection.getURL();
         }
+
+        id = id || this.id;
+
         if (id && url) {
             url = normalize_path(url, this.id);
         }

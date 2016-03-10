@@ -429,6 +429,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.callFunc = callFunc;
+	function isFunction(a) {
+	    return typeof a === 'function';
+	}
+	exports.isFunction = isFunction;
+	function isEventEmitter(a) {
+	    return a instanceof EventEmitter || (a.listenId && isFunction(a.on) && isFunction(a.off) && isFunction(a.trigger));
+	}
+	exports.isEventEmitter = isEventEmitter;
 	var EventEmitter = (function () {
 	    function EventEmitter() {
 	    }
@@ -1649,6 +1657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.collection && this.collection.getURL()) {
 	            url = this.collection.getURL();
 	        }
+	        id = id || this.id;
 	        if (id && url) {
 	            url = normalize_path(url, this.id);
 	        }
