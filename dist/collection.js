@@ -1566,7 +1566,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            model = value;
 	        }
 	        else {
-	            model = new this.Model(value, { parse: true });
+	            model = new this.Model(value, { parse: true, url: this.getURL() });
 	        }
 	        if (options.wait === void 0)
 	            options.wait = true;

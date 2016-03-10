@@ -73,7 +73,7 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
     if (value instanceof RestModel) {
       model = value;
     } else {
-      model = new this.Model(value, { parse: true });
+      model = new this.Model(value, { parse: true, url: this.getURL() });
     }
 
     if (options.wait === void 0) options.wait = true;
