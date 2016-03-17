@@ -1943,7 +1943,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        query = request_1.queryParam(options.params);
 	    if (query) {
 	        var sep = (options.url.indexOf('?') === -1) ? '?' : '&';
-	        url += sep + query.substring(1);
+	        url += sep + query;
 	    }
 	    return new promises_1.Promise(function (resolve, reject) {
 	        xhr.onreadystatechange = function () {

@@ -79,7 +79,7 @@ export function sync (method: RestMethod, model:ISerializable, options:SyncOptio
 
    if (query) {
     var sep = (options.url.indexOf('?') === -1) ? '?' : '&';
-    url += sep + query.substring(1);
+    url += sep + query;
    }
 
    return new Promise((resolve, reject) => {
