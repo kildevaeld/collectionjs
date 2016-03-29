@@ -112,6 +112,8 @@ export function sync (method: RestMethod, model:ISerializable, options:SyncOptio
         }
      }
 
+     xhr.setRequestHeader('Content-Type', "application/json");
+
      if (options.headers) for (var key in options.headers) {
         xhr.setRequestHeader(key, options.headers[key]);
       }

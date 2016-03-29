@@ -434,7 +434,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isFunction = isFunction;
 	function isEventEmitter(a) {
-	    return a instanceof EventEmitter || (a.listenId && isFunction(a.on) && isFunction(a.off) && isFunction(a.trigger));
+	    return a instanceof EventEmitter || (isFunction(a.on) && isFunction(a.off) && isFunction(a.trigger));
 	}
 	exports.isEventEmitter = isEventEmitter;
 	var EventEmitter = (function () {
@@ -486,10 +486,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var _i = 1; _i < arguments.length; _i++) {
 	            args[_i - 1] = arguments[_i];
 	        }
-	        var events = (this._listeners || (this._listeners = {}))[eventName] || (this._listeners[eventName] = [])
-	            .concat(this._listeners['all'] || []);
+	        //let events = (this._listeners|| (this._listeners = {}))[eventName]||(this._listeners[eventName]=[])
+	        //.concat(this._listeners['all']||[])
+	        this._listeners = this._listeners || {};
+	        var events = (this._listeners[eventName] || []).concat(this._listeners['all'] || []);
 	        if (EventEmitter.debugCallback)
-	            EventEmitter.debugCallback(this.constructor.name, this.name, eventName, args);
+	            EventEmitter.debugCallback(this.constructor.name, this.name, eventName, args, events);
 	        var event, a, len = events.length, index;
 	        var calls = [];
 	        for (var i = 0, ii = events.length; i < ii; i++) {
@@ -1969,6 +1971,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                Accept: "application/json"
 	            };
 	        }
+	        xhr.setRequestHeader('Content-Type', "application/json");
 	        if (options.headers)
 	            for (var key in options.headers) {
 	                xhr.setRequestHeader(key, options.headers[key]);
@@ -2010,7 +2013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.queryStringToParams = queryStringToParams;
 	function queryParam(obj) {
-	    return '?' + Object.keys(obj).reduce(function (a, k) { a.push(k + '=' + encodeURIComponent(obj[k])); return a; }, []).join('&');
+	    return Object.keys(obj).reduce(function (a, k) { a.push(k + '=' + encodeURIComponent(obj[k])); return a; }, []).join('&');
 	}
 	exports.queryParam = queryParam;
 	var isValid = function (xhr, url) {
@@ -2023,7 +2026,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Request(_method, _url) {
 	        this._method = _method;
 	        this._url = _url;
-	        this._headers = {};
+	        this._headers = { 'X-Requested-With': 'XMLHttpRequest' };
 	        this._params = {};
 	        this._xhr = utils_1.ajax();
 	    }
@@ -2050,7 +2053,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        data = this._data;
 	        var url = this._url;
 	        if (data && data === Object(data) && this._method == 'GET') {
-	            var d = queryParam(data);
+	            var sep = (url.indexOf('?') === -1) ? '?' : '&';
+	            var d = sep + queryParam(data);
 	            url += d;
 	        }
 	        url = this._apply_params(url);
@@ -2081,6 +2085,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Request.prototype.progress = function (fn) {
 	        this._xhr.addEventListener('progress', fn);
+	        return this;
+	    };
+	    Request.prototype.uploadProgress = function (fn) {
+	        this._xhr.upload.addEventListener('progress', fn);
 	        return this;
 	    };
 	    Request.prototype.header = function (field, value) {
