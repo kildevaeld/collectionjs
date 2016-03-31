@@ -32,7 +32,7 @@ describe('Utils', () => {
   
   const Model = require('../lib/nested-model').NestedModel;
   
-  describe.only('ObjToPaths', () => {
+  describe('ObjToPaths', () => {
     
     const fixture = {
       genres: [{

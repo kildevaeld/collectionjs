@@ -219,7 +219,7 @@ export class NestedModel extends Model {
 				(<any>this)._changed[attr] = val
 			}
 			if (!equal(getNested(prev, attr), val)) {
-				setNested(this.changed, attr, val);
+				setNested(this.changed, attr, val, options);
 			} else {
 				deleteNested(this.changed, attr);
 			}
@@ -253,7 +253,7 @@ export class NestedModel extends Model {
 					// Gets triggered when set on nested model
 					alreadyTriggered[attr] = true;
 				}
-				setNested(current, attr, val);
+				setNested(current, attr, val, options);
 			}
 
 			//</custom code>
