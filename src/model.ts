@@ -47,8 +47,9 @@ export class Model extends BaseObject implements IModel, ISerializable {
 		this.options = options;
 		if (options.parse) attributes = this.parse(attributes);
 		//this._attributes = attributes
-		this.set(attributes, null, { silent: true });
+		this.set(attributes,  <any>{ silent: true, array: false });
 		this.uid = uniqueId('uid')
+
 
 		this._changed = {};
 

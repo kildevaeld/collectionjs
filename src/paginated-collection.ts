@@ -165,7 +165,7 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     params[this.queryParams.size] = this._state.size;
     
     if (!this._link[options.page + '']) {
-      this._link[options.page] = url + queryParam({page:options.page})
+      this._link[options.page] = url + '?' + queryParam({page:options.page})
     }
     
     return this.sync(RestMethod.Read, this, options)

@@ -11,7 +11,7 @@ import {Model, ModelSetOptions} from './model'
  * @param  {Object}      Nested object e.g. { level1: { level2: 'value' } }
  * @return {Object}      Shallow object with path names e.g. { 'level1.level2': 'value' }
  */
-function objToPaths(obj:Object, separator:string = ".") {
+export function objToPaths(obj:Object, separator:string = ".", array:boolean = true) {
 	var ret = {};
 
   if (!obj) return obj;
@@ -19,7 +19,7 @@ function objToPaths(obj:Object, separator:string = ".") {
 	for (var key in obj) {
 		var val = obj[key];
 
-		if (val && (val.constructor === Object || val.constructor === Array) && !isEmpty(val)) {
+		if (val && (val.constructor === Object || (array && val.constructor === Array)) && !isEmpty(val)) {
 			//Recursion for embedded objects
 			var obj2 = objToPaths(val);
 
@@ -59,7 +59,7 @@ function isOnNestedModel(obj:Object, path:string, separator:string = "."): boole
  * @param  {[type]} return_exists [description]
  * @return {mixed}                [description]
  */
-function getNested(obj, path, return_exists?, separator:string = ".") {
+export function getNested(obj, path, return_exists?, separator:string = ".") {
   if (!obj) return null;
 
 	var fields = path ? path.split(separator) : [];
@@ -112,6 +112,7 @@ function setNested(obj, path, val, options?) {
 
 		//If the last in the path, set the value
 		if (i === n - 1) {
+      
 			options.unset ? delete result[field] : result[field] = val;
 		} else {
 			//Create the child object if it doesn't exist, or isn't an object
@@ -148,6 +149,11 @@ function deleteNested(obj, path) {
 	});
 }
 
+export interface NestedModelSetOptions extends ModelSetOptions {
+  array?: boolean;
+}
+
+
 export class NestedModel extends Model {
 	static keyPathSeparator = '.'
 
@@ -160,7 +166,7 @@ export class NestedModel extends Model {
 
 	// Override set
 	// Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
-	set (key:string|Object, val?:any, options?:ModelSetOptions) {
+	set (key:string|Object, val?:any, options?:NestedModelSetOptions) {
 		var attr, attrs, unset, changes, silent, changing, prev, current;
 		if (key == null) return this;
 
@@ -192,12 +198,13 @@ export class NestedModel extends Model {
 
 		// Check for changes of `id`.
 		//if (this.idAttribute in attrs) this.id = attrs[this.idAttribute];
-
+    var separator = NestedModel.keyPathSeparator;
 		//<custom code>
-		attrs = objToPaths(attrs);
+		attrs = objToPaths(attrs, separator, options.array);
+   
 		//</custom code>
 		var alreadyTriggered = {}; // * @restorer
-		var separator = NestedModel.keyPathSeparator;
+		
 		if (!this._nestedListener) this._nestedListener = {};
 
 		// For each `set` attribute, update or delete the current value.
