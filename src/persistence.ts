@@ -3,6 +3,18 @@ import {IPromise, Promise} from 'utilities/lib/promises';
 import {ajax, proxy} from 'utilities/lib/utils';
 import {queryParam} from 'utilities/lib/request';
 
+export class HttpError extends Error {
+  public message: string;
+  public status: number;
+  public body: any;
+  constructor(status:number, message: string, body: any) {
+    super(message);
+    this.message = message;
+    this.status = status;
+    this.body = body;
+  }
+}
+
 export enum RestMethod {
     Create, Update, Read, Patch, Delete
 };
@@ -86,11 +98,19 @@ export function sync (method: RestMethod, model:ISerializable, options:SyncOptio
 
      xhr.onreadystatechange = function () {
        if (xhr.readyState !== 4) return;
+       
+       let data;
+       
+       try {
+         data = getData(options.headers['Accept'], xhr);
+       } catch (e) {
+          return reject(new Error('Could not serialize response'));
+       }
 
        let response: SyncResponse = {
          method: method,
          status: xhr.status,
-         content: getData(options.headers['Accept'], xhr)
+         content: data
        };
 
        proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
@@ -98,7 +118,8 @@ export function sync (method: RestMethod, model:ISerializable, options:SyncOptio
        if (isValid(xhr)) {
          return resolve(response)
        } else {
-         var error = new Error('Server responded with status of ' + xhr.statusText);
+         let error = new HttpError(xhr.status, xhr.statusText, data);
+         
          return reject(error);
        }
 
