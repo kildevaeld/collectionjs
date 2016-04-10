@@ -1,6 +1,6 @@
 
 import {EventEmitter} from 'eventsjs'
-import {IModel,ICollection} from './interfaces'
+import {IModel, ICollection} from './interfaces'
 import {uniqueId, equal} from 'utilities/lib/utils'
 import {has, extend, isEmpty, isObject} from 'utilities/lib/objects'
 import {Model, ModelSetOptions} from './model'
@@ -11,44 +11,44 @@ import {Model, ModelSetOptions} from './model'
  * @param  {Object}      Nested object e.g. { level1: { level2: 'value' } }
  * @return {Object}      Shallow object with path names e.g. { 'level1.level2': 'value' }
  */
-export function objToPaths(obj:Object, separator:string = ".", array:boolean = true) {
-	var ret = {};
+export function objToPaths(obj: Object, separator: string = ".", array: boolean = true) {
+  var ret = {};
 
   if (!obj) return obj;
 
-	for (var key in obj) {
-		var val = obj[key];
+  for (var key in obj) {
+    var val = obj[key];
 
-		if (val && (val.constructor === Object || (array && val.constructor === Array)) && !isEmpty(val)) {
-			//Recursion for embedded objects
-			var obj2 = objToPaths(val);
+    if (val && (val.constructor === Object || (array && val.constructor === Array)) && !isEmpty(val)) {
+      //Recursion for embedded objects
+      var obj2 = objToPaths(val);
 
-			for (var key2 in obj2) {
-				var val2 = obj2[key2];
+      for (var key2 in obj2) {
+        var val2 = obj2[key2];
 
-				ret[key + separator + key2] = val2;
-			}
-		} else {
-			ret[key] = val;
-		}
-	}
+        ret[key + separator + key2] = val2;
+      }
+    } else {
+      ret[key] = val;
+    }
+  }
 
-	return ret;
+  return ret;
 }
 
-function isOnNestedModel(obj:Object, path:string, separator:string = "."): boolean {
-	var fields = path ? path.split(separator) : [];
+function isOnNestedModel(obj: Object, path: string, separator: string = "."): boolean {
+  var fields = path ? path.split(separator) : [];
 
   if (!obj) return false;
 
-	var result = obj;
+  var result = obj;
 
-	for (let i = 0, n = fields.length; i < n; i++) {
-		if (result instanceof Model) return true
-		if (!result) return false;
-		result = result[fields[i]];
-	}
-	return false;
+  for (let i = 0, n = fields.length; i < n; i++) {
+    if (result instanceof Model) return true
+    if (!result) return false;
+    result = result[fields[i]];
+  }
+  return false;
 
 }
 
@@ -59,35 +59,35 @@ function isOnNestedModel(obj:Object, path:string, separator:string = "."): boole
  * @param  {[type]} return_exists [description]
  * @return {mixed}                [description]
  */
-export function getNested(obj, path, return_exists?, separator:string = ".") {
+export function getNested(obj, path, return_exists?, separator: string = ".") {
   if (!obj) return null;
 
-	var fields = path ? path.split(separator) : [];
-	var result = obj;
-	return_exists || (return_exists === false);
-	for (var i = 0, n = fields.length; i < n; i++) {
-		if (return_exists && !has(result, fields[i])) {
-			return false;
-		}
+  var fields = path ? path.split(separator) : [];
+  var result = obj;
+  return_exists || (return_exists === false);
+  for (var i = 0, n = fields.length; i < n; i++) {
+    if (return_exists && !has(result, fields[i])) {
+      return false;
+    }
 
-		result = result instanceof Model ? result.get(fields[i]) : result[fields[i]];
+    result = result instanceof Model ? result.get(fields[i]) : result[fields[i]];
 
-		if (result == null && i < n - 1) {
-			result = {};
-		}
+    if (result == null && i < n - 1) {
+      result = {};
+    }
 
 
-		if (typeof result === 'undefined') {
-			if (return_exists) {
-				return true;
-			}
-			return result;
-		}
-	}
-	if (return_exists) {
-		return true;
-	}
-	return result;
+    if (typeof result === 'undefined') {
+      if (return_exists) {
+        return true;
+      }
+      return result;
+    }
+  }
+  if (return_exists) {
+    return true;
+  }
+  return result;
 }
 
 
@@ -99,54 +99,54 @@ export function getNested(obj, path, return_exists?, separator:string = ".") {
  * @param {Mixed}                     Value to set
  */
 function setNested(obj, path, val, options?) {
-	options = options || {};
+  options = options || {};
 
   if (!obj) return null;
 
-	var separator = options.separator || "."
+  var separator = options.separator || "."
 
-	var fields = path ? path.split(separator) : [];
-	var result = obj;
-	for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
-		var field = fields[i];
+  var fields = path ? path.split(separator) : [];
+  var result = obj;
+  for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
+    var field = fields[i];
 
-		//If the last in the path, set the value
-		if (i === n - 1) {
-      
-			options.unset ? delete result[field] : result[field] = val;
-		} else {
-			//Create the child object if it doesn't exist, or isn't an object
-			if (typeof result[field] === 'undefined' || !isObject(result[field])) {
-				// If trying to remove a field that doesn't exist, then there's no need
-				// to create its missing parent (doing so causes a problem with
-				// hasChanged()).
-				if (options.unset) {
-					delete result[field]; // in case parent exists but is not an object
-					return;
-				}
-				var nextField = fields[i + 1];
+    //If the last in the path, set the value
+    if (i === n - 1) {
 
-				// create array if next field is integer, else create object
-				result[field] = /^\d+$/.test(nextField) ? [] : {};
-			}
+      options.unset ? delete result[field] : result[field] = val;
+    } else {
+      //Create the child object if it doesn't exist, or isn't an object
+      if (typeof result[field] === 'undefined' || !isObject(result[field])) {
+        // If trying to remove a field that doesn't exist, then there's no need
+        // to create its missing parent (doing so causes a problem with
+        // hasChanged()).
+        if (options.unset) {
+          delete result[field]; // in case parent exists but is not an object
+          return;
+        }
+        var nextField = fields[i + 1];
 
-			//Move onto the next part of the path
-			result = result[field];
+        // create array if next field is integer, else create object
+        result[field] = /^\d+$/.test(nextField) ? [] : {};
+      }
 
-			// The field is a model - delegate...
-			if (result instanceof Model) {
-				let rest = fields.slice(i+1);
-				return result.set(rest.join('.'), val, options);
-			}
+      //Move onto the next part of the path
+      result = result[field];
 
-		}
-	}
+      // The field is a model - delegate...
+      if (result instanceof Model) {
+        let rest = fields.slice(i + 1);
+        return result.set(rest.join('.'), val, options);
+      }
+
+    }
+  }
 }
 
 function deleteNested(obj, path) {
-	setNested(obj, path, null, {
-		unset: true
-	});
+  setNested(obj, path, null, {
+    unset: true
+  });
 }
 
 export interface NestedModelSetOptions extends ModelSetOptions {
@@ -155,234 +155,251 @@ export interface NestedModelSetOptions extends ModelSetOptions {
 
 
 export class NestedModel extends Model {
-	static keyPathSeparator = '.'
+  static keyPathSeparator = '.'
 
-	private _nestedListener: {[key: string]: Function}
-	// Override get
-	// Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
-	get (attr) {
-		return getNested(this._attributes, attr);
-	}
+  private _nestedListener: { [key: string]: Function }
+  // Override get
+  // Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
+  get(attr) {
+    return getNested(this._attributes, attr);
+  }
 
-	// Override set
-	// Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
-	set (key:string|Object, val?:any, options?:NestedModelSetOptions) {
-		var attr, attrs, unset, changes, silent, changing, prev, current;
-		if (key == null) return this;
+  // Override set
+  // Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
+  set(key: string | Object, val?: any, options?: NestedModelSetOptions) {
+    var attr, attrs, unset, changes, silent, changing, prev, current;
+    if (key == null) return this;
 
-		// Handle both `"key", value` and `{key: value}` -style arguments.
-		if (typeof key === 'object') {
-			attrs = key;
-			options = val || {};
-		} else {
-			(attrs = {})[<string>key] = val;
-		}
+    // Handle both `"key", value` and `{key: value}` -style arguments.
+    if (typeof key === 'object') {
+      attrs = key;
+      options = val || {};
+    } else {
+      (attrs = {})[<string>key] = val;
+    }
 
-		options || (options = {});
+    options || (options = {});
 
-		// Run validation.
-		//if (!this._validate(attrs, options)) return false;
+    // Run validation.
+    //if (!this._validate(attrs, options)) return false;
 
-		// Extract attributes and options.
-		unset = options.unset;
-		silent = options.silent;
-		changes = [];
-		changing = (<any>this)._changing;
-		(<any>this)._changing = true;
+    // Extract attributes and options.
+    unset = options.unset;
+    silent = options.silent;
+    changes = [];
+    changing = (<any>this)._changing;
+    (<any>this)._changing = true;
 
-		if (!changing) {
-			(<any>this)._previousAttributes = extend({}, this._attributes);
-			(<any>this)._changed = {};
-		}
-		current = this._attributes, prev = (<any>this)._previousAttributes;
+    if (!changing) {
+      (<any>this)._previousAttributes = extend({}, this._attributes);
+      (<any>this)._changed = {};
+    }
+    current = this._attributes, prev = (<any>this)._previousAttributes;
 
-		// Check for changes of `id`.
-		//if (this.idAttribute in attrs) this.id = attrs[this.idAttribute];
+    // Check for changes of `id`.
+    //if (this.idAttribute in attrs) this.id = attrs[this.idAttribute];
     var separator = NestedModel.keyPathSeparator;
-		//<custom code>
-		attrs = objToPaths(attrs, separator, options.array);
-   
-		//</custom code>
-		var alreadyTriggered = {}; // * @restorer
-		
-		if (!this._nestedListener) this._nestedListener = {};
+    //<custom code>
+    attrs = objToPaths(attrs, separator, options.array);
 
-		// For each `set` attribute, update or delete the current value.
-		for (attr in attrs) {
-			val = attrs[attr];
+    //</custom code>
+    var alreadyTriggered = {}; // * @restorer
+
+    if (!this._nestedListener) this._nestedListener = {};
+
+    // For each `set` attribute, update or delete the current value.
+    for (attr in attrs) {
+      val = attrs[attr];
 
 
-			//<custom code>: Using getNested, setNested and deleteNested
+      //<custom code>: Using getNested, setNested and deleteNested
       let curVal = getNested(current, attr);
-			if (!equal(curVal, val)) {
-				changes.push(attr);
-				(<any>this)._changed[attr] = val
-			}
-			if (!equal(getNested(prev, attr), val)) {
-				setNested(this.changed, attr, val, options);
-			} else {
-				deleteNested(this.changed, attr);
-			}
+      if (!equal(curVal, val)) {
+        changes.push(attr);
+        (<any>this)._changed[attr] = val
+      }
+      if (!equal(getNested(prev, attr), val)) {
+        setNested(this.changed, attr, val, options);
+      } else {
+        deleteNested(this.changed, attr);
+      }
 
-			if (curVal instanceof Model) {
-          let fn = this._nestedListener[attr]
-          if (fn) {
-              curVal.off('change', fn);
-              delete this._nestedListener[attr];
-          }
-			}
+      if (curVal instanceof Model) {
+        let fn = this._nestedListener[attr]
+        if (fn) {
+          curVal.off('change', fn);
+          delete this._nestedListener[attr];
+        }
+      }
 
-			if (unset) {
-				deleteNested(current, attr);
+      if (unset) {
+        deleteNested(current, attr);
 
-			} else {
-				if (!isOnNestedModel(current, attr, separator)) {
-					if (val instanceof Model) {
-						let fn = (model) => {
+      } else {
+        if (!isOnNestedModel(current, attr, separator)) {
+          if (val instanceof Model) {
+            let fn = (model) => {
               if (model.changed == undefined || isEmpty(model.changed)) return;
-							for (let key in model.changed) {
-								this._changed[attr + separator + key] = model.changed[key];
-								this.trigger('change:' + attr + separator + key, model.changed[key])
-							}
-							this.trigger('change', this, options);
-						}
-						this._nestedListener[attr] = fn;
-						val.on('change', fn);
-					}
-				} else {
-					// Gets triggered when set on nested model
-					alreadyTriggered[attr] = true;
-				}
-				setNested(current, attr, val, options);
-			}
+              for (let key in model.changed) {
+                this._changed[attr + separator + key] = model.changed[key];
+                this.trigger('change:' + attr + separator + key, model.changed[key])
+              }
+              this.trigger('change', this, options);
+            }
+            this._nestedListener[attr] = fn;
+            val.on('change', fn);
+          }
+        } else {
+          // Gets triggered when set on nested model
+          alreadyTriggered[attr] = true;
+        }
+        setNested(current, attr, val, options);
+      }
 
-			//</custom code>
-		}
+      //</custom code>
+    }
 
-		// Trigger all relevant attribute changes.
-		if (!silent) {
-			if (changes.length) (<any>this)._pending = true;
+    // Trigger all relevant attribute changes.
+    if (!silent) {
+      if (changes.length) (<any>this)._pending = true;
 
-			//<custom code>
-			//var separator = NestedModel.keyPathSeparator;
-			//var alreadyTriggered = {}; // * @restorer
+      //<custom code>
+      //var separator = NestedModel.keyPathSeparator;
+      //var alreadyTriggered = {}; // * @restorer
 
-			for (var i = 0, l = changes.length; i < l; i++) {
-				let key = changes[i];
+      for (var i = 0, l = changes.length; i < l; i++) {
+        let key = changes[i];
 
-				if (!alreadyTriggered.hasOwnProperty(key) || !alreadyTriggered[key]) { // * @restorer
-					alreadyTriggered[key] = true; // * @restorer
-					this.trigger('change:' + key, this, getNested(current, key), options);
-				} // * @restorer
+        if (!alreadyTriggered.hasOwnProperty(key) || !alreadyTriggered[key]) { // * @restorer
+          alreadyTriggered[key] = true; // * @restorer
+          this.trigger('change:' + key, this, getNested(current, key), options);
+        } // * @restorer
 
-				var fields = key.split(separator);
+        var fields = key.split(separator);
 
-				//Trigger change events for parent keys with wildcard (*) notation
-				for (var n = fields.length - 1; n > 0; n--) {
-					var parentKey = fields.slice(0, n).join(separator),
-						wildcardKey = parentKey + separator + '*';
+        //Trigger change events for parent keys with wildcard (*) notation
+        for (var n = fields.length - 1; n > 0; n--) {
+          var parentKey = fields.slice(0, n).join(separator),
+            wildcardKey = parentKey + separator + '*';
 
-					if (!alreadyTriggered.hasOwnProperty(wildcardKey) || !alreadyTriggered[wildcardKey]) { // * @restorer
-						alreadyTriggered[wildcardKey] = true; // * @restorer
-						this.trigger('change:' + wildcardKey, this, getNested(current, parentKey), options);
-					} // * @restorer
+          if (!alreadyTriggered.hasOwnProperty(wildcardKey) || !alreadyTriggered[wildcardKey]) { // * @restorer
+            alreadyTriggered[wildcardKey] = true; // * @restorer
+            this.trigger('change:' + wildcardKey, this, getNested(current, parentKey), options);
+          } // * @restorer
 
-					// + @restorer
-					if (!alreadyTriggered.hasOwnProperty(parentKey) || !alreadyTriggered[parentKey]) {
-						alreadyTriggered[parentKey] = true;
-						this.trigger('change:' + parentKey, this, getNested(current, parentKey), options);
-					}
-					// - @restorer
-				}
-				//</custom code>
-			}
-		}
+          // + @restorer
+          if (!alreadyTriggered.hasOwnProperty(parentKey) || !alreadyTriggered[parentKey]) {
+            alreadyTriggered[parentKey] = true;
+            this.trigger('change:' + parentKey, this, getNested(current, parentKey), options);
+          }
+          // - @restorer
+        }
+        //</custom code>
+      }
+    }
 
-		if (changing) return this;
-		if (!silent) {
-			while ((<any>this)._pending) {
-				(<any>this)._pending = false;
+    if (changing) return this;
+    if (!silent) {
+      while ((<any>this)._pending) {
+        (<any>this)._pending = false;
 
-				this.trigger('change', this, options);
-			}
-		}
-		(<any>this)._pending = false;
-		(<any>this)._changing = false;
-		return this;
-	}
+        this.trigger('change', this, options);
+      }
+    }
+    (<any>this)._pending = false;
+    (<any>this)._changing = false;
+    return this;
+  }
 
-	// Clear all attributes on the model, firing `"change"` unless you choose
-	// to silence it.
-	clear (options) {
-		var attrs = {};
-		var shallowAttributes = objToPaths(this._attributes);
-		for (var key in shallowAttributes) attrs[key] = void 0;
-		return this.set(attrs, extend({}, options, {
-			unset: true
-		}));
-	}
+  // Clear all attributes on the model, firing `"change"` unless you choose
+  // to silence it.
+  clear(options) {
+    var attrs = {};
+    var shallowAttributes = objToPaths(this._attributes);
+    for (var key in shallowAttributes) attrs[key] = void 0;
+    return this.set(attrs, extend({}, options, {
+      unset: true
+    }));
+  }
 
-	// Determine if the model has changed since the last `"change"` event.
-	// If you specify an attribute name, determine if that attribute has changed.
-	hasChanged (attr?) {
-		if (attr == null) {
-			return !Object.keys(this.changed).length;
-		}
-		return getNested(this.changed, attr) !== undefined;
-	}
+  // Determine if the model has changed since the last `"change"` event.
+  // If you specify an attribute name, determine if that attribute has changed.
+  hasChanged(attr?) {
+    if (attr == null) {
+      return !Object.keys(this.changed).length;
+    }
+    return getNested(this.changed, attr) !== undefined;
+  }
 
-	// Return an object containing all the attributes that have changed, or
-	// false if there are no changed attributes. Useful for determining what
-	// parts of a view need to be updated and/or what attributes need to be
-	// persisted to the server. Unset attributes will be set to undefined.
-	// You can also pass an attributes object to diff against the model,
-	// determining if there *would be* a change.
-	changedAttributes (diff) {
-		//<custom code>: objToPaths
-		if (!diff) return this.hasChanged() ? objToPaths(this.changed) : false;
-		//</custom code>
+  // Return an object containing all the attributes that have changed, or
+  // false if there are no changed attributes. Useful for determining what
+  // parts of a view need to be updated and/or what attributes need to be
+  // persisted to the server. Unset attributes will be set to undefined.
+  // You can also pass an attributes object to diff against the model,
+  // determining if there *would be* a change.
+  changedAttributes(diff) {
+    //<custom code>: objToPaths
+    if (!diff) return this.hasChanged() ? objToPaths(this.changed) : false;
+    //</custom code>
 
-		var old = (<any>this)._changing ? (<any>this)._previousAttributes : this._attributes;
+    var old = (<any>this)._changing ? (<any>this)._previousAttributes : this._attributes;
 
-		//<custom code>
-		diff = objToPaths(diff);
-		old = objToPaths(old);
-		//</custom code>
+    //<custom code>
+    diff = objToPaths(diff);
+    old = objToPaths(old);
+    //</custom code>
 
-		var val, changed = false;
-		for (var attr in diff) {
-			if (equal(old[attr], (val = diff[attr]))) continue;
-			(changed || (changed = <any>{}))[attr] = val;
-		}
-		return changed;
-	}
+    var val, changed = false;
+    for (var attr in diff) {
+      if (equal(old[attr], (val = diff[attr]))) continue;
+      (changed || (changed = <any>{}))[attr] = val;
+    }
+    return changed;
+  }
 
-	// Get the previous value of an attribute, recorded at the time the last
-	// `"change"` event was fired.
-	previous (attr) {
-		if (attr == null || !(<any>this)._previousAttributes) {
-			return null;
-		}
+  // Get the previous value of an attribute, recorded at the time the last
+  // `"change"` event was fired.
+  previous(attr) {
+    if (attr == null || !(<any>this)._previousAttributes) {
+      return null;
+    }
 
-		//<custom code>
-		return getNested((<any>this)._previousAttributes, attr);
-		//</custom code>
-	}
+    //<custom code>
+    return getNested((<any>this)._previousAttributes, attr);
+    //</custom code>
+  }
 
-	// Get all of the attributes of the model at the time of the previous
-	// `"change"` event.
-	previousAttributes () {
-		return extend({}, (<any>this)._previousAttributes);
-	}
+  // Get all of the attributes of the model at the time of the previous
+  // `"change"` event.
+  previousAttributes() {
+    return extend({}, (<any>this)._previousAttributes);
+  }
 
-	destroy () {
-		for (let key in this._nestedListener) {
-			let fn = this._nestedListener[key];
-			if (fn) {
-				let m = this.get(key);
-				if (m) m.off(key, fn);
-			}
-		}
-		super.destroy();
-	}
+  public pick(attr: string | string[], ...attrs: string[]): any {
+    if (arguments.length === 1) {
+      attr  = !Array.isArray(attr) ? [attr] : (attr as string[]);
+    } else {
+      attrs = [<string>attr].concat(attrs);
+    }
+    let out = {};
+    for (let i = 0, ii = attrs.length; i < ii; i++) {
+      if (this.has(attrs[i])) {
+        setNested(out, attr[i], this.get(attr[i]));
+      }
+    }
+
+    return out;
+  }
+
+
+  destroy() {
+    for (let key in this._nestedListener) {
+      let fn = this._nestedListener[key];
+      if (fn) {
+        let m = this.get(key);
+        if (m) m.off(key, fn);
+      }
+    }
+    super.destroy();
+  }
 }
