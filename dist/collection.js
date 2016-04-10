@@ -1534,7 +1534,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var out = {};
 	        for (var i = 0, ii = attrs.length; i < ii; i++) {
 	            if (this.has(attrs[i])) {
-	                setNested(out, attr[i], this.get(attr[i]));
+	                setNested(out, attrs[i], this.get(attrs[i]));
 	            }
 	        }
 	        return out;
