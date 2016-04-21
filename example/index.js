@@ -19,8 +19,11 @@ let data = function () {
   
 }();
 
-
-app.use(express.static('../dist'))
+app.set('etag', false); 
+app.use(express.static('../dist', {
+  etag: false,
+  lastModified: false
+}))
 
 app.get('/', (req, res) => {
   res.render('index.jade');
@@ -37,10 +40,10 @@ app.get('/data', (req, res) => {
   
   if (page > 1) links.prev = page - 1
   
-  if (page < links.last) links.next = page + 1; 
+  if (page < links.last) links.next = page + 2; 
   
   for (let k in links) {
-    links[k] = "http://localhost:3000/data?page=" + links[k];
+    links[k] = "http://localhost:4000/data?page=" + links[k];
   }
   res.set('content-type', 'application/json');
   res.links(links);

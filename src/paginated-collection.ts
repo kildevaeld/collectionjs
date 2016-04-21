@@ -216,11 +216,10 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
       for ( let i = 0, ii = data.length; i < ii; i++ ) {
         data[i] = this._prepareModel(data[i]); //new this.Model(data[i], { parse: true });
       }
-      this[options.reset ? 'reset' : 'set'](data, options);
-      //this.add(data);
-      this.page.reset(data);
       
-      
+      //this[options.reset ? 'reset' : 'set'](data, options);
+      this.add(data);
+      //this.page.reset(data);
       return this;
   }
   

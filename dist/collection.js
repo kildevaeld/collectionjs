@@ -2369,8 +2369,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var i = 0, ii = data.length; i < ii; i++) {
 	            data[i] = this._prepareModel(data[i]);
 	        }
-	        this[options.reset ? 'reset' : 'set'](data, options);
-	        this.page.reset(data);
+	        this.add(data);
 	        return this;
 	    };
 	    PaginatedCollection.prototype._parseLinkHeaders = function (resp) {
