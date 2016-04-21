@@ -1,5 +1,11 @@
 import { ISerializable } from './interfaces';
 import { IPromise } from 'utilities/lib/promises';
+export declare class HttpError extends Error {
+    message: string;
+    status: number;
+    body: any;
+    constructor(status: number, message: string, body: any);
+}
 export declare enum RestMethod {
     Create = 0,
     Update = 1,

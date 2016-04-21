@@ -1,3 +1,6 @@
+/* global describe:true,beforeEach,it,require */
+'use strict';
+
 require('should');
 var sinon = require('sinon');
 var NestedModel = require('../lib/nested-model').NestedModel;
@@ -81,6 +84,26 @@ describe('NestedModel', function () {
     this.model.set('nested', new NestedModel({value:'value'}));
     this.model.unset('nested');
     Object.keys(this.model._nestedListener).length.should.equal(0);
+  });
+  
+  
+  
+  it('should pick properties', () => {
+    let model = new NestedModel({
+      name: 'Lars',
+      meta: {
+        cool: 'guy',
+        notcool: 'letter'  
+      },
+      age: 22
+    });
+    
+    let obj = model.pick("name", "meta.cool");
+    
+    Object.keys(obj).length.should.equal(2)
+    obj.should.be.an.Object();
+    obj.should.have.property('name', 'Lars');
+    obj.should.have.property('meta', {cool: 'guy'});
   });
 
 });

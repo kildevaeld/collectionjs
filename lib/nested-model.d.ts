@@ -14,5 +14,6 @@ export declare class NestedModel extends Model {
     changedAttributes(diff: any): Object;
     previous(attr: any): any;
     previousAttributes(): any;
+    pick(attr: string | string[], ...attrs: string[]): any;
     destroy(): void;
 }

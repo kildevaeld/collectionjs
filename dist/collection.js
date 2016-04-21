@@ -1226,6 +1226,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Model.prototype.remove = function (options) {
 	        this.trigger('remove', this, this.collection, options);
 	    };
+	    Model.prototype.pick = function (attr) {
+	        var attrs = [];
+	        for (var _i = 1; _i < arguments.length; _i++) {
+	            attrs[_i - 1] = arguments[_i];
+	        }
+	        if (arguments.length === 1) {
+	            if (!Array.isArray(attr)) {
+	                attrs = [attr];
+	            }
+	            else {
+	                attrs = attr;
+	            }
+	        }
+	        else {
+	            attrs = [attr].concat(attrs);
+	        }
+	        var out = {};
+	        for (var i = 0, ii = attrs.length; i < ii; i++) {
+	            if (this.has(attrs[i]))
+	                out[attrs[i]] = this.get(attrs[i]);
+	        }
+	        return out;
+	    };
 	    return Model;
 	}(object_1.BaseObject));
 	exports.Model = Model;
@@ -1387,7 +1410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this._changed[attr] = val;
 	            }
 	            if (!utils_1.equal(getNested(prev, attr), val)) {
-	                setNested(this.changed, attr, val);
+	                setNested(this.changed, attr, val, options);
 	            }
 	            else {
 	                deleteNested(this.changed, attr);
@@ -1421,7 +1444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                else {
 	                    alreadyTriggered[attr] = true;
 	                }
-	                setNested(current, attr, val);
+	                setNested(current, attr, val, options);
 	            }
 	        }
 	        if (!silent) {
@@ -1496,6 +1519,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    NestedModel.prototype.previousAttributes = function () {
 	        return objects_1.extend({}, this._previousAttributes);
+	    };
+	    NestedModel.prototype.pick = function (attr) {
+	        var attrs = [];
+	        for (var _i = 1; _i < arguments.length; _i++) {
+	            attrs[_i - 1] = arguments[_i];
+	        }
+	        if (arguments.length === 1) {
+	            attr = !Array.isArray(attr) ? [attr] : attr;
+	        }
+	        else {
+	            attrs = [attr].concat(attrs);
+	        }
+	        var out = {};
+	        for (var i = 0, ii = attrs.length; i < ii; i++) {
+	            if (this.has(attrs[i])) {
+	                setNested(out, attrs[i], this.get(attrs[i]));
+	            }
+	        }
+	        return out;
 	    };
 	    NestedModel.prototype.destroy = function () {
 	        for (var key in this._nestedListener) {
@@ -1889,9 +1931,25 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
 	var promises_1 = __webpack_require__(12);
 	var utils_1 = __webpack_require__(4);
 	var request_1 = __webpack_require__(14);
+	var HttpError = (function (_super) {
+	    __extends(HttpError, _super);
+	    function HttpError(status, message, body) {
+	        _super.call(this, message);
+	        this.message = message;
+	        this.status = status;
+	        this.body = body;
+	    }
+	    return HttpError;
+	}(Error));
+	exports.HttpError = HttpError;
 	(function (RestMethod) {
 	    RestMethod[RestMethod["Create"] = 0] = "Create";
 	    RestMethod[RestMethod["Update"] = 1] = "Update";
@@ -1954,17 +2012,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        xhr.onreadystatechange = function () {
 	            if (xhr.readyState !== 4)
 	                return;
+	            var data;
+	            try {
+	                data = getData(options.headers['Accept'], xhr);
+	            }
+	            catch (e) {
+	                return reject(new Error('Could not serialize response'));
+	            }
 	            var response = {
 	                method: method,
 	                status: xhr.status,
-	                content: getData(options.headers['Accept'], xhr)
+	                content: data
 	            };
 	            utils_1.proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
 	            if (isValid(xhr)) {
 	                return resolve(response);
 	            }
 	            else {
-	                var error = new Error('Server responded with status of ' + xhr.statusText);
+	                var error = new HttpError(xhr.status, xhr.statusText, data);
 	                return reject(error);
 	            }
 	        };

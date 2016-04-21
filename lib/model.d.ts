@@ -37,4 +37,5 @@ export declare class Model extends BaseObject implements IModel, ISerializable {
     clone(): IModel;
     parse(attr: any, options?: any): any;
     remove(options?: any): any;
+    pick(attr: string | string[], ...attrs: string[]): any;
 }
