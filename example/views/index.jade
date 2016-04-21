@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    script(src="collection.js")
+  body
+    button.next Next
+    div.result count
+    
+    script.
+      var col = new collection.PaginatedCollection(null, {
+        url: 'data'
+      });
+      
+      col.fetch();
+      
+      document.querySelector('.next').addEventListener('click', function () {
+        if (!col.hasNext()) return; 
+        col.getNextPage().then(function () {
+          document.querySelector('.result').textContent = "Numbero: " + col.length;
+        });
+       
+      });
