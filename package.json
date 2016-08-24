@@ -1,6 +1,6 @@
 {
   "name": "collection",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -44,5 +44,14 @@
     "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
     "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
   },
-  "typings": "lib/index"
+  "typings": "lib/index",
+  "jspm": {
+    "registry": "github",
+    "format": "cjs",
+    "main": "dist/collection.js",
+    "dependencies": {
+      "eventsjs": "github:kildevaeld/eventsjs",
+      "utilities": "github:kildevaeld/utilitiesjs"
+    }
+  }
 }
