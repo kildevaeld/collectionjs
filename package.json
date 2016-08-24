@@ -50,8 +50,8 @@
     "format": "cjs",
     "main": "dist/collection.js",
     "dependencies": {
-      "eventsjs": "github:kildevaeld/eventsjs",
-      "utilities": "github:kildevaeld/utilitiesjs"
+      "eventsjs": "github:kildevaeld/eventsjs@master",
+      "utilities": "github:kildevaeld/utilitiesjs@master"
     }
   }
 }
