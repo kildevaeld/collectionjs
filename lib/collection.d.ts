@@ -45,6 +45,7 @@ export declare class Collection<U extends IModel> extends BaseObject implements 
     parse(models: U | U[], options?: CollectionSetOptions): U | U[];
     find(nidOrFn: any): any;
     forEach(iterator: (model: U, index?: number) => void, ctx?: any): this;
+    map<T>(iterator: (model: U, index?: number, collection?: ICollection) => T, thisArgs?: any): T[];
     filter(fn: (model: U, index?: number) => boolean): U[];
     indexOf(model: U): number;
     toJSON(): any[];

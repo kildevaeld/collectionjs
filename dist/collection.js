@@ -309,6 +309,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this;
 	    };
+	    Collection.prototype.map = function (iterator, thisArgs) {
+	        var out = [];
+	        for (var i = 0, ii = this.length; i < ii; i++) {
+	            out.push(iterator.call(thisArgs, this.models[i], i, this));
+	        }
+	        return out;
+	    };
 	    Collection.prototype.filter = function (fn) {
 	        var out = [];
 	        this.forEach(function (m, i) {

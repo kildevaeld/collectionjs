@@ -101,7 +101,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     this.set(<U|U[]>models, extend({merge:false}, options, addOptions));
   }
 
-  protected set (items:U|U[], options: CollectionSetOptions={}) {
+  protected set(items:U|U[], options: CollectionSetOptions={}) {
     options = extend({}, setOptions, options);
     if (options.parse) items = this.parse(items, options);
 
@@ -289,12 +289,20 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     return model;
   }
 
-  forEach (iterator:(model:U, index?:number) => void, ctx?:any) {
+  forEach(iterator:(model:U, index?:number) => void, ctx?:any) {
     for (let i=0, l = this.models.length; i < l; i++) {
       iterator.call(ctx||this, this.models[i], i);
     }
 
     return this;
+  }
+
+  map<T>(iterator:(model:U, index?:number, collection?: ICollection) => T, thisArgs?:any): T[] {
+    let out: T[] = []
+    for (let i=0, ii = this.length; i<ii; i++) {
+      out.push(iterator.call(thisArgs, this.models[i], i, this));
+    }
+    return out;
   }
 
   filter(fn:(model:U, index?:number) => boolean): U[] {
