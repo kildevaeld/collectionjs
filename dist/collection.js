@@ -115,7 +115,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Collection(models, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this);
-	        this.__classType = 'Collection';
 	        this.options = options;
 	        if (this.options.model) {
 	            this.Model = this.options.model;
@@ -124,6 +123,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.add(models);
 	        }
 	    }
+	    Object.defineProperty(Collection.prototype, "__classType", {
+	        get: function () { return 'Collection'; },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    ;
 	    Object.defineProperty(Collection.prototype, "length", {
 	        get: function () {
 	            return this.models.length;
@@ -1114,7 +1119,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (attributes === void 0) { attributes = {}; }
 	        if (options === void 0) { options = {}; }
 	        _super.call(this);
-	        this.__classType = "Model";
 	        options = options || {};
 	        this._attributes = {};
 	        this.options = options;
@@ -1126,6 +1130,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.collection = options.collection;
 	        this.idAttribute = options.idAttribute || this.idAttribute || 'id';
 	    }
+	    Object.defineProperty(Model.prototype, "__classType", {
+	        get: function () { return 'Model'; },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    ;
 	    Object.defineProperty(Model.prototype, "id", {
 	        get: function () {
 	            if (this.idAttribute in this._attributes)
@@ -1612,11 +1622,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function RestCollection(models, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this, models, options);
-	        this.__classType = "RestCollection";
 	        if (options.url)
 	            this.url = options.url;
 	        this.options.queryParameter = this.options.queryParameter || 'q';
 	    }
+	    Object.defineProperty(RestCollection.prototype, "__classType", {
+	        get: function () { return 'RestCollection'; },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    ;
 	    RestCollection.prototype.getURL = function () {
 	        return typeof this.url === 'function' ? this.url() : this.url;
 	    };
@@ -1731,12 +1746,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function RestModel(attr, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this, attr, options);
-	        this.__classType = "RestModel";
 	        this.idAttribute = 'id';
 	        if (options.url) {
 	            this.rootURL = options.url;
 	        }
 	    }
+	    Object.defineProperty(RestModel.prototype, "__classType", {
+	        get: function () { return 'RestModel'; },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    ;
 	    RestModel.prototype.getURL = function (id) {
 	        var url = this.rootURL;
 	        if (this.collection && this.collection.getURL()) {
