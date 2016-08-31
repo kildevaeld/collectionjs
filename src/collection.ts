@@ -41,7 +41,8 @@ export interface CollectionResetOptions extends Silenceable {
 }
 
 export class Collection<U extends IModel> extends BaseObject implements ICollection, ISerializable {
-  protected __classType = 'Collection';
+  
+  protected get __classType() { return 'Collection' };
   /**
    * The length of the collection
    * @property {Number} length
