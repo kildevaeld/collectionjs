@@ -64,6 +64,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(10));
 	__export(__webpack_require__(11));
 	__export(__webpack_require__(15));
+	var collection_2 = __webpack_require__(1);
+	var rest_collection_2 = __webpack_require__(10);
+	var model_2 = __webpack_require__(8);
+	function isCollection(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof collection_2.Collection) || a.__classType == 'Collection' || a.__classType == 'RestCollection';
+	}
+	exports.isCollection = isCollection;
+	function isRestCollection(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof rest_collection_2.RestCollection) || a.__classType == 'RestCollection';
+	}
+	exports.isRestCollection = isRestCollection;
+	function isModel(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof model_2.Model) || a.__classType === 'Model' || a.__classType === 'RestModel';
+	}
+	exports.isModel = isModel;
+	function isRestModel(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof model_2.Model) || a.__classType === 'RestModel';
+	}
+	exports.isRestModel = isRestModel;
 
 
 /***/ },
@@ -88,6 +115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Collection(models, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this);
+	        this.__classType = 'Collection';
 	        this.options = options;
 	        if (this.options.model) {
 	            this.Model = this.options.model;
@@ -1086,6 +1114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (attributes === void 0) { attributes = {}; }
 	        if (options === void 0) { options = {}; }
 	        _super.call(this);
+	        this.__classType = "Model";
 	        options = options || {};
 	        this._attributes = {};
 	        this.options = options;
@@ -1583,6 +1612,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function RestCollection(models, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this, models, options);
+	        this.__classType = "RestCollection";
 	        if (options.url)
 	            this.url = options.url;
 	        this.options.queryParameter = this.options.queryParameter || 'q';
@@ -1701,6 +1731,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function RestModel(attr, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this, attr, options);
+	        this.__classType = "RestModel";
 	        this.idAttribute = 'id';
 	        if (options.url) {
 	            this.rootURL = options.url;

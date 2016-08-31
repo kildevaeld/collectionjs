@@ -16,6 +16,7 @@ export interface RestCollectionCreateOptions extends CollectionCreateOptions, Sy
     complete?: (error: Error, model: IPersistableModel) => void;
 }
 export declare class RestCollection<T extends IPersistableModel> extends Collection<T> implements IPersistableCollection {
+    protected __classType: string;
     url: string | (() => string);
     options: RestCollectionOptions<T>;
     getURL(): string;

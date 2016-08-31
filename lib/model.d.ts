@@ -10,6 +10,7 @@ export interface ModelSetOptions {
     silent?: boolean;
 }
 export declare class Model extends BaseObject implements IModel, ISerializable {
+    protected __classType: string;
     protected _attributes: any;
     uid: string;
     collection: ICollection;

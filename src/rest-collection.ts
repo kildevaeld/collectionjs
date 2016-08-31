@@ -26,6 +26,8 @@ export interface RestCollectionCreateOptions extends CollectionCreateOptions, Sy
 
 
 export class RestCollection<T extends IPersistableModel> extends Collection<T> implements IPersistableCollection {
+  protected __classType = "RestCollection";
+  
   url: string | (() => string);
   options: RestCollectionOptions<T>;
 

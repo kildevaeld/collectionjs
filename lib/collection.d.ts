@@ -23,6 +23,7 @@ export interface CollectionResetOptions extends Silenceable {
     previousModels?: IModel[];
 }
 export declare class Collection<U extends IModel> extends BaseObject implements ICollection, ISerializable {
+    protected __classType: string;
     length: number;
     private _model;
     Model: new (attr: Object, options?: any) => U;

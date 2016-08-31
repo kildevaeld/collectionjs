@@ -32,6 +32,8 @@ export interface ModelRemoveOptions extends SyncOptions {
 
 
 export class RestModel extends NestedModel implements IPersistableModel {
+    protected __classType = "RestModel";
+    
     idAttribute = 'id';
     collection: IPersistableCollection;
     rootURL: string;

@@ -17,6 +17,7 @@ export interface ModelSetOptions {
 }
 
 export class Model extends BaseObject implements IModel, ISerializable {
+  protected __classType = "Model";
   protected _attributes: any
   public uid: string
   public collection: ICollection
