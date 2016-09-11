@@ -1,10 +1,10 @@
-/// <reference path="interfaces" />
 import {BaseObject} from './object'
 import {IModel,ICollection, Silenceable, ISerializable} from './interfaces'
 import {Model} from './model'
 import {extend,isObject} from 'utilities/lib/objects'
 import {sortBy, find, slice} from 'utilities/lib/arrays'
 import {callFunc} from 'utilities/lib/utils'
+import {isModel} from './utils';
 
 var setOptions = {add: true, remove: true, merge: true};
 var addOptions = {add: true, remove: false};
@@ -325,7 +325,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
 
 
   protected _prepareModel(value:any): U {
-    if (value instanceof Model) return value;
+    if (isModel(value)) return value;
     if (isObject(value)) return new this.Model(value, {parse: true});
     throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
   }

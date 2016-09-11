@@ -4,6 +4,7 @@ import {IModel, ICollection} from './interfaces'
 import {uniqueId, equal} from 'utilities/lib/utils'
 import {has, extend, isEmpty, isObject} from 'utilities/lib/objects'
 import {Model, ModelSetOptions} from './model'
+import  {isModel} from './utils';
 /**
  * Takes a nested object and returns a shallow object keyed with the path names
  * e.g. { "level1.level2": "value" }
@@ -44,7 +45,7 @@ function isOnNestedModel(obj: Object, path: string, separator: string = "."): bo
   var result = obj;
 
   for (let i = 0, n = fields.length; i < n; i++) {
-    if (result instanceof Model) return true
+    if (isModel(result)) return true
     if (!result) return false;
     result = result[fields[i]];
   }
@@ -70,7 +71,7 @@ export function getNested(obj, path, return_exists?, separator: string = ".") {
       return false;
     }
 
-    result = result instanceof Model ? result.get(fields[i]) : result[fields[i]];
+    result = isModel(result) ? result.get(fields[i]) : result[fields[i]];
 
     if (result == null && i < n - 1) {
       result = {};
@@ -134,7 +135,7 @@ function setNested(obj, path, val, options?) {
       result = result[field];
 
       // The field is a model - delegate...
-      if (result instanceof Model) {
+      if (isModel(result)) {
         let rest = fields.slice(i + 1);
         return result.set(rest.join('.'), val, options);
       }
@@ -224,7 +225,7 @@ export class NestedModel extends Model {
         deleteNested(this.changed, attr);
       }
 
-      if (curVal instanceof Model) {
+      if (isModel(curVal)) {
         let fn = this._nestedListener[attr]
         if (fn) {
           curVal.off('change', fn);
@@ -237,7 +238,7 @@ export class NestedModel extends Model {
 
       } else {
         if (!isOnNestedModel(current, attr, separator)) {
-          if (val instanceof Model) {
+          if (isModel(val)) {
             let fn = (model) => {
               if (model.changed == undefined || isEmpty(model.changed)) return;
               for (let key in model.changed) {

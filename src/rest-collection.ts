@@ -2,6 +2,7 @@
 import {extend} from 'utilities/lib/objects';
 import {Collection, CollectionOptions, CollectionCreateOptions, CollectionSetOptions} from './collection';
 import {RestModel} from './rest-model';
+import {isRestModel} from './utils';
 import {IModel, IPersistableModel,
 IPersistableCollection, ISerializable} from './interfaces';
 
@@ -72,7 +73,7 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
 
     options.url = url;
 
-    if (value instanceof RestModel) {
+    if (isRestModel(value)) {
       model = value;
     } else {
       model = new this.Model(value, { parse: true, url: this.getURL() });

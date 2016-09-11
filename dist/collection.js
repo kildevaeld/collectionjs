@@ -60,37 +60,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	__export(__webpack_require__(1));
 	__export(__webpack_require__(8));
-	__export(__webpack_require__(9));
+	__export(__webpack_require__(14));
 	__export(__webpack_require__(10));
-	__export(__webpack_require__(11));
 	__export(__webpack_require__(15));
-	var collection_2 = __webpack_require__(1);
-	var rest_collection_2 = __webpack_require__(10);
-	var model_2 = __webpack_require__(8);
-	function isCollection(a) {
-	    if (a == null)
-	        return false;
-	    return (a instanceof collection_2.Collection) || a.__classType == 'Collection' || a.__classType == 'RestCollection';
-	}
-	exports.isCollection = isCollection;
-	function isRestCollection(a) {
-	    if (a == null)
-	        return false;
-	    return (a instanceof rest_collection_2.RestCollection) || a.__classType == 'RestCollection';
-	}
-	exports.isRestCollection = isRestCollection;
-	function isModel(a) {
-	    if (a == null)
-	        return false;
-	    return (a instanceof model_2.Model) || a.__classType === 'Model' || a.__classType === 'RestModel';
-	}
-	exports.isModel = isModel;
-	function isRestModel(a) {
-	    if (a == null)
-	        return false;
-	    return (a instanceof model_2.Model) || a.__classType === 'RestModel';
-	}
-	exports.isRestModel = isRestModel;
+	__export(__webpack_require__(16));
+	__export(__webpack_require__(9));
 
 
 /***/ },
@@ -108,6 +82,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var objects_1 = __webpack_require__(5);
 	var arrays_1 = __webpack_require__(6);
 	var utils_1 = __webpack_require__(4);
+	var utils_2 = __webpack_require__(9);
 	var setOptions = { add: true, remove: true, merge: true };
 	var addOptions = { add: true, remove: false };
 	var Collection = (function (_super) {
@@ -364,7 +339,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.models.map(function (m) { return m.toJSON(); });
 	    };
 	    Collection.prototype._prepareModel = function (value) {
-	        if (value instanceof model_1.Model)
+	        if (utils_2.isModel(value))
 	            return value;
 	        if (objects_1.isObject(value))
 	            return new this.Model(value, { parse: true });
@@ -1305,301 +1280,33 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var utils_1 = __webpack_require__(4);
-	var objects_1 = __webpack_require__(5);
+	var collection_1 = __webpack_require__(1);
 	var model_1 = __webpack_require__(8);
-	function objToPaths(obj, separator, array) {
-	    if (separator === void 0) { separator = "."; }
-	    if (array === void 0) { array = true; }
-	    var ret = {};
-	    if (!obj)
-	        return obj;
-	    for (var key in obj) {
-	        var val = obj[key];
-	        if (val && (val.constructor === Object || (array && val.constructor === Array)) && !objects_1.isEmpty(val)) {
-	            var obj2 = objToPaths(val);
-	            for (var key2 in obj2) {
-	                var val2 = obj2[key2];
-	                ret[key + separator + key2] = val2;
-	            }
-	        }
-	        else {
-	            ret[key] = val;
-	        }
-	    }
-	    return ret;
-	}
-	exports.objToPaths = objToPaths;
-	function isOnNestedModel(obj, path, separator) {
-	    if (separator === void 0) { separator = "."; }
-	    var fields = path ? path.split(separator) : [];
-	    if (!obj)
+	var rest_collection_1 = __webpack_require__(10);
+	function isCollection(a) {
+	    if (a == null)
 	        return false;
-	    var result = obj;
-	    for (var i = 0, n = fields.length; i < n; i++) {
-	        if (result instanceof model_1.Model)
-	            return true;
-	        if (!result)
-	            return false;
-	        result = result[fields[i]];
-	    }
-	    return false;
+	    return (a instanceof collection_1.Collection) || a.__classType == 'Collection' || a.__classType == 'RestCollection';
 	}
-	function getNested(obj, path, return_exists, separator) {
-	    if (separator === void 0) { separator = "."; }
-	    if (!obj)
-	        return null;
-	    var fields = path ? path.split(separator) : [];
-	    var result = obj;
-	    return_exists || (return_exists === false);
-	    for (var i = 0, n = fields.length; i < n; i++) {
-	        if (return_exists && !objects_1.has(result, fields[i])) {
-	            return false;
-	        }
-	        result = result instanceof model_1.Model ? result.get(fields[i]) : result[fields[i]];
-	        if (result == null && i < n - 1) {
-	            result = {};
-	        }
-	        if (typeof result === 'undefined') {
-	            if (return_exists) {
-	                return true;
-	            }
-	            return result;
-	        }
-	    }
-	    if (return_exists) {
-	        return true;
-	    }
-	    return result;
+	exports.isCollection = isCollection;
+	function isRestCollection(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof rest_collection_1.RestCollection) || a.__classType == 'RestCollection';
 	}
-	exports.getNested = getNested;
-	function setNested(obj, path, val, options) {
-	    options = options || {};
-	    if (!obj)
-	        return null;
-	    var separator = options.separator || ".";
-	    var fields = path ? path.split(separator) : [];
-	    var result = obj;
-	    for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
-	        var field = fields[i];
-	        if (i === n - 1) {
-	            options.unset ? delete result[field] : result[field] = val;
-	        }
-	        else {
-	            if (typeof result[field] === 'undefined' || !objects_1.isObject(result[field])) {
-	                if (options.unset) {
-	                    delete result[field];
-	                    return;
-	                }
-	                var nextField = fields[i + 1];
-	                result[field] = /^\d+$/.test(nextField) ? [] : {};
-	            }
-	            result = result[field];
-	            if (result instanceof model_1.Model) {
-	                var rest = fields.slice(i + 1);
-	                return result.set(rest.join('.'), val, options);
-	            }
-	        }
-	    }
+	exports.isRestCollection = isRestCollection;
+	function isModel(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof model_1.Model) || a.__classType === 'Model' || a.__classType === 'RestModel';
 	}
-	function deleteNested(obj, path) {
-	    setNested(obj, path, null, {
-	        unset: true
-	    });
+	exports.isModel = isModel;
+	function isRestModel(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof model_1.Model) || a.__classType === 'RestModel';
 	}
-	var NestedModel = (function (_super) {
-	    __extends(NestedModel, _super);
-	    function NestedModel() {
-	        _super.apply(this, arguments);
-	    }
-	    NestedModel.prototype.get = function (attr) {
-	        return getNested(this._attributes, attr);
-	    };
-	    NestedModel.prototype.set = function (key, val, options) {
-	        var _this = this;
-	        var attr, attrs, unset, changes, silent, changing, prev, current;
-	        if (key == null)
-	            return this;
-	        if (typeof key === 'object') {
-	            attrs = key;
-	            options = val || {};
-	        }
-	        else {
-	            (attrs = {})[key] = val;
-	        }
-	        options || (options = {});
-	        unset = options.unset;
-	        silent = options.silent;
-	        changes = [];
-	        changing = this._changing;
-	        this._changing = true;
-	        if (!changing) {
-	            this._previousAttributes = objects_1.extend({}, this._attributes);
-	            this._changed = {};
-	        }
-	        current = this._attributes, prev = this._previousAttributes;
-	        var separator = NestedModel.keyPathSeparator;
-	        attrs = objToPaths(attrs, separator, options.array);
-	        var alreadyTriggered = {};
-	        if (!this._nestedListener)
-	            this._nestedListener = {};
-	        for (attr in attrs) {
-	            val = attrs[attr];
-	            var curVal = getNested(current, attr);
-	            if (!utils_1.equal(curVal, val)) {
-	                changes.push(attr);
-	                this._changed[attr] = val;
-	            }
-	            if (!utils_1.equal(getNested(prev, attr), val)) {
-	                setNested(this.changed, attr, val, options);
-	            }
-	            else {
-	                deleteNested(this.changed, attr);
-	            }
-	            if (curVal instanceof model_1.Model) {
-	                var fn = this._nestedListener[attr];
-	                if (fn) {
-	                    curVal.off('change', fn);
-	                    delete this._nestedListener[attr];
-	                }
-	            }
-	            if (unset) {
-	                deleteNested(current, attr);
-	            }
-	            else {
-	                if (!isOnNestedModel(current, attr, separator)) {
-	                    if (val instanceof model_1.Model) {
-	                        var fn = function (model) {
-	                            if (model.changed == undefined || objects_1.isEmpty(model.changed))
-	                                return;
-	                            for (var key_1 in model.changed) {
-	                                _this._changed[attr + separator + key_1] = model.changed[key_1];
-	                                _this.trigger('change:' + attr + separator + key_1, model.changed[key_1]);
-	                            }
-	                            _this.trigger('change', _this, options);
-	                        };
-	                        this._nestedListener[attr] = fn;
-	                        val.on('change', fn);
-	                    }
-	                }
-	                else {
-	                    alreadyTriggered[attr] = true;
-	                }
-	                setNested(current, attr, val, options);
-	            }
-	        }
-	        if (!silent) {
-	            if (changes.length)
-	                this._pending = true;
-	            for (var i = 0, l = changes.length; i < l; i++) {
-	                var key_2 = changes[i];
-	                if (!alreadyTriggered.hasOwnProperty(key_2) || !alreadyTriggered[key_2]) {
-	                    alreadyTriggered[key_2] = true;
-	                    this.trigger('change:' + key_2, this, getNested(current, key_2), options);
-	                }
-	                var fields = key_2.split(separator);
-	                for (var n = fields.length - 1; n > 0; n--) {
-	                    var parentKey = fields.slice(0, n).join(separator), wildcardKey = parentKey + separator + '*';
-	                    if (!alreadyTriggered.hasOwnProperty(wildcardKey) || !alreadyTriggered[wildcardKey]) {
-	                        alreadyTriggered[wildcardKey] = true;
-	                        this.trigger('change:' + wildcardKey, this, getNested(current, parentKey), options);
-	                    }
-	                    if (!alreadyTriggered.hasOwnProperty(parentKey) || !alreadyTriggered[parentKey]) {
-	                        alreadyTriggered[parentKey] = true;
-	                        this.trigger('change:' + parentKey, this, getNested(current, parentKey), options);
-	                    }
-	                }
-	            }
-	        }
-	        if (changing)
-	            return this;
-	        if (!silent) {
-	            while (this._pending) {
-	                this._pending = false;
-	                this.trigger('change', this, options);
-	            }
-	        }
-	        this._pending = false;
-	        this._changing = false;
-	        return this;
-	    };
-	    NestedModel.prototype.clear = function (options) {
-	        var attrs = {};
-	        var shallowAttributes = objToPaths(this._attributes);
-	        for (var key in shallowAttributes)
-	            attrs[key] = void 0;
-	        return this.set(attrs, objects_1.extend({}, options, {
-	            unset: true
-	        }));
-	    };
-	    NestedModel.prototype.hasChanged = function (attr) {
-	        if (attr == null) {
-	            return !Object.keys(this.changed).length;
-	        }
-	        return getNested(this.changed, attr) !== undefined;
-	    };
-	    NestedModel.prototype.changedAttributes = function (diff) {
-	        if (!diff)
-	            return this.hasChanged() ? objToPaths(this.changed) : false;
-	        var old = this._changing ? this._previousAttributes : this._attributes;
-	        diff = objToPaths(diff);
-	        old = objToPaths(old);
-	        var val, changed = false;
-	        for (var attr in diff) {
-	            if (utils_1.equal(old[attr], (val = diff[attr])))
-	                continue;
-	            (changed || (changed = {}))[attr] = val;
-	        }
-	        return changed;
-	    };
-	    NestedModel.prototype.previous = function (attr) {
-	        if (attr == null || !this._previousAttributes) {
-	            return null;
-	        }
-	        return getNested(this._previousAttributes, attr);
-	    };
-	    NestedModel.prototype.previousAttributes = function () {
-	        return objects_1.extend({}, this._previousAttributes);
-	    };
-	    NestedModel.prototype.pick = function (attr) {
-	        var attrs = [];
-	        for (var _i = 1; _i < arguments.length; _i++) {
-	            attrs[_i - 1] = arguments[_i];
-	        }
-	        if (arguments.length === 1) {
-	            attr = !Array.isArray(attr) ? [attr] : attr;
-	        }
-	        else {
-	            attrs = [attr].concat(attrs);
-	        }
-	        var out = {};
-	        for (var i = 0, ii = attrs.length; i < ii; i++) {
-	            if (this.has(attrs[i])) {
-	                setNested(out, attrs[i], this.get(attrs[i]));
-	            }
-	        }
-	        return out;
-	    };
-	    NestedModel.prototype.destroy = function () {
-	        for (var key in this._nestedListener) {
-	            var fn = this._nestedListener[key];
-	            if (fn) {
-	                var m = this.get(key);
-	                if (m)
-	                    m.off(key, fn);
-	            }
-	        }
-	        _super.prototype.destroy.call(this);
-	    };
-	    NestedModel.keyPathSeparator = '.';
-	    return NestedModel;
-	}(model_1.Model));
-	exports.NestedModel = NestedModel;
+	exports.isRestModel = isRestModel;
 
 
 /***/ },
@@ -1614,9 +1321,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var objects_1 = __webpack_require__(5);
 	var collection_1 = __webpack_require__(1);
-	var rest_model_1 = __webpack_require__(11);
-	var promises_1 = __webpack_require__(12);
-	var persistence_1 = __webpack_require__(13);
+	var utils_1 = __webpack_require__(9);
+	var promises_1 = __webpack_require__(11);
+	var persistence_1 = __webpack_require__(12);
 	var RestCollection = (function (_super) {
 	    __extends(RestCollection, _super);
 	    function RestCollection(models, options) {
@@ -1661,7 +1368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (url == null)
 	            throw new Error('Url or rootURL no specified');
 	        options.url = url;
-	        if (value instanceof rest_model_1.RestModel) {
+	        if (utils_1.isRestModel(value)) {
 	            model = value;
 	        }
 	        else {
@@ -1718,131 +1425,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var objects_1 = __webpack_require__(5);
-	var promises_1 = __webpack_require__(12);
-	var nested_model_1 = __webpack_require__(9);
-	var persistence_1 = __webpack_require__(13);
-	function normalize_path(url, id) {
-	    var i, p = "";
-	    if ((i = url.indexOf('?')) >= 0) {
-	        p = url.substr(i);
-	        url = url.substr(0, i);
-	    }
-	    if (url[url.length - 1] !== '/')
-	        url += '/';
-	    return url + id + p;
-	}
-	exports.normalize_path = normalize_path;
-	var RestModel = (function (_super) {
-	    __extends(RestModel, _super);
-	    function RestModel(attr, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, attr, options);
-	        this.idAttribute = 'id';
-	        if (options.url) {
-	            this.rootURL = options.url;
-	        }
-	    }
-	    Object.defineProperty(RestModel.prototype, "__classType", {
-	        get: function () { return 'RestModel'; },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    ;
-	    RestModel.prototype.getURL = function (id) {
-	        var url = this.rootURL;
-	        if (this.collection && this.collection.getURL()) {
-	            url = this.collection.getURL();
-	        }
-	        id = id || this.id;
-	        if (id && url) {
-	            url = normalize_path(url, this.id);
-	        }
-	        return url;
-	    };
-	    RestModel.prototype.fetch = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        var url = this.getURL();
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        this.trigger('before:fetch', this, options);
-	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (result) {
-	            if (result)
-	                _this.set(_this.parse(result.content, options), options);
-	            _this.trigger('fetch', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            if (e) {
-	                throw e;
-	            }
-	            return _this;
-	        });
-	    };
-	    RestModel.prototype.save = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        this.trigger('before:save', this, options);
-	        var method = persistence_1.RestMethod[this.isNew ? 'Create' : options.changed ? 'Patch' : "Update"];
-	        var url = this.getURL(this.id);
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        return this.sync(method, this, options)
-	            .then(function (result) {
-	            _this.set(result.content, options);
-	            _this.trigger('save', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            throw e;
-	        });
-	    };
-	    RestModel.prototype.remove = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        if (this.isNew) {
-	            _super.prototype.remove.call(this, options);
-	            return promises_1.Promise.resolve(this);
-	        }
-	        var url = this.getURL(this.id);
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        this.trigger('before:remove', this, options);
-	        if (!options.wait)
-	            _super.prototype.remove.call(this, options);
-	        options.url = url;
-	        return this.sync(persistence_1.RestMethod.Delete, this, options)
-	            .then(function (result) {
-	            if (!options.wait)
-	                _super.prototype.remove.call(_this, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            throw e;
-	        });
-	    };
-	    RestModel.prototype.sync = function (method, model, options) {
-	        return persistence_1.sync(method, model, options);
-	    };
-	    return RestModel;
-	}(nested_model_1.NestedModel));
-	exports.RestModel = RestModel;
-
-
-/***/ },
-/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var objects_1 = __webpack_require__(5);
@@ -1985,7 +1567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1994,9 +1576,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var promises_1 = __webpack_require__(12);
+	var promises_1 = __webpack_require__(11);
 	var utils_1 = __webpack_require__(4);
-	var request_1 = __webpack_require__(14);
+	var request_1 = __webpack_require__(13);
 	var HttpError = (function (_super) {
 	    __extends(HttpError, _super);
 	    function HttpError(status, message, body) {
@@ -2111,13 +1693,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var utils_1 = __webpack_require__(4);
 	var strings_1 = __webpack_require__(7);
 	var objects_1 = __webpack_require__(5);
-	var promises_1 = __webpack_require__(12);
+	var promises_1 = __webpack_require__(11);
 	var xmlRe = /^(?:application|text)\/xml/, jsonRe = /^application\/json/, fileProto = /^file:/;
 	function queryStringToParams(qs) {
 	    var kvp, k, v, ls, params = {}, decode = decodeURIComponent;
@@ -2257,7 +1839,435 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var utils_1 = __webpack_require__(4);
+	var objects_1 = __webpack_require__(5);
+	var model_1 = __webpack_require__(8);
+	var utils_2 = __webpack_require__(9);
+	function objToPaths(obj, separator, array) {
+	    if (separator === void 0) { separator = "."; }
+	    if (array === void 0) { array = true; }
+	    var ret = {};
+	    if (!obj)
+	        return obj;
+	    for (var key in obj) {
+	        var val = obj[key];
+	        if (val && (val.constructor === Object || (array && val.constructor === Array)) && !objects_1.isEmpty(val)) {
+	            var obj2 = objToPaths(val);
+	            for (var key2 in obj2) {
+	                var val2 = obj2[key2];
+	                ret[key + separator + key2] = val2;
+	            }
+	        }
+	        else {
+	            ret[key] = val;
+	        }
+	    }
+	    return ret;
+	}
+	exports.objToPaths = objToPaths;
+	function isOnNestedModel(obj, path, separator) {
+	    if (separator === void 0) { separator = "."; }
+	    var fields = path ? path.split(separator) : [];
+	    if (!obj)
+	        return false;
+	    var result = obj;
+	    for (var i = 0, n = fields.length; i < n; i++) {
+	        if (utils_2.isModel(result))
+	            return true;
+	        if (!result)
+	            return false;
+	        result = result[fields[i]];
+	    }
+	    return false;
+	}
+	function getNested(obj, path, return_exists, separator) {
+	    if (separator === void 0) { separator = "."; }
+	    if (!obj)
+	        return null;
+	    var fields = path ? path.split(separator) : [];
+	    var result = obj;
+	    return_exists || (return_exists === false);
+	    for (var i = 0, n = fields.length; i < n; i++) {
+	        if (return_exists && !objects_1.has(result, fields[i])) {
+	            return false;
+	        }
+	        result = utils_2.isModel(result) ? result.get(fields[i]) : result[fields[i]];
+	        if (result == null && i < n - 1) {
+	            result = {};
+	        }
+	        if (typeof result === 'undefined') {
+	            if (return_exists) {
+	                return true;
+	            }
+	            return result;
+	        }
+	    }
+	    if (return_exists) {
+	        return true;
+	    }
+	    return result;
+	}
+	exports.getNested = getNested;
+	function setNested(obj, path, val, options) {
+	    options = options || {};
+	    if (!obj)
+	        return null;
+	    var separator = options.separator || ".";
+	    var fields = path ? path.split(separator) : [];
+	    var result = obj;
+	    for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
+	        var field = fields[i];
+	        if (i === n - 1) {
+	            options.unset ? delete result[field] : result[field] = val;
+	        }
+	        else {
+	            if (typeof result[field] === 'undefined' || !objects_1.isObject(result[field])) {
+	                if (options.unset) {
+	                    delete result[field];
+	                    return;
+	                }
+	                var nextField = fields[i + 1];
+	                result[field] = /^\d+$/.test(nextField) ? [] : {};
+	            }
+	            result = result[field];
+	            if (utils_2.isModel(result)) {
+	                var rest = fields.slice(i + 1);
+	                return result.set(rest.join('.'), val, options);
+	            }
+	        }
+	    }
+	}
+	function deleteNested(obj, path) {
+	    setNested(obj, path, null, {
+	        unset: true
+	    });
+	}
+	var NestedModel = (function (_super) {
+	    __extends(NestedModel, _super);
+	    function NestedModel() {
+	        _super.apply(this, arguments);
+	    }
+	    NestedModel.prototype.get = function (attr) {
+	        return getNested(this._attributes, attr);
+	    };
+	    NestedModel.prototype.set = function (key, val, options) {
+	        var _this = this;
+	        var attr, attrs, unset, changes, silent, changing, prev, current;
+	        if (key == null)
+	            return this;
+	        if (typeof key === 'object') {
+	            attrs = key;
+	            options = val || {};
+	        }
+	        else {
+	            (attrs = {})[key] = val;
+	        }
+	        options || (options = {});
+	        unset = options.unset;
+	        silent = options.silent;
+	        changes = [];
+	        changing = this._changing;
+	        this._changing = true;
+	        if (!changing) {
+	            this._previousAttributes = objects_1.extend({}, this._attributes);
+	            this._changed = {};
+	        }
+	        current = this._attributes, prev = this._previousAttributes;
+	        var separator = NestedModel.keyPathSeparator;
+	        attrs = objToPaths(attrs, separator, options.array);
+	        var alreadyTriggered = {};
+	        if (!this._nestedListener)
+	            this._nestedListener = {};
+	        for (attr in attrs) {
+	            val = attrs[attr];
+	            var curVal = getNested(current, attr);
+	            if (!utils_1.equal(curVal, val)) {
+	                changes.push(attr);
+	                this._changed[attr] = val;
+	            }
+	            if (!utils_1.equal(getNested(prev, attr), val)) {
+	                setNested(this.changed, attr, val, options);
+	            }
+	            else {
+	                deleteNested(this.changed, attr);
+	            }
+	            if (utils_2.isModel(curVal)) {
+	                var fn = this._nestedListener[attr];
+	                if (fn) {
+	                    curVal.off('change', fn);
+	                    delete this._nestedListener[attr];
+	                }
+	            }
+	            if (unset) {
+	                deleteNested(current, attr);
+	            }
+	            else {
+	                if (!isOnNestedModel(current, attr, separator)) {
+	                    if (utils_2.isModel(val)) {
+	                        var fn = function (model) {
+	                            if (model.changed == undefined || objects_1.isEmpty(model.changed))
+	                                return;
+	                            for (var key_1 in model.changed) {
+	                                _this._changed[attr + separator + key_1] = model.changed[key_1];
+	                                _this.trigger('change:' + attr + separator + key_1, model.changed[key_1]);
+	                            }
+	                            _this.trigger('change', _this, options);
+	                        };
+	                        this._nestedListener[attr] = fn;
+	                        val.on('change', fn);
+	                    }
+	                }
+	                else {
+	                    alreadyTriggered[attr] = true;
+	                }
+	                setNested(current, attr, val, options);
+	            }
+	        }
+	        if (!silent) {
+	            if (changes.length)
+	                this._pending = true;
+	            for (var i = 0, l = changes.length; i < l; i++) {
+	                var key_2 = changes[i];
+	                if (!alreadyTriggered.hasOwnProperty(key_2) || !alreadyTriggered[key_2]) {
+	                    alreadyTriggered[key_2] = true;
+	                    this.trigger('change:' + key_2, this, getNested(current, key_2), options);
+	                }
+	                var fields = key_2.split(separator);
+	                for (var n = fields.length - 1; n > 0; n--) {
+	                    var parentKey = fields.slice(0, n).join(separator), wildcardKey = parentKey + separator + '*';
+	                    if (!alreadyTriggered.hasOwnProperty(wildcardKey) || !alreadyTriggered[wildcardKey]) {
+	                        alreadyTriggered[wildcardKey] = true;
+	                        this.trigger('change:' + wildcardKey, this, getNested(current, parentKey), options);
+	                    }
+	                    if (!alreadyTriggered.hasOwnProperty(parentKey) || !alreadyTriggered[parentKey]) {
+	                        alreadyTriggered[parentKey] = true;
+	                        this.trigger('change:' + parentKey, this, getNested(current, parentKey), options);
+	                    }
+	                }
+	            }
+	        }
+	        if (changing)
+	            return this;
+	        if (!silent) {
+	            while (this._pending) {
+	                this._pending = false;
+	                this.trigger('change', this, options);
+	            }
+	        }
+	        this._pending = false;
+	        this._changing = false;
+	        return this;
+	    };
+	    NestedModel.prototype.clear = function (options) {
+	        var attrs = {};
+	        var shallowAttributes = objToPaths(this._attributes);
+	        for (var key in shallowAttributes)
+	            attrs[key] = void 0;
+	        return this.set(attrs, objects_1.extend({}, options, {
+	            unset: true
+	        }));
+	    };
+	    NestedModel.prototype.hasChanged = function (attr) {
+	        if (attr == null) {
+	            return !Object.keys(this.changed).length;
+	        }
+	        return getNested(this.changed, attr) !== undefined;
+	    };
+	    NestedModel.prototype.changedAttributes = function (diff) {
+	        if (!diff)
+	            return this.hasChanged() ? objToPaths(this.changed) : false;
+	        var old = this._changing ? this._previousAttributes : this._attributes;
+	        diff = objToPaths(diff);
+	        old = objToPaths(old);
+	        var val, changed = false;
+	        for (var attr in diff) {
+	            if (utils_1.equal(old[attr], (val = diff[attr])))
+	                continue;
+	            (changed || (changed = {}))[attr] = val;
+	        }
+	        return changed;
+	    };
+	    NestedModel.prototype.previous = function (attr) {
+	        if (attr == null || !this._previousAttributes) {
+	            return null;
+	        }
+	        return getNested(this._previousAttributes, attr);
+	    };
+	    NestedModel.prototype.previousAttributes = function () {
+	        return objects_1.extend({}, this._previousAttributes);
+	    };
+	    NestedModel.prototype.pick = function (attr) {
+	        var attrs = [];
+	        for (var _i = 1; _i < arguments.length; _i++) {
+	            attrs[_i - 1] = arguments[_i];
+	        }
+	        if (arguments.length === 1) {
+	            attr = !Array.isArray(attr) ? [attr] : attr;
+	        }
+	        else {
+	            attrs = [attr].concat(attrs);
+	        }
+	        var out = {};
+	        for (var i = 0, ii = attrs.length; i < ii; i++) {
+	            if (this.has(attrs[i])) {
+	                setNested(out, attrs[i], this.get(attrs[i]));
+	            }
+	        }
+	        return out;
+	    };
+	    NestedModel.prototype.destroy = function () {
+	        for (var key in this._nestedListener) {
+	            var fn = this._nestedListener[key];
+	            if (fn) {
+	                var m = this.get(key);
+	                if (m)
+	                    m.off(key, fn);
+	            }
+	        }
+	        _super.prototype.destroy.call(this);
+	    };
+	    NestedModel.keyPathSeparator = '.';
+	    return NestedModel;
+	}(model_1.Model));
+	exports.NestedModel = NestedModel;
+
+
+/***/ },
 /* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var objects_1 = __webpack_require__(5);
+	var promises_1 = __webpack_require__(11);
+	var nested_model_1 = __webpack_require__(14);
+	var persistence_1 = __webpack_require__(12);
+	function normalize_path(url, id) {
+	    var i, p = "";
+	    if ((i = url.indexOf('?')) >= 0) {
+	        p = url.substr(i);
+	        url = url.substr(0, i);
+	    }
+	    if (url[url.length - 1] !== '/')
+	        url += '/';
+	    return url + id + p;
+	}
+	exports.normalize_path = normalize_path;
+	var RestModel = (function (_super) {
+	    __extends(RestModel, _super);
+	    function RestModel(attr, options) {
+	        if (options === void 0) { options = {}; }
+	        _super.call(this, attr, options);
+	        this.idAttribute = 'id';
+	        if (options.url) {
+	            this.rootURL = options.url;
+	        }
+	    }
+	    Object.defineProperty(RestModel.prototype, "__classType", {
+	        get: function () { return 'RestModel'; },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    ;
+	    RestModel.prototype.getURL = function (id) {
+	        var url = this.rootURL;
+	        if (this.collection && this.collection.getURL()) {
+	            url = this.collection.getURL();
+	        }
+	        id = id || this.id;
+	        if (id && url) {
+	            url = normalize_path(url, this.id);
+	        }
+	        return url;
+	    };
+	    RestModel.prototype.fetch = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        var url = this.getURL();
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        options.url = url;
+	        this.trigger('before:fetch', this, options);
+	        return this.sync(persistence_1.RestMethod.Read, this, options)
+	            .then(function (result) {
+	            if (result)
+	                _this.set(_this.parse(result.content, options), options);
+	            _this.trigger('fetch', _this, result, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', _this, e);
+	            if (e) {
+	                throw e;
+	            }
+	            return _this;
+	        });
+	    };
+	    RestModel.prototype.save = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        this.trigger('before:save', this, options);
+	        var method = persistence_1.RestMethod[this.isNew ? 'Create' : options.changed ? 'Patch' : "Update"];
+	        var url = this.getURL(this.id);
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        options.url = url;
+	        return this.sync(method, this, options)
+	            .then(function (result) {
+	            _this.set(result.content, options);
+	            _this.trigger('save', _this, result, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', _this, e);
+	            throw e;
+	        });
+	    };
+	    RestModel.prototype.remove = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        if (this.isNew) {
+	            _super.prototype.remove.call(this, options);
+	            return promises_1.Promise.resolve(this);
+	        }
+	        var url = this.getURL(this.id);
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        this.trigger('before:remove', this, options);
+	        if (!options.wait)
+	            _super.prototype.remove.call(this, options);
+	        options.url = url;
+	        return this.sync(persistence_1.RestMethod.Delete, this, options)
+	            .then(function (result) {
+	            if (!options.wait)
+	                _super.prototype.remove.call(_this, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', _this, e);
+	            throw e;
+	        });
+	    };
+	    RestModel.prototype.sync = function (method, model, options) {
+	        return persistence_1.sync(method, model, options);
+	    };
+	    return RestModel;
+	}(nested_model_1.NestedModel));
+	exports.RestModel = RestModel;
+
+
+/***/ },
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2268,10 +2278,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var collection_1 = __webpack_require__(1);
 	var rest_collection_1 = __webpack_require__(10);
-	var promises_1 = __webpack_require__(12);
-	var persistence_1 = __webpack_require__(13);
+	var promises_1 = __webpack_require__(11);
+	var persistence_1 = __webpack_require__(12);
 	var objects_1 = __webpack_require__(5);
-	var request_1 = __webpack_require__(14);
+	var request_1 = __webpack_require__(13);
 	var PARAM_TRIM_RE = /[\s'"]/g;
 	var URL_TRIM_RE = /[<>\s'"]/g;
 	function queryStringToParams(qs) {
