@@ -1,10 +1,15 @@
 import {BaseObject} from './object'
 import {IModel,ICollection, Silenceable, ISerializable} from './interfaces'
-import {Model} from './model'
+import {Model, isModel} from './model'
 import {extend,isObject} from 'utilities/lib/objects'
 import {sortBy, find, slice} from 'utilities/lib/arrays'
 import {callFunc} from 'utilities/lib/utils'
-import {isModel} from './utils';
+
+
+export function isCollection<T extends IModel>(a:any): a is Collection<T> {
+  if (a == null) return false;
+  return (a instanceof Collection) || a.__classType == 'Collection' || a.__classType == 'RestCollection';
+}
 
 var setOptions = {add: true, remove: true, merge: true};
 var addOptions = {add: true, remove: false};

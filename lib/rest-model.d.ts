@@ -3,6 +3,7 @@ import { ModelOptions } from './model';
 import { NestedModel } from './nested-model';
 import { IPersistableModel, IPersistableCollection, ISerializable } from './interfaces';
 import { RestMethod, SyncFunc, SyncOptions, SyncResponse } from './persistence';
+export declare function isRestModel(a: any): a is RestModel;
 export interface RestModelOptions extends ModelOptions {
     url?: string;
     sync?: SyncFunc;

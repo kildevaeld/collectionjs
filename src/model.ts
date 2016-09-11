@@ -16,6 +16,11 @@ export interface ModelSetOptions {
   silent?: boolean
 }
 
+export function isModel(a:any): a is IModel {
+  if (a == null) return false;
+  return (a instanceof Model) || a.__classType === 'Model' || a.__classType === 'RestModel';
+}
+
 export class Model extends BaseObject implements IModel, ISerializable {
   protected get __classType() { return 'Model' };
   

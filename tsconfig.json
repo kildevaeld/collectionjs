@@ -29,7 +29,6 @@
       "./src/persistence.ts",
       "./src/rest-model.ts",
       "./src/rest-collection.ts",
-      "./src/paginated-collection.ts",
-      "./src/utils.ts"
+      "./src/paginated-collection.ts"
     ]
 }

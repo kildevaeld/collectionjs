@@ -1,7 +1,8 @@
 import { Collection, CollectionOptions, CollectionCreateOptions, CollectionSetOptions } from './collection';
-import { IPersistableModel, IPersistableCollection, ISerializable } from './interfaces';
+import { IModel, IPersistableModel, IPersistableCollection, ISerializable } from './interfaces';
 import { IPromise } from 'utilities/lib/promises';
 import { RestMethod, SyncOptions, SyncResponse } from './persistence';
+export declare function isRestCollection<T extends IModel>(a: any): a is RestCollection<T>;
 export interface RestCollectionOptions<T extends IPersistableModel> extends CollectionOptions<T> {
     url?: string;
     sync?: (method: RestMethod) => IPromise<any>;

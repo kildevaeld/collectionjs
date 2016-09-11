@@ -1,13 +1,18 @@
 
 import {extend} from 'utilities/lib/objects';
 import {Collection, CollectionOptions, CollectionCreateOptions, CollectionSetOptions} from './collection';
-import {RestModel} from './rest-model';
-import {isRestModel} from './utils';
+import {RestModel, isRestModel} from './rest-model';
 import {IModel, IPersistableModel,
 IPersistableCollection, ISerializable} from './interfaces';
 
 import {IPromise, Promise} from 'utilities/lib/promises';
 import {RestMethod, SyncFunc, SyncOptions, sync, SyncResponse} from './persistence';
+
+export function isRestCollection<T extends IModel>(a:any): a is RestCollection<T>  {
+  if (a == null) return false;
+  return (a instanceof RestCollection) || a.__classType == 'RestCollection';
+}
+
 
 export interface RestCollectionOptions<T extends IPersistableModel> extends CollectionOptions<T> {
   url?: string

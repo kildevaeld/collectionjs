@@ -9,6 +9,7 @@ export interface ModelSetOptions {
     unset?: boolean;
     silent?: boolean;
 }
+export declare function isModel(a: any): a is IModel;
 export declare class Model extends BaseObject implements IModel, ISerializable {
     protected __classType: string;
     protected _attributes: any;

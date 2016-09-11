@@ -1,5 +1,6 @@
 import { BaseObject } from './object';
 import { IModel, ICollection, Silenceable, ISerializable } from './interfaces';
+export declare function isCollection<T extends IModel>(a: any): a is Collection<T>;
 export declare type SortFunction = <T>(a: T, b: T) => number;
 export interface CollectionOptions<U> {
     model?: new (attr: Object, options?: any) => U;

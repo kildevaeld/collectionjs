@@ -1,10 +1,15 @@
 
 import {extend} from 'utilities/lib/objects';
 import {IPromise, Promise} from 'utilities/lib/promises';
-import {ModelOptions} from './model';
+import {ModelOptions, Model} from './model';
 import {NestedModel} from './nested-model';
 import {IPersistableModel, IPersistableCollection, ISerializable} from './interfaces';
 import {RestMethod, SyncFunc, SyncOptions, sync, SyncResponse} from './persistence';
+
+export function isRestModel(a:any): a is RestModel {
+  if (a == null) return false;
+  return (a instanceof Model) ||  a.__classType === 'RestModel';
+}
 
 export interface RestModelOptions extends ModelOptions {
     url?:string
