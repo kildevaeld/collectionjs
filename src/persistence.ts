@@ -7,7 +7,7 @@ export class HttpError extends Error {
   public message: string;
   public status: number;
   public body: any;
-  constructor(status:number, message: string, body: any) {
+  constructor(status: number, message: string, body: any) {
     super(message);
     this.message = message;
     this.status = status;
@@ -20,16 +20,16 @@ export enum RestMethod {
 };
 
 export interface SyncOptions {
-    url?:string;
-    contentType?:string
-    params?: Object|string;
-    headers?: {[key:string]: string};
-    progress?: (progress:number, total:number) => void;
-    beforeSend?: (xhr:XMLHttpRequest) => void
+    url?: string;
+    contentType?: string
+    params?: Object | string;
+    headers?: { [key: string]: string };
+    progress?: (progress: number, total: number) => void;
+    beforeSend?: (xhr: XMLHttpRequest) => void
 }
 
 export interface SyncFunc {
-    (method:RestMethod, model:ISerializable, options: SyncOptions): IPromise<SyncResponse>
+    (method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse>
 }
 
 export interface SyncResponse {
@@ -61,86 +61,87 @@ var isValid = function(xhr) {
     (xhr.status === 0 && window.location.protocol === 'file:')
 };
 
-export function sync (method: RestMethod, model:ISerializable, options:SyncOptions): IPromise<SyncResponse> {
+export function sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse> {
     let http;
     switch (method) {
-      case RestMethod.Create:
-        http = 'POST';
-        break;
-      case RestMethod.Update:
-        http = "PUT";
-        break;
-      case RestMethod.Patch:
-        http = "PATCH";
-        break;
-      case RestMethod.Delete:
-        http = "DELETE";
-        break;
-      case RestMethod.Read:
-        http = "GET";
-        break;
-      default:
-        return Promise.reject(new Error(`Sync: does not recognise method: ${method}`));
+    case RestMethod.Create:
+      http = 'POST';
+      break;
+    case RestMethod.Update:
+      http = "PUT";
+      break;
+    case RestMethod.Patch:
+      http = "PATCH";
+      break;
+    case RestMethod.Delete:
+      http = "DELETE";
+      break;
+    case RestMethod.Read:
+      http = "GET";
+      break;
+    default:
+      return Promise.reject(new Error(`Sync: does not recognise method: ${method}`));
     }
 
 
-   let xhr = ajax();
+  let xhr = ajax();
 
-   let query: string, url = options.url;
-   if (options.params) query = queryParam(options.params);
+  let query: string, url = options.url;
+  if (options.params) query = queryParam(options.params);
 
-   if (query) {
+  if (query) {
     var sep = (options.url.indexOf('?') === -1) ? '?' : '&';
     url += sep + query;
-   }
+  }
 
-   return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
 
-     xhr.onreadystatechange = function () {
-       if (xhr.readyState !== 4) return;
-       
-       let data;
-       
-       try {
-         data = getData(options.headers['Accept'], xhr);
-       } catch (e) {
-          return reject(new Error('Could not serialize response'));
-       }
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState !== 4) return;
 
-       let response: SyncResponse = {
-         method: method,
-         status: xhr.status,
-         content: data
-       };
+      let data;
 
-       proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
-
-       if (isValid(xhr)) {
-         return resolve(response)
-       } else {
-         let error = new HttpError(xhr.status, xhr.statusText, data);
-         
-         return reject(error);
-       }
-
-     }
-
-     xhr.open(http, url, true);
-
-     if (!(options.headers && options.headers['Accept'])) {
-        options.headers = {
-          Accept: "application/json"
-        }
-     }
-
-     xhr.setRequestHeader('Content-Type', "application/json");
-
-     if (options.headers) for (var key in options.headers) {
-        xhr.setRequestHeader(key, options.headers[key]);
+      try {
+        data = getData(options.headers['Accept'], xhr);
+      } catch (e) {
+        return reject(new Error('Could not serialize response'));
       }
 
-     if (options.beforeSend) options.beforeSend(xhr);
-     xhr.send(JSON.stringify(model.toJSON()));
+      let response: SyncResponse = {
+        method: method,
+        status: xhr.status,
+        content: data
+      };
 
-   });
+      proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
+
+      if (isValid(xhr)) {
+        return resolve(response)
+      } else {
+        let error = new HttpError(xhr.status, xhr.statusText, data);
+
+        return reject(error);
+      }
+
+    }
+
+    xhr.open(http, url, true);
+
+    if (!(options.headers && options.headers['Accept'])) {
+      if (!options.headers) options.headers = {};
+      options.headers = {
+        Accept: "application/json"
+      }
+    }
+
+    xhr.setRequestHeader('Content-Type', "application/json");
+
+    if (options.headers) for (var key in options.headers) {
+      xhr.setRequestHeader(key, options.headers[key]);
+    }
+
+    if (options.beforeSend) options.beforeSend(xhr);
+    xhr.send(JSON.stringify(model.toJSON()));
+
+  });
 }
