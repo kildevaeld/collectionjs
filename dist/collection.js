@@ -2091,9 +2091,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	        xhr.open(http, url, true);
 	        if (!(options.headers && options.headers['Accept'])) {
-	            options.headers = {
-	                Accept: "application/json"
-	            };
+	            if (!options.headers)
+	                options.headers = {};
+	            options.headers['Accept'] = "application/json";
 	        }
 	        xhr.setRequestHeader('Content-Type', "application/json");
 	        if (options.headers)

@@ -129,9 +129,7 @@ export function sync(method: RestMethod, model: ISerializable, options: SyncOpti
 
     if (!(options.headers && options.headers['Accept'])) {
       if (!options.headers) options.headers = {};
-      options.headers = {
-        Accept: "application/json"
-      }
+      options.headers['Accept'] = "application/json"
     }
 
     xhr.setRequestHeader('Content-Type', "application/json");
