@@ -115,65 +115,7 @@ export function sync(method: RestMethod, model: ISerializable, options: SyncOpti
         content: json,
         headers: new Headers(res.headers)
       }
-    })
-  })
+    });
+  });
 
-  /*let xhr = ajax();
-
-  let query: string, url = options.url;
-  if (options.params) query = queryParam(options.params);
-
-  if (query) {
-    var sep = (options.url.indexOf('?') === -1) ? '?' : '&';
-    url += sep + query;
-  }
-
-  return new Promise((resolve, reject) => {
-
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState !== 4) return;
-
-      let data;
-
-      try {
-        data = getData(options.headers['Accept'], xhr);
-      } catch (e) {
-        return reject(new Error('Could not serialize response'));
-      }
-
-      let response: SyncResponse = {
-        method: method,
-        status: xhr.status,
-        content: data
-      };
-
-      proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
-
-      if (isValid(xhr)) {
-        return resolve(response)
-      } else {
-        let error = new HttpError(xhr.status, xhr.statusText, data);
-
-        return reject(error);
-      }
-
-    }
-
-    xhr.open(http, url, true);
-
-    if (!(options.headers && options.headers['Accept'])) {
-      if (!options.headers) options.headers = {};
-      options.headers['Accept'] = "application/json"
-    }
-
-    xhr.setRequestHeader('Content-Type', "application/json");
-
-    if (options.headers) for (var key in options.headers) {
-      xhr.setRequestHeader(key, options.headers[key]);
-    }
-
-    if (options.beforeSend) options.beforeSend(xhr);
-    xhr.send(JSON.stringify(model.toJSON()));
-
-  });*/
 }
