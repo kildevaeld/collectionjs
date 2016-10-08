@@ -1,5 +1,6 @@
 import { ISerializable } from './interfaces';
-import { IPromise } from 'utilities/lib/promises';
+import { IPromise } from 'orange';
+import { HttpRequest, Headers } from 'orange.request';
 export declare class HttpError extends Error {
     message: string;
     status: number;
@@ -21,7 +22,7 @@ export interface SyncOptions {
         [key: string]: string;
     };
     progress?: (progress: number, total: number) => void;
-    beforeSend?: (xhr: XMLHttpRequest) => void;
+    beforeSend?: (xhr: HttpRequest) => void;
 }
 export interface SyncFunc {
     (method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse>;
@@ -30,6 +31,7 @@ export interface SyncResponse {
     method: RestMethod;
     status: number;
     content: any;
+    headers: Headers;
     [key: string]: any;
 }
 export declare function sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse>;

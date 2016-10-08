@@ -1,5 +1,5 @@
 import {EventEmitter} from 'eventsjs'
-import {inherits} from 'utilities/lib/utils'
+import {inherits} from 'orange'
 
 export abstract class BaseObject extends EventEmitter {
   protected __classType: string;

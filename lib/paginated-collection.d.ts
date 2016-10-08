@@ -1,7 +1,7 @@
 import { IPersistableModel } from './interfaces';
 import { Collection } from './collection';
 import { RestCollection, RestCollectionOptions, CollectionFetchOptions } from './rest-collection';
-import { IPromise } from 'utilities/lib/promises';
+import { IPromise } from 'orange';
 export interface GetPageOptions extends CollectionFetchOptions {
     page?: number;
 }

@@ -1,8 +1,7 @@
 
 import {EventEmitter} from 'eventsjs'
 import {IModel, ICollection} from './interfaces'
-import {uniqueId, equal} from 'utilities/lib/utils'
-import {has, extend, isEmpty, isObject} from 'utilities/lib/objects'
+import {uniqueId, equal, has, extend, isEmpty, isObject} from 'orange'
 import {Model, ModelSetOptions, isModel} from './model'
 /**
  * Takes a nested object and returns a shallow object keyed with the path names

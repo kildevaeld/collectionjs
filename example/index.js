@@ -8,7 +8,7 @@ var _  = require('underscore');
 let data = function () {
   let out = [];
   let id = 0;
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 200; i++) {
     out.push({
       id: ++id,
       name: faker.name.firstName()
@@ -18,6 +18,8 @@ let data = function () {
   return out;
   
 }();
+
+const PORT = 5000;
 
 app.set('etag', false); 
 app.use(express.static('../dist', {
@@ -43,7 +45,7 @@ app.get('/data', (req, res) => {
   if (page < links.last) links.next = page + 2; 
   
   for (let k in links) {
-    links[k] = "http://localhost:4000/data?page=" + links[k];
+    links[k] = `http://localhost:${PORT}/data?page=${links[k]}`;
   }
   res.set('content-type', 'application/json');
   res.links(links);
@@ -65,4 +67,4 @@ app.get('/data', (req, res) => {
 })
 
 
-app.listen(4000)
+app.listen(PORT)

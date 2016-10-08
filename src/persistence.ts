@@ -1,7 +1,6 @@
-import {ISerializable} from './interfaces';
-import {IPromise, Promise} from 'utilities/lib/promises';
-import {ajax, proxy} from 'utilities/lib/utils';
-import {queryParam} from 'utilities/lib/request';
+import { ISerializable } from './interfaces';
+import { IPromise, Promise, proxy } from 'orange';
+import { HttpMethod, HttpRequest, Headers } from 'orange.request';
 
 export class HttpError extends Error {
   public message: string;
@@ -16,34 +15,34 @@ export class HttpError extends Error {
 }
 
 export enum RestMethod {
-    Create, Update, Read, Patch, Delete
+  Create, Update, Read, Patch, Delete
 };
 
 export interface SyncOptions {
-    url?: string;
-    contentType?: string
-    params?: Object | string;
-    headers?: { [key: string]: string };
-    progress?: (progress: number, total: number) => void;
-    beforeSend?: (xhr: XMLHttpRequest) => void
+  url?: string;
+  contentType?: string
+  params?: Object | string;
+  headers?: { [key: string]: string };
+  progress?: (progress: number, total: number) => void;
+  beforeSend?: (xhr: HttpRequest) => void
 }
 
 export interface SyncFunc {
-    (method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse>
+  (method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse>
 }
 
 export interface SyncResponse {
   method: RestMethod;
   status: number;
   content: any;
-
+  headers: Headers;
   [key: string]: any;
 }
 
 const xmlRe = /^(?:application|text)\/xml/;
 const jsonRe = /^application\/json/;
 
-var getData = function(accepts, xhr) {
+var getData = function (accepts, xhr) {
 
   if (accepts == null) accepts = xhr.getResponseHeader('content-type');
   if (xmlRe.test(accepts)) {
@@ -55,36 +54,71 @@ var getData = function(accepts, xhr) {
   }
 };
 
-var isValid = function(xhr) {
+var isValid = function (xhr) {
   return (xhr.status >= 200 && xhr.status < 300) ||
     (xhr.status === 304) ||
     (xhr.status === 0 && window.location.protocol === 'file:')
 };
 
 export function sync(method: RestMethod, model: ISerializable, options: SyncOptions): IPromise<SyncResponse> {
-    let http;
-    switch (method) {
+  let http: HttpMethod;
+  switch (method) {
     case RestMethod.Create:
-      http = 'POST';
+      http = HttpMethod.POST
       break;
     case RestMethod.Update:
-      http = "PUT";
+      http = HttpMethod.PUT;
       break;
     case RestMethod.Patch:
-      http = "PATCH";
+      http = HttpMethod.PATCH;
       break;
     case RestMethod.Delete:
-      http = "DELETE";
+      http = HttpMethod.DELETE;
       break;
     case RestMethod.Read:
-      http = "GET";
+      http = HttpMethod.GET;
       break;
     default:
       return Promise.reject(new Error(`Sync: does not recognise method: ${method}`));
+  }
+
+
+  let request = new HttpRequest(http, options.url);
+
+  if (options.params) request.params(options.params);
+  if (options.headers) request.header(options.headers);
+
+  request.header('Content-Type', 'application/json');
+
+  if (!(options.headers && options.headers['Accept'])) {
+    request.header('Accept', 'application/json')
+  }
+
+
+  if (options.beforeSend) options.beforeSend(request);
+
+  let data = undefined;
+  if (http == HttpMethod.PATCH || http === HttpMethod.PUT || http === HttpMethod.POST) {
+    data = model.toJSON();
+  }
+
+  return request.end(data)
+  .then( res => {
+    if (!res.isValid) {
+      return res.text().then( t => {throw new HttpError(res.status, res.statusText, t)})
     }
+    return res.json()
+    .then( json => {
+      return {
+        method: method,
+        status: res.status,
+        content: json,
+        headers: new Headers(res.headers)
+      }
+    })
+  })
 
-
-  let xhr = ajax();
+  /*let xhr = ajax();
 
   let query: string, url = options.url;
   if (options.params) query = queryParam(options.params);
@@ -96,7 +130,7 @@ export function sync(method: RestMethod, model: ISerializable, options: SyncOpti
 
   return new Promise((resolve, reject) => {
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
       if (xhr.readyState !== 4) return;
 
       let data;
@@ -141,5 +175,5 @@ export function sync(method: RestMethod, model: ISerializable, options: SyncOpti
     if (options.beforeSend) options.beforeSend(xhr);
     xhr.send(JSON.stringify(model.toJSON()));
 
-  });
+  });*/
 }

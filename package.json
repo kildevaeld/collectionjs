@@ -1,6 +1,6 @@
 {
   "name": "collection",
-  "version": "0.3.10",
+  "version": "0.4.0",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -9,10 +9,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/kildevaeld/collectionjs.git"
-  },
-  "jspm": {
-    "main": "dist/collection.js",
-    "format": "cjs"
   },
   "homepage": "https://github.com/kildevaeld/collectionjs",
   "authors": [
@@ -42,7 +38,8 @@
   },
   "dependencies": {
     "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
-    "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
+    "orange": "git+https://github.com/kildevaeld/orange.git",
+    "orange.request": "git+https://github.com/kildevaeld/orange.request.git"
   },
   "typings": "lib/index",
   "jspm": {
@@ -51,7 +48,8 @@
     "main": "lib/index.js",
     "dependencies": {
       "eventsjs": "github:kildevaeld/eventsjs@master",
-      "utilities": "github:kildevaeld/utilitiesjs@master"
+      "orange": "github:kildevaeld/orange@master",
+      "orange.request": "github:kildevaeld/orange.reguest@master"
     }
   }
 }

@@ -1,9 +1,7 @@
 import {BaseObject} from './object'
 import {IModel,ICollection, Silenceable, ISerializable} from './interfaces'
 import {Model, isModel} from './model'
-import {extend,isObject} from 'utilities/lib/objects'
-import {sortBy, find, slice} from 'utilities/lib/arrays'
-import {callFunc} from 'utilities/lib/utils'
+import {extend,isObject, sortBy, find, slice, callFunc} from 'orange'
 
 
 export function isCollection<T extends IModel>(a:any): a is Collection<T> {

@@ -1,8 +1,7 @@
 
 import {BaseObject} from './object'
 import {IModel, ICollection, ISerializable} from './interfaces'
-import {uniqueId, equal} from 'utilities/lib/utils'
-import {has, extend} from 'utilities/lib/objects'
+import {uniqueId, equal, has, extend} from 'orange'
 
 export interface ModelOptions {
   collection?: ICollection;

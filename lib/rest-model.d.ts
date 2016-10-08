@@ -1,4 +1,4 @@
-import { IPromise } from 'utilities/lib/promises';
+import { IPromise } from 'orange';
 import { ModelOptions } from './model';
 import { NestedModel } from './nested-model';
 import { IPersistableModel, IPersistableCollection, ISerializable } from './interfaces';

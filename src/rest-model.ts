@@ -1,6 +1,5 @@
 
-import {extend} from 'utilities/lib/objects';
-import {IPromise, Promise} from 'utilities/lib/promises';
+import {extend, IPromise, Promise} from 'orange';
 import {ModelOptions, Model} from './model';
 import {NestedModel} from './nested-model';
 import {IPersistableModel, IPersistableCollection, ISerializable} from './interfaces';

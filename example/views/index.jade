@@ -1,7 +1,7 @@
 doctype html
 html
   head
-    script(src="collection.js")
+    script(src="collection.bundle.js")
   body
     button.next Next
     div.result count
@@ -11,9 +11,14 @@ html
         url: 'data'
       });
       
-      col.fetch();
+      col.fetch().catch(e => {
+        console.log(e)
+      }).then( c => {
+        console.log('done', c)
+      })
       
       document.querySelector('.next').addEventListener('click', function () {
+        console.log(col.hasNext())
         if (!col.hasNext()) return; 
         col.getNextPage().then(function () {
           document.querySelector('.result').textContent = "Numbero: " + col.length;

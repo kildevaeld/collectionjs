@@ -1,10 +1,10 @@
 import {IPersistableModel} from './interfaces';
 import {Collection} from './collection';
 import {RestCollection, RestCollectionOptions, CollectionFetchOptions} from './rest-collection';
-import {IPromise, Promise} from 'utilities/lib/promises';
+import {IPromise, Promise, extend,has} from 'orange';
 import {SyncResponse, RestMethod} from './persistence';
-import {extend, has} from 'utilities/lib/objects';
-import {queryParam} from 'utilities/lib/request';
+
+import {queryParam} from 'orange.request';
 
 const PARAM_TRIM_RE = /[\s'"]/g;
 const URL_TRIM_RE = /[<>\s'"]/g;
@@ -226,11 +226,12 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
   private _parseLinkHeaders (resp:SyncResponse): Link  {
     var link: Link = {}; 
     
-    if (typeof resp['getResponseHeader'] !== 'function') {
+    /*if (typeof resp['getResponseHeader'] !== 'function') {
       return link;
-    }
+    }*/
     
-    let linkHeader = resp['getResponseHeader']('Link');
+    let linkHeader: any = resp.headers.get('Link');
+    
     if (!linkHeader) return link;
     linkHeader = linkHeader.split(',')
     let relations = ['first', 'prev', 'next', 'last'];

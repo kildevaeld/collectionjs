@@ -13,7 +13,7 @@ const project = typescript.createProject('tsconfig.json', {
 	 typescript: require('typescript')
 });
 	
-gulp.task('build', function () {
+gulp.task('typescript', function () {
 	let result = project.src('src/**/*.ts')
 	.pipe(typescript(project))
 	
@@ -24,7 +24,7 @@ gulp.task('build', function () {
 	
 })
 
-gulp.task('build:bundle', ['build'], function () {
+gulp.task('build', ['typescript'], function () {
 	
 	return gulp.src('./lib/index.js')
 	.pipe(webpack({
@@ -32,29 +32,37 @@ gulp.task('build:bundle', ['build'], function () {
 			filename: 'collection.js',
 			libraryTarget: 'umd',
 			library: 'collection'
-		}/*,
+		},
 		externals: {
-			'eventsjs': 'eventsjs'
-		}*/
+			eventsjs: 'eventsjs',
+			orange: 'orange',
+			'orange.request': {
+				commonjs: 'orange.request',
+				commonjs2: 'orange.request',
+				amd: 'orange.request',
+				root: ['orange', 'request']
+			}
+		}
 	}))
 	.pipe(gulp.dest('dist'))
 	
-	/*let tsconfig = require(process.cwd() + '/tsconfig.json')
+})
+
+gulp.task('build:bundle', ['typescript'], function () {
 	
-	let files = tsconfig.files.map(function (file) {
-		console.log(file.replace('src','lib').replace('.ts','.js'))
-		return gulp.src(file.replace('src','lib').replace('.ts','.js'));
-	});
-	
-	return sq.apply(sq, [{objectMode:true}].concat(files))
-	.pipe(concat('collection.js'))
-	.pipe(wrap({
-		namespace: 'collection',
-		deps: [
-			{name: 'eventsjs', globalName:'eventsjs', paramName: 'events' }
-		],
-		exports: 'exports'
+	return gulp.src('./lib/index.js')
+	.pipe(webpack({
+		output: {
+			filename: 'collection.bundle.js',
+			libraryTarget: 'umd',
+			library: 'collection'
+		},
+		resolve: {
+			alias: {
+				'orange.request': process.cwd() + '/node_modules/orange.request/lib/browser.js'
+			}
+		}
 	}))
-	.pipe(gulp.dest('dist'));*/
+	.pipe(gulp.dest('dist'))
 	
 })

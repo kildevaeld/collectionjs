@@ -1,6 +1,6 @@
+import { IPromise } from 'orange';
 import { Collection, CollectionOptions, CollectionCreateOptions, CollectionSetOptions } from './collection';
 import { IModel, IPersistableModel, IPersistableCollection, ISerializable } from './interfaces';
-import { IPromise } from 'utilities/lib/promises';
 import { RestMethod, SyncOptions, SyncResponse } from './persistence';
 export declare function isRestCollection<T extends IModel>(a: any): a is RestCollection<T>;
 export interface RestCollectionOptions<T extends IPersistableModel> extends CollectionOptions<T> {

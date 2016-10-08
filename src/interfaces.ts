@@ -1,5 +1,5 @@
 import {IEventEmitter} from 'eventsjs';
-import {IPromise} from 'utilities/lib/promises';
+import {IPromise} from 'orange';
 
 export interface ISerializable {
     toJSON(): any

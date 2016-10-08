@@ -1,11 +1,9 @@
 
-import {extend} from 'utilities/lib/objects';
+import {extend, IPromise, Promise} from 'orange';
 import {Collection, CollectionOptions, CollectionCreateOptions, CollectionSetOptions} from './collection';
 import {RestModel, isRestModel} from './rest-model';
 import {IModel, IPersistableModel,
 IPersistableCollection, ISerializable} from './interfaces';
-
-import {IPromise, Promise} from 'utilities/lib/promises';
 import {RestMethod, SyncFunc, SyncOptions, sync, SyncResponse} from './persistence';
 
 export function isRestCollection<T extends IModel>(a:any): a is RestCollection<T>  {
