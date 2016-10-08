@@ -1273,7 +1273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                method: method,
 	                status: res.status,
 	                content: json,
-	                headers: res.headers
+	                headers: new orange_request_1.Headers(res.headers)
 	            };
 	        });
 	    });
@@ -1462,10 +1462,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    PaginatedCollection.prototype._parseLinkHeaders = function (resp) {
 	        var link = {};
-	        if (typeof resp['getResponseHeader'] !== 'function') {
-	            return link;
-	        }
-	        var linkHeader = resp['getResponseHeader']('Link');
+	        var linkHeader = resp.headers.get('Link');
 	        if (!linkHeader)
 	            return link;
 	        linkHeader = linkHeader.split(',');

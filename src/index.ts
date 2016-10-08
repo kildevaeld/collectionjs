@@ -6,3 +6,4 @@ export * from './interfaces';
 export * from './rest-collection';
 export * from './rest-model';
 export * from './paginated-collection';
+export {SyncResponse} from './persistence'
