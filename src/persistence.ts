@@ -99,7 +99,7 @@ export function sync(method: RestMethod, model: ISerializable, options: SyncOpti
 
   let data = undefined;
   if (http == HttpMethod.PATCH || http === HttpMethod.PUT || http === HttpMethod.POST) {
-    data = model.toJSON();
+    data = JSON.stringify(model.toJSON());
   }
 
   return request.end(data)

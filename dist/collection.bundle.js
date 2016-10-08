@@ -2539,7 +2539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        options.beforeSend(request);
 	    var data = undefined;
 	    if (http == orange_request_1.HttpMethod.PATCH || http === orange_request_1.HttpMethod.PUT || http === orange_request_1.HttpMethod.POST) {
-	        data = model.toJSON();
+	        data = JSON.stringify(model.toJSON());
 	    }
 	    return request.end(data)
 	        .then(function (res) {
