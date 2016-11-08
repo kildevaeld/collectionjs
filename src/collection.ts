@@ -29,7 +29,6 @@ export interface CollectionSetOptions extends Silenceable {
   parse?: boolean
 }
 
-
 export interface CollectionRemoveOptions extends Silenceable {
   index?: number
 }
