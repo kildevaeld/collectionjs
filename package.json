@@ -1,6 +1,6 @@
 {
   "name": "collection",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -33,7 +33,7 @@
     "sinon": "^1.17.2",
     "streamqueue": "^1.1.1",
     "tslint": "^3.2.1",
-    "typescript": "^1.7.0-dev.20150922",
+    "typescript": "^2.0.8",
     "webpack": "^1.12.1"
   },
   "dependencies": {

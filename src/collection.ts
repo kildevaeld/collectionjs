@@ -1,33 +1,34 @@
-import {BaseObject} from './object'
-import {IModel,ICollection, Silenceable, ISerializable} from './interfaces'
-import {Model, isModel} from './model'
-import {extend,isObject, sortBy, find, slice, callFunc} from 'orange'
+import { BaseObject } from './object'
+import { IModel, ICollection, Silenceable, ISerializable } from './interfaces'
+import { Model, isModel } from './model'
+import { extend, isObject, sortBy, find, slice, callFunc } from 'orange'
 
 
-export function isCollection<T extends IModel>(a:any): a is Collection<T> {
+export function isCollection<T extends IModel>(a: any): a is Collection<T> {
   if (a == null) return false;
   return (a instanceof Collection) || a.__classType == 'Collection' || a.__classType == 'RestCollection';
 }
 
-var setOptions = {add: true, remove: true, merge: true};
-var addOptions = {add: true, remove: false};
+var setOptions = { add: true, remove: true, merge: true };
+var addOptions = { add: true, remove: false };
 
-export type SortFunction = <T>(a:T, b:T) => number
+export type SortFunction = <T>(a: T, b: T) => number
 
 
 export interface CollectionOptions<U> {
-  model?: new (attr:Object, options?:any) => U
+  model?: new (attr: Object, options?: any) => U
 }
 
 
 export interface CollectionSetOptions extends Silenceable {
-  at?:number
-  sort?:boolean
-  add?:boolean
-  merge?:boolean
-  remove?:boolean
-  parse?:boolean
+  at?: number
+  sort?: boolean
+  add?: boolean
+  merge?: boolean
+  remove?: boolean
+  parse?: boolean
 }
+
 
 export interface CollectionRemoveOptions extends Silenceable {
   index?: number
@@ -44,40 +45,40 @@ export interface CollectionResetOptions extends Silenceable {
 }
 
 export class Collection<U extends IModel> extends BaseObject implements ICollection, ISerializable {
-  
+
   protected get __classType() { return 'Collection' };
   /**
    * The length of the collection
    * @property {Number} length
    */
-  public get length () {
-		return this.models.length
-	}
-
-  private _model: new (attr:Object, options?:any) => U
-	public get Model (): new (attr:Object, options?:any) => U {
-   if (!this._model) {
-     this._model = <any>Model
-   }
-
-   return this._model
+  public get length() {
+    return this.models.length
   }
 
-  public set Model (con:new (attr:Object, options?:any) => U) {
-   this._model = con
+  private _model: new (attr: Object, options?: any) => U
+  public get Model(): new (attr: Object, options?: any) => U {
+    if (!this._model) {
+      this._model = <any>Model
+    }
+
+    return this._model
   }
 
-  private _models:U[]
-
-  get models (): U[] {
-    return this._models||(this._models=[]);
+  public set Model(con: new (attr: Object, options?: any) => U) {
+    this._model = con
   }
 
-  comparator:string|SortFunction
+  private _models: U[]
+
+  get models(): U[] {
+    return this._models || (this._models = []);
+  }
+
+  comparator: string | SortFunction
 
   options: CollectionOptions<U>
 
-  constructor (models?:U[]|Object[], options:CollectionOptions<U>={}) {
+  constructor(models?: U[] | Object[], options: CollectionOptions<U> = {}) {
     super();
     this.options = options;
 
@@ -93,27 +94,27 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
 
   }
 
-  add (models:U|U[]|Object|Object[], options:CollectionSetOptions={}) {
+  add(models: U | U[] | Object | Object[], options: CollectionSetOptions = {}) {
     if (!Array.isArray(models)) {
       if (!(models instanceof this.Model)) {
         models = this._prepareModel(<any>models);
       }
     } else {
-      models = (<any[]>models).map<U>( (item) => {
+      models = (<any[]>models).map<U>((item) => {
         return (item instanceof this.Model) ? item : <any>(this._prepareModel(item));
       });
     }
-    this.set(<U|U[]>models, extend({merge:false}, options, addOptions));
+    this.set(<U | U[]>models, extend({ merge: false }, options, addOptions));
   }
 
-  protected set(items:U|U[], options: CollectionSetOptions={}) {
+  protected set(items: U | U[], options: CollectionSetOptions = {}) {
     options = extend({}, setOptions, options);
     if (options.parse) items = this.parse(items, options);
 
-		var singular = !Array.isArray(items);
+    var singular = !Array.isArray(items);
     let models: U[] = <U[]>(singular ? (items ? [items] : []) : (<U[]>items).slice())
 
-		var i, l, id, model: U, attrs, existing: U, sort;
+    var i, l, id, model: U, attrs, existing: U, sort;
     var at = options.at;
     //var targetModel = this.model;
     var sortable = this.comparator && (at == null) && options.sort !== false;
@@ -129,7 +130,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
 
       model = this._prepareModel(model);
 
-			id = model.get(model.idAttribute)||model.uid
+      id = model.get(model.idAttribute) || model.uid
 
       // If a duplicate is found, prevent it from being added and
       // optionally merge it into the existing model.
@@ -143,7 +144,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
         }
         models[i] = existing;
 
-      // If this is a new, valid model, push it to the `toAdd` list.
+        // If this is a new, valid model, push it to the `toAdd` list.
       } else if (add) {
         models[i] = model//this._prepareModel(attrs, options);
         if (!model) continue;
@@ -152,7 +153,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
       }
 
       // Do not add multiple models with the same `id`.
-       model = existing || model;
+      model = existing || model;
       if (order && !modelMap[model.id]) order.push(model);
       modelMap[model.uid] = true;
     }
@@ -183,7 +184,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     }
 
     // Silently sort the collection if appropriate.
-    if (sort) this.sort({silent: true});
+    if (sort) this.sort({ silent: true });
 
     // Unless silenced, it's time to fire all appropriate add/sort events.
     if (!options.silent) {
@@ -199,7 +200,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     return singular ? models[0] : models;
   }
 
-  remove (models:U[]|U, options: CollectionRemoveOptions={}) {
+  remove(models: U[] | U, options: CollectionRemoveOptions = {}) {
     var singular = !Array.isArray(models);
     models = <U[]>(singular ? [models] : (<U[]>models).slice());
 
@@ -220,21 +221,21 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     return singular ? models[0] : models;
   }
 
-  get (id:any): U {
+  get(id: any): U {
     return this.find(id)
   }
 
   // Get the model at the given index.
-  at (index) {
+  at(index) {
     return this.models[index];
   }
 
-  clone (options?:CollectionOptions<U>) {
-    options = options||this.options
+  clone(options?: CollectionOptions<U>) {
+    options = options || this.options
     return new (<any>this).constructor(this.models, options);
   }
 
-  sort (options: CollectionSortOptions={}) {
+  sort(options: CollectionSortOptions = {}) {
     if (!this.comparator) throw new Error('Cannot sort a set without a comparator');
 
     // Run sort based on type of `comparator`.
@@ -248,15 +249,15 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     return this;
   }
 
-  sortBy (key: string|Function, context?: any): U[] {
-    return sortBy(this._models,key, context)
+  sortBy(key: string | Function, context?: any): U[] {
+    return sortBy(this._models, key, context)
   }
 
-  push (model, options={}) {
-    return this.add(model, extend({at:this.length}, options));
+  push(model, options = {}) {
+    return this.add(model, extend({ at: this.length }, options));
   }
 
-  reset (models, options:CollectionResetOptions={}) {
+  reset(models, options: CollectionResetOptions = {}) {
     this.forEach((model) => {
       this._removeReference(model, options);
     });
@@ -270,18 +271,18 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     return models;
   }
 
-  create (values?:any, options: CollectionCreateOptions={add:true}): IModel  {
+  create(values?: any, options: CollectionCreateOptions = { add: true }): IModel {
     let model = new this.Model(values, options)
     if (options.add)
       this.add(model)
     return model
   }
 
-  parse (models:U|U[], options: CollectionSetOptions={}): U|U[] {
+  parse(models: U | U[], options: CollectionSetOptions = {}): U | U[] {
     return models
   }
 
-  find (nidOrFn) {
+  find(nidOrFn) {
     let model;
     if (typeof nidOrFn === 'function') {
       model = find<IModel>(this.models, nidOrFn);
@@ -294,71 +295,71 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     return model;
   }
 
-  forEach(iterator:(model:U, index?:number) => void, ctx?:any) {
-    for (let i=0, l = this.models.length; i < l; i++) {
-      iterator.call(ctx||this, this.models[i], i);
+  forEach(iterator: (model: U, index?: number) => void, ctx?: any) {
+    for (let i = 0, l = this.models.length; i < l; i++) {
+      iterator.call(ctx || this, this.models[i], i);
     }
 
     return this;
   }
 
-  map<T>(iterator:(model:U, index?:number, collection?: ICollection) => T, thisArgs?:any): T[] {
+  map<T>(iterator: (model: U, index?: number, collection?: ICollection) => T, thisArgs?: any): T[] {
     let out: T[] = []
-    for (let i=0, ii = this.length; i<ii; i++) {
+    for (let i = 0, ii = this.length; i < ii; i++) {
       out.push(iterator.call(thisArgs, this.models[i], i, this));
     }
     return out;
   }
 
-  filter(fn:(model:U, index?:number) => boolean): U[] {
+  filter(fn: (model: U, index?: number) => boolean): U[] {
     let out = [];
     this.forEach((m, i) => {
-      if (fn(m,i)) out.push(m);
+      if (fn(m, i)) out.push(m);
     });
     return out;
   }
 
-  indexOf (model:U): number {
+  indexOf(model: U): number {
     return this.models.indexOf(model)
   }
 
-  toJSON () {
+  toJSON() {
     return this.models.map(function (m) { return m.toJSON(); });
   }
 
 
-  protected _prepareModel(value:any): U {
+  protected _prepareModel(value: any): U {
     if (isModel(value)) return value;
-    if (isObject(value)) return new this.Model(value, {parse: true});
+    if (isObject(value)) return new this.Model(value, { parse: true });
     throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
   }
 
-  private _removeReference (model:U, options?: any) {
+  private _removeReference(model: U, options?: any) {
     if (this === model.collection) delete model.collection;
     this.stopListening(model)
   }
 
-  private _addReference (model:IModel, options?:any) {
+  private _addReference(model: IModel, options?: any) {
     if (!model.collection) model.collection = this;
     this.listenTo(model, 'all', this._onModelEvent)
   }
 
-  private _reset () {
+  private _reset() {
     this._models = [];
   }
 
-  private _onModelEvent (event, model, collection, options) {
+  private _onModelEvent(event, model, collection, options) {
     if ((event === 'add' || event === 'remove') && collection !== this) return;
     if (event === 'destroy') this.remove(model, options);
 
     callFunc(this.trigger, this, slice(arguments))
   }
 
-  destroy () {
+  destroy() {
 
-    this.models.forEach( m => {
+    this.models.forEach(m => {
       if (typeof (<any>m).destroy === 'function' &&
-         m.collection == this) (<any>m).destroy();
+        m.collection == this) (<any>m).destroy();
     });
 
     super.destroy();

@@ -24,18 +24,18 @@ export interface CollectionResetOptions extends Silenceable {
     previousModels?: IModel[];
 }
 export declare class Collection<U extends IModel> extends BaseObject implements ICollection, ISerializable {
-    protected __classType: string;
-    length: number;
+    protected readonly __classType: string;
+    readonly length: number;
     private _model;
     Model: new (attr: Object, options?: any) => U;
     private _models;
-    models: U[];
+    readonly models: U[];
     comparator: string | SortFunction;
     options: CollectionOptions<U>;
     constructor(models?: U[] | Object[], options?: CollectionOptions<U>);
     add(models: U | U[] | Object | Object[], options?: CollectionSetOptions): void;
     protected set(items: U | U[], options?: CollectionSetOptions): U | U[];
-    remove(models: U[] | U, options?: CollectionRemoveOptions): any;
+    remove(models: U[] | U, options?: CollectionRemoveOptions): U | U[];
     get(id: any): U;
     at(index: any): U;
     clone(options?: CollectionOptions<U>): any;

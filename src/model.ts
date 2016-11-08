@@ -1,7 +1,7 @@
 
-import {BaseObject} from './object'
-import {IModel, ICollection, ISerializable} from './interfaces'
-import {uniqueId, equal, has, extend} from 'orange'
+import { BaseObject } from './object'
+import { IModel, ICollection, ISerializable } from './interfaces'
+import { uniqueId, equal, has, extend } from 'orange'
 
 export interface ModelOptions {
   collection?: ICollection;
@@ -15,14 +15,14 @@ export interface ModelSetOptions {
   silent?: boolean
 }
 
-export function isModel(a:any): a is IModel {
+export function isModel(a: any): a is IModel {
   if (a == null) return false;
   return (a instanceof Model) || a.__classType === 'Model' || a.__classType === 'RestModel';
 }
 
 export class Model extends BaseObject implements IModel, ISerializable {
   protected get __classType() { return 'Model' };
-  
+
   protected _attributes: any
   public uid: string
   public collection: ICollection
@@ -37,13 +37,13 @@ export class Model extends BaseObject implements IModel, ISerializable {
     if (this.idAttribute in this._attributes) return this._attributes[this.idAttribute]
   }
 
-    get isNew (): boolean {
-        return this.id == null;
-    }
+  get isNew(): boolean {
+    return this.id == null;
+  }
 
-    get isDirty(): boolean {
-        return this.hasChanged();
-    }
+  get isDirty(): boolean {
+    return this.hasChanged();
+  }
 
 
   constructor(attributes: Object = {}, options: ModelOptions = {}) {
@@ -53,7 +53,7 @@ export class Model extends BaseObject implements IModel, ISerializable {
     this.options = options;
     if (options.parse) attributes = this.parse(attributes);
     //this._attributes = attributes
-    this.set(attributes,  <any>{ silent: true, array: false });
+    this.set(attributes, <any>{ silent: true, array: false });
     this.uid = uniqueId('uid')
 
 
@@ -67,7 +67,7 @@ export class Model extends BaseObject implements IModel, ISerializable {
 
   }
 
-  set(key: string | Object, val?: any|ModelSetOptions, options: ModelSetOptions = {}) {
+  set(key: string | Object, val?: any | ModelSetOptions, options: ModelSetOptions = {}) {
     var attr, attrs: any = {}, unset, changes, silent, changing, prev, current;
     if (key == null) return this;
 
@@ -178,15 +178,15 @@ export class Model extends BaseObject implements IModel, ISerializable {
     return changed;
   }
 
-    // Get the previous value of an attribute, recorded at the time the last
-    // `"change"` event was fired.
+  // Get the previous value of an attribute, recorded at the time the last
+  // `"change"` event was fired.
   previous(attr) {
     if (attr == null || !this._previousAttributes) return null;
     return this._previousAttributes[attr];
   }
 
-    // Get all of the attributes of the model at the time of the previous
-    // `"change"` event.
+  // Get all of the attributes of the model at the time of the previous
+  // `"change"` event.
   previousAttributes() {
     return extend(Object.create(null), this._previousAttributes);
   }
@@ -199,31 +199,31 @@ export class Model extends BaseObject implements IModel, ISerializable {
     return new ((<any>this).constructor)(this._attributes, this.options);
   }
 
-  parse(attr:any, options?:any): any {
+  parse(attr: any, options?: any): any {
     return attr;
   }
 
-  remove(options?:any): any {
+  remove(options?: any): any {
     this.trigger('remove', this, this.collection, options);
-    
+
   }
 
-  public pick(attr:string|string[], ...attrs:string[]): any {
-        if (arguments.length === 1) {
-            if (!Array.isArray(attr)) {
-                attrs = [attr];
-            } else {
-                attrs = <string[]>attr;
-            }
-        } else {
-            attrs = [<string>attr].concat(attrs);
-        }
-        let out = {};
-        for (let i = 0, ii = attrs.length; i < ii; i++ ) {
-            if (this.has(attrs[i])) out[attrs[i]] = this.get(attrs[i]);
-        }
-        
-        return out;
+  public pick(attr: string | string[], ...attrs: string[]): any {
+    if (arguments.length === 1) {
+      if (!Array.isArray(attr)) {
+        attrs = [attr];
+      } else {
+        attrs = <string[]>attr;
+      }
+    } else {
+      attrs = [<string>attr].concat(attrs);
     }
+    let out = {};
+    for (let i = 0, ii = attrs.length; i < ii; i++) {
+      if (this.has(attrs[i])) out[attrs[i]] = this.get(attrs[i]);
+    }
+
+    return out;
+  }
 
 }

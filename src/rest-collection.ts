@@ -1,12 +1,14 @@
 
-import {extend, IPromise, Promise} from 'orange';
-import {Collection, CollectionOptions, CollectionCreateOptions, CollectionSetOptions} from './collection';
-import {RestModel, isRestModel} from './rest-model';
-import {IModel, IPersistableModel,
-IPersistableCollection, ISerializable} from './interfaces';
-import {RestMethod, SyncFunc, SyncOptions, sync, SyncResponse} from './persistence';
+import { extend, IPromise, Promise } from 'orange';
+import { Collection, CollectionOptions, CollectionCreateOptions, CollectionSetOptions } from './collection';
+import { RestModel, isRestModel } from './rest-model';
+import {
+  IModel, IPersistableModel,
+  IPersistableCollection, ISerializable
+} from './interfaces';
+import { RestMethod, SyncFunc, SyncOptions, sync, SyncResponse } from './persistence';
 
-export function isRestCollection<T extends IModel>(a:any): a is RestCollection<T>  {
+export function isRestCollection<T extends IModel>(a: any): a is RestCollection<T> {
   if (a == null) return false;
   return (a instanceof RestCollection) || a.__classType == 'RestCollection';
 }
@@ -25,13 +27,13 @@ export interface CollectionFetchOptions extends CollectionSetOptions, SyncOption
 
 export interface RestCollectionCreateOptions extends CollectionCreateOptions, SyncOptions {
   wait?: boolean;
-  complete?: (error: Error, model:IPersistableModel) => void;
+  complete?: (error: Error, model: IPersistableModel) => void;
 }
 
 
 export class RestCollection<T extends IPersistableModel> extends Collection<T> implements IPersistableCollection {
   protected get __classType() { return 'RestCollection' };
-  
+  Model = <any>RestModel
   url: string | (() => string);
   options: RestCollectionOptions<T>;
 
@@ -44,7 +46,7 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
 
     if (options.url) this.url = options.url;
 
-    this.options.queryParameter = this.options.queryParameter||'q';
+    this.options.queryParameter = this.options.queryParameter || 'q';
   }
 
   fetch(options?: CollectionFetchOptions): IPromise<any> {
@@ -90,11 +92,11 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
 
     model.save().then(() => {
 
-     if (!options.wait) this.add(model, options);
+      if (!options.wait) this.add(model, options);
 
-     this.trigger('create', this, model, value, options);
+      this.trigger('create', this, model, value, options);
 
-     if (options.complete) options.complete(null,model);
+      if (options.complete) options.complete(null, model);
 
     }).catch((e) => {
       this.trigger('error', e);
@@ -104,9 +106,9 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
     return model;
   }
 
-  query(term:string, options:CollectionFetchOptions={}): IPromise<T[]> {
+  query(term: string, options: CollectionFetchOptions = {}): IPromise<T[]> {
 
-    let params = {[this.options.queryParameter]: term};
+    let params = { [this.options.queryParameter]: term };
 
     let url = this.getURL();
     if (url == null) return Promise.reject(new Error('Url or rootURL no specified'));

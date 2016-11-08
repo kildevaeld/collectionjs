@@ -19,9 +19,6 @@ export interface IModel extends IEventEmitter {
         [key: string]: any;
     };
 }
-export interface IModelConstructor {
-    new (attr?: any, options?: IModelOptions): IModel;
-}
 export interface IPersistableModel extends IModel {
     collection?: IPersistableCollection;
     fetch(): IPromise<IPersistableModel>;

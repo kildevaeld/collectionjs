@@ -420,8 +420,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	function getID() {
 	    return "" + (++idCounter);
 	}
+	/**
+	 *
+	 *
+	 * @export
+	 * @class EventEmitterError
+	 * @extends {Error}
+	 */
 	var EventEmitterError = (function (_super) {
 	    __extends(EventEmitterError, _super);
+	    /**
+	     * Creates an instance of EventEmitterError.
+	     *
+	     * @param {string} [message]
+	     * @param {string} [method]
+	     * @param {*} [klass]
+	     * @param {*} [ctx]
+	     *
+	     * @memberOf EventEmitterError
+	     */
 	    function EventEmitterError(message, method, klass, ctx) {
 	        _super.call(this, message);
 	        this.message = message;
@@ -429,6 +446,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.klass = klass;
 	        this.ctx = ctx;
 	    }
+	    /**
+	     *
+	     *
+	     * @returns
+	     *
+	     * @memberOf EventEmitterError
+	     */
 	    EventEmitterError.prototype.toString = function () {
 	        var prefix = "EventEmitterError";
 	        if (this.method && this.method != "") {
@@ -439,6 +463,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return EventEmitterError;
 	}(Error));
 	exports.EventEmitterError = EventEmitterError;
+	function removeFromListener(listeners, fn, ctx) {
+	    for (var i = 0; i < listeners.length; i++) {
+	        var e = listeners[i];
+	        if ((fn == null && ctx != null && e.ctx === ctx) ||
+	            (fn != null && ctx == null && e.handler === fn) ||
+	            (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
+	            listeners.splice(i, 1);
+	        }
+	    }
+	    return listeners;
+	}
+	/**
+	 *
+	 *
+	 * @export
+	 * @param {Events[]} fn
+	 * @param {any[]} [args=[]]
+	 * @returns
+	 */
 	function callFunc(fn, args) {
 	    if (args === void 0) { args = []; }
 	    var l = fn.length, i = -1, a1 = args[0], a2 = args[1], a3 = args[2], a4 = args[3];
@@ -470,24 +513,64 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.callFunc = callFunc;
+	/**
+	 *
+	 *
+	 * @export
+	 * @param {*} a
+	 * @returns {a is Function}
+	 */
 	function isFunction(a) {
 	    return typeof a === 'function';
 	}
 	exports.isFunction = isFunction;
+	/**
+	 *
+	 *
+	 * @export
+	 * @param {*} a
+	 * @returns {a is EventEmitter}
+	 */
 	function isEventEmitter(a) {
 	    return a && (a instanceof EventEmitter || (isFunction(a.on) && isFunction(a.once) && isFunction(a.off) && isFunction(a.trigger)));
 	}
 	exports.isEventEmitter = isEventEmitter;
+	/**
+	 *
+	 *
+	 * @export
+	 * @class EventEmitter
+	 * @implements {IEventEmitter}
+	 * @implements {Destroyable}
+	 */
 	var EventEmitter = (function () {
 	    function EventEmitter() {
 	    }
 	    Object.defineProperty(EventEmitter.prototype, "listeners", {
+	        /**
+	         *
+	         *
+	         * @readonly
+	         * @type {{ [key: string]: Events[] }}
+	         * @memberOf EventEmitter
+	         */
 	        get: function () {
 	            return this._listeners;
 	        },
 	        enumerable: true,
 	        configurable: true
 	    });
+	    /**
+	     *
+	     *
+	     * @param {string} event
+	     * @param {EventHandler} fn
+	     * @param {*} [ctx]
+	     * @param {boolean} [once=false]
+	     * @returns {*}
+	     *
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.prototype.on = function (event, fn, ctx, once) {
 	        if (once === void 0) { once = false; }
 	        var events = (this._listeners || (this._listeners = {}))[event] || (this._listeners[event] = []);
@@ -499,30 +582,68 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        return this;
 	    };
+	    /**
+	     *
+	     *
+	     * @param {string} event
+	     * @param {EventHandler} fn
+	     * @param {*} [ctx]
+	     * @returns {*}
+	     *
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.prototype.once = function (event, fn, ctx) {
 	        return this.on(event, fn, ctx, true);
 	    };
-	    EventEmitter.prototype.off = function (eventName, fn) {
+	    /**
+	     *
+	     *
+	     * @param {string} [eventName]
+	     * @param {EventHandler} [fn]
+	     * @param {*} [ctx]
+	     * @returns {*}
+	     *
+	     * @memberOf EventEmitter
+	     */
+	    EventEmitter.prototype.off = function (eventName, fn, ctx) {
 	        this._listeners = this._listeners || {};
-	        if (eventName == null) {
+	        if (eventName == null && ctx == null) {
 	            this._listeners = {};
 	        }
 	        else if (this._listeners[eventName]) {
 	            var events = this._listeners[eventName];
-	            if (fn == null) {
+	            if (fn == null && ctx == null) {
 	                this._listeners[eventName] = [];
 	            }
 	            else {
-	                for (var i = 0; i < events.length; i++) {
-	                    var event_1 = events[i];
-	                    if (events[i].handler == fn) {
-	                        this._listeners[eventName].splice(i, 1);
-	                    }
-	                }
+	                /*for (let i = 0; i < events.length; i++) {
+	                  let e = events[i];
+	                  if ((fn == null && ctx != null && e.ctx === ctx) ||
+	                    (fn != null && ctx == null && e.handler === fn) ||
+	                    (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
+	                    this._listeners[eventName].splice(i, 1);
+	                  }
+	                }*/
+	                removeFromListener(events, fn, ctx);
+	            }
+	        }
+	        else {
+	            for (var en in this.listeners) {
+	                var l = this.listeners[en];
+	                removeFromListener(l, fn, ctx);
 	            }
 	        }
 	        return this;
 	    };
+	    /**
+	     *
+	     *
+	     * @param {string} eventName
+	     * @param {...any[]} args
+	     * @returns {*}
+	     *
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.prototype.trigger = function (eventName) {
 	        var args = [];
 	        for (var _i = 1; _i < arguments.length; _i++) {
@@ -532,7 +653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var events = (this._listeners[eventName] || []).concat(this._listeners['all'] || []).concat(this._listeners["*"] || []);
 	        if (EventEmitter.debugCallback)
 	            EventEmitter.debugCallback(this.constructor.name, this.name, eventName, args, events);
-	        var event, a, len = events.length, index;
+	        var event, a, index;
 	        var calls = [];
 	        var alls = [];
 	        for (var i = 0, ii = events.length; i < ii; i++) {
@@ -557,9 +678,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._executeListener(calls, args);
 	        return this;
 	    };
+	    /**
+	     *
+	     *
+	     * @param {Events[]} func
+	     * @param {any[]} [args]
+	     *
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.prototype._executeListener = function (func, args) {
 	        EventEmitter.executeListenerFunction(func, args);
 	    };
+	    /**
+	     *
+	     *
+	     * @param {IEventEmitter} obj
+	     * @param {string} event
+	     * @param {EventHandler} fn
+	     * @param {*} [ctx]
+	     * @param {boolean} [once=false]
+	     * @returns {*}
+	     *
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.prototype.listenTo = function (obj, event, fn, ctx, once) {
 	        if (once === void 0) { once = false; }
 	        if (!isEventEmitter(obj)) {
@@ -575,9 +716,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        obj[meth](event, fn, this);
 	        return this;
 	    };
+	    /**
+	     *
+	     *
+	     * @param {IEventEmitter} obj
+	     * @param {string} event
+	     * @param {EventHandler} fn
+	     * @param {*} [ctx]
+	     * @returns {*}
+	     *
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.prototype.listenToOnce = function (obj, event, fn, ctx) {
 	        return this.listenTo(obj, event, fn, ctx, true);
 	    };
+	    /**
+	     *
+	     *
+	     * @param {IEventEmitter} [obj]
+	     * @param {string} [event]
+	     * @param {EventHandler} [callback]
+	     * @returns
+	     *
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.prototype.stopListening = function (obj, event, callback) {
 	        if (obj && !isEventEmitter(obj)) {
 	            if (EventEmitter.throwOnError)
@@ -600,11 +762,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this;
 	    };
+	    /**
+	     *
+	     *
+	     *
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.prototype.destroy = function () {
 	        this.stopListening();
 	        this.off();
 	    };
+	    /**
+	     *
+	     *
+	     * @static
+	     * @type {boolean}
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.throwOnError = true;
+	    /**
+	     *
+	     *
+	     * @static
+	     *
+	     * @memberOf EventEmitter
+	     */
 	    EventEmitter.executeListenerFunction = function (func, args) {
 	        callFunc(func, args);
 	    };
@@ -2228,6 +2410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function RestCollection(models, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this, models, options);
+	        this.Model = rest_model_1.RestModel;
 	        if (options.url)
 	            this.url = options.url;
 	        this.options.queryParameter = this.options.queryParameter || 'q';
@@ -2612,6 +2795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(25));
 	var base_http_request_2 = __webpack_require__(18);
 	exports.HttpMethod = base_http_request_2.HttpMethod;
+	exports.HttpError = base_http_request_2.HttpError;
 	var base_http_request_3 = __webpack_require__(18);
 	function get(url) {
 	    return new HttpRequest(base_http_request_3.HttpMethod.GET, url);
@@ -2648,6 +2832,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 	var orange_1 = __webpack_require__(4);
 	var utils_1 = __webpack_require__(19);
 	var header_1 = __webpack_require__(20);
@@ -2661,6 +2849,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(exports.HttpMethod || (exports.HttpMethod = {}));
 	var HttpMethod = exports.HttpMethod;
 
+	var HttpError = function (_Error) {
+	    _inherits(HttpError, _Error);
+
+	    function HttpError(response) {
+	        _classCallCheck(this, HttpError);
+
+	        var _this = _possibleConstructorReturn(this, (HttpError.__proto__ || Object.getPrototypeOf(HttpError)).call(this));
+
+	        _this.response = response;
+	        _this.status = response.status;
+	        _this.statusText = response.statusText;
+	        return _this;
+	    }
+
+	    return HttpError;
+	}(Error);
+
+	exports.HttpError = HttpError;
+
 	var BaseHttpRequest = function () {
 	    function BaseHttpRequest(_method, _url) {
 	        _classCallCheck(this, BaseHttpRequest);
@@ -2669,6 +2876,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._url = _url;
 	        this._params = {};
 	        this._headers = new header_1.Headers();
+	        //private _body: any;
 	        this._request = {};
 	        if (!utils_1.isNode) {
 	            this._headers.append('X-Requested-With', 'XMLHttpRequest');
@@ -2719,24 +2927,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'json',
 	        value: function json(data) {
+	            var throwOnInvalid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
 	            this.header('content-type', 'application/json; charset=utf-8');
 	            if (!orange_1.isString(data)) {
 	                data = JSON.stringify(data);
 	            }
-	            return this.end(data).then(function (res) {
+	            return this.end(data, throwOnInvalid).then(function (res) {
 	                return res.json();
 	            });
 	        }
 	    }, {
 	        key: 'text',
 	        value: function text(data) {
-	            return this.end(data).then(function (r) {
+	            var throwOnInvalid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+	            return this.end(data, throwOnInvalid).then(function (r) {
 	                return r.text();
 	            });
 	        }
 	    }, {
 	        key: 'end',
 	        value: function end(data) {
+	            var throwOnInvalid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
 	            var url = this._url;
 	            if (data && data === Object(data) && this._method == HttpMethod.GET /* && check for content-type */) {
 	                    var sep = url.indexOf('?') === -1 ? '?' : '&';
@@ -2748,11 +2962,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            url = this._apply_params(url);
 	            this._request.headers = this._headers;
-	            /*return fetch(url, this._request)
-	            .then((res: Response) => {
+	            return this._fetch(url, this._request).then(function (res) {
+	                if (!res.isValid && throwOnInvalid) {
+	                    throw new HttpError(res);
+	                }
 	                return res;
-	            });*/
-	            return this._fetch(url, this._request);
+	            });
 	        }
 	    }, {
 	        key: 'then',
@@ -2875,12 +3090,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Headers = function () {
 	    function Headers(headers) {
+	        var _this = this;
+
 	        _classCallCheck(this, Headers);
 
 	        this.map = {};
 	        if (headers instanceof Headers) {
+	            var _loop = function _loop(key) {
+	                headers.map[key].forEach(function (v) {
+	                    return _this.append(key, v);
+	                });
+	            };
+
 	            for (var key in headers.map) {
-	                this.append(key, headers.map[key]);
+	                _loop(key);
 	            }
 	        } else if (headers) {
 	            var names = Object.getOwnPropertyNames(headers);
@@ -3137,7 +3360,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Request = function () {
 	    function Request(input) {
-	        var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	        _classCallCheck(this, Request);
 
@@ -3233,7 +3456,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    reader.readAsText(blob);
 	    return fileReaderReady(reader);
 	}
-	var redirectStatuses = [301, 302, 303, 307, 308];
+	//var redirectStatuses = [301, 302, 303, 307, 308]
 
 	var BaseResponse = function () {
 	    function BaseResponse(body, options) {

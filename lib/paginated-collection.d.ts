@@ -18,7 +18,7 @@ export declare class PaginatedCollection<T extends IPersistableModel> extends Re
     private _link;
     private _state;
     private _page;
-    page: Collection<T>;
+    readonly page: Collection<T>;
     queryParams: QueryParameters;
     constructor(models?: any, options?: PaginatedCollectionOptions<T>);
     hasNext(): boolean;

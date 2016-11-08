@@ -949,6 +949,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function RestCollection(models, options) {
 	        if (options === void 0) { options = {}; }
 	        _super.call(this, models, options);
+	        this.Model = rest_model_1.RestModel;
 	        if (options.url)
 	            this.url = options.url;
 	        this.options.queryParameter = this.options.queryParameter || 'q';
