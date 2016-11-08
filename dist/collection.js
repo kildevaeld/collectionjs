@@ -1159,7 +1159,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        options.url = url;
 	        return this.sync(persistence_1.RestMethod.Delete, this, options)
 	            .then(function (result) {
-	            if (!options.wait)
+	            if (options.wait)
 	                _super.prototype.remove.call(_this, options);
 	            return _this;
 	        }).catch(function (e) {
