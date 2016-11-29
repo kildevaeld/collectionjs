@@ -1478,6 +1478,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return link;
 	    };
+	    PaginatedCollection.prototype._reset = function () {
+	        _super.prototype._reset.call(this);
+	        this._state = { first: 1, last: -1, current: 1, size: this._state.size };
+	        this._link = {};
+	    };
 	    return PaginatedCollection;
 	}(rest_collection_1.RestCollection));
 	exports.PaginatedCollection = PaginatedCollection;

@@ -52,9 +52,9 @@ export declare class Collection<U extends IModel> extends BaseObject implements 
     indexOf(model: U): number;
     toJSON(): any[];
     protected _prepareModel(value: any): U;
-    private _removeReference(model, options?);
-    private _addReference(model, options?);
-    private _reset();
+    protected _removeReference(model: U, options?: any): void;
+    protected _addReference(model: IModel, options?: any): void;
+    protected _reset(): void;
     private _onModelEvent(event, model, collection, options);
     destroy(): void;
 }

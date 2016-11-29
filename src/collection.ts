@@ -328,22 +328,22 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
 
 
   protected _prepareModel(value: any): U {
-    if (isModel(value)) return value;
+    if (isModel(value)) return value as U;
     if (isObject(value)) return new this.Model(value, { parse: true });
     throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
   }
 
-  private _removeReference(model: U, options?: any) {
+  protected _removeReference(model: U, options?: any) {
     if (this === model.collection) delete model.collection;
     this.stopListening(model)
   }
 
-  private _addReference(model: IModel, options?: any) {
+  protected _addReference(model: IModel, options?: any) {
     if (!model.collection) model.collection = this;
     this.listenTo(model, 'all', this._onModelEvent)
   }
 
-  private _reset() {
+  protected _reset() {
     this._models = [];
   }
 

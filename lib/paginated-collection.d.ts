@@ -30,4 +30,5 @@ export declare class PaginatedCollection<T extends IPersistableModel> extends Re
     fetch(options?: GetPageOptions): IPromise<any>;
     private _processResponse(resp, options);
     private _parseLinkHeaders(resp);
+    protected _reset(): void;
 }

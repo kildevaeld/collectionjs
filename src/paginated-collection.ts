@@ -252,5 +252,11 @@ export class PaginatedCollection<T extends IPersistableModel> extends RestCollec
     return link;
     
   }
+
+  protected _reset() {
+    super._reset();
+    this._state = {first:1, last: -1, current: 1, size: this._state.size};
+    this._link = {};
+  }
   
 } 
