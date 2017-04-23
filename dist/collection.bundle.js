@@ -52,33 +52,30 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
+	Object.defineProperty(exports, "__esModule", { value: true });
 	__export(__webpack_require__(1));
+	__export(__webpack_require__(11));
 	__export(__webpack_require__(12));
 	__export(__webpack_require__(13));
 	__export(__webpack_require__(14));
-	__export(__webpack_require__(15));
-	__export(__webpack_require__(26));
+	__export(__webpack_require__(25));
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var object_1 = __webpack_require__(2);
-	var model_1 = __webpack_require__(12);
-	var orange_1 = __webpack_require__(4);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	const object_1 = __webpack_require__(2);
+	const model_1 = __webpack_require__(11);
+	const orange_1 = __webpack_require__(4);
 	function isCollection(a) {
 	    if (a == null)
 	        return false;
@@ -87,11 +84,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isCollection = isCollection;
 	var setOptions = { add: true, remove: true, merge: true };
 	var addOptions = { add: true, remove: false };
-	var Collection = (function (_super) {
-	    __extends(Collection, _super);
-	    function Collection(models, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this);
+	class Collection extends object_1.BaseObject {
+	    constructor(models, options = {}) {
+	        super();
 	        this.options = options;
 	        if (this.options.model) {
 	            this.Model = this.options.model;
@@ -100,61 +95,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.add(models);
 	        }
 	    }
-	    Object.defineProperty(Collection.prototype, "__classType", {
-	        get: function () { return 'Collection'; },
-	        enumerable: true,
-	        configurable: true
-	    });
+	    get __classType() { return 'Collection'; }
 	    ;
-	    Object.defineProperty(Collection.prototype, "length", {
-	        get: function () {
-	            return this.models.length;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Collection.prototype, "Model", {
-	        get: function () {
-	            if (!this._model) {
-	                this._model = model_1.Model;
-	            }
-	            return this._model;
-	        },
-	        set: function (con) {
-	            this._model = con;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Collection.prototype, "models", {
-	        get: function () {
-	            return this._models || (this._models = []);
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Collection.prototype.add = function (models, options) {
-	        var _this = this;
-	        if (options === void 0) { options = {}; }
+	    get length() {
+	        return this.models.length;
+	    }
+	    get Model() {
+	        if (!this._model) {
+	            this._model = model_1.Model;
+	        }
+	        return this._model;
+	    }
+	    set Model(con) {
+	        this._model = con;
+	    }
+	    get models() {
+	        return this._models || (this._models = []);
+	    }
+	    add(models, options = {}) {
 	        if (!Array.isArray(models)) {
 	            if (!(models instanceof this.Model)) {
 	                models = this._prepareModel(models);
 	            }
 	        }
 	        else {
-	            models = models.map(function (item) {
-	                return (item instanceof _this.Model) ? item : (_this._prepareModel(item));
+	            models = models.map((item) => {
+	                return (item instanceof this.Model) ? item : (this._prepareModel(item));
 	            });
 	        }
-	        this.set(models, orange_1.extend({ merge: false }, options, addOptions));
-	    };
-	    Collection.prototype.set = function (items, options) {
-	        if (options === void 0) { options = {}; }
+	        return this.set(models, orange_1.extend({ merge: false }, options, addOptions));
+	    }
+	    set(items, options = {}) {
 	        options = orange_1.extend({}, setOptions, options);
 	        if (options.parse)
 	            items = this.parse(items, options);
 	        var singular = !Array.isArray(items);
-	        var models = (singular ? (items ? [items] : []) : items.slice());
+	        let models = (singular ? (items ? [items] : []) : items.slice());
 	        var i, l, id, model, attrs, existing, sort;
 	        var at = options.at;
 	        var sortable = this.comparator && (at == null) && options.sort !== false;
@@ -226,9 +202,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.trigger('update', this, options);
 	        }
 	        return singular ? models[0] : models;
-	    };
-	    Collection.prototype.remove = function (models, options) {
-	        if (options === void 0) { options = {}; }
+	    }
+	    remove(models, options = {}) {
 	        var singular = !Array.isArray(models);
 	        models = (singular ? [models] : models.slice());
 	        var i, l, index, model;
@@ -245,19 +220,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._removeReference(model, options);
 	        }
 	        return singular ? models[0] : models;
-	    };
-	    Collection.prototype.get = function (id) {
+	    }
+	    get(id) {
 	        return this.find(id);
-	    };
-	    Collection.prototype.at = function (index) {
+	    }
+	    at(index) {
 	        return this.models[index];
-	    };
-	    Collection.prototype.clone = function (options) {
+	    }
+	    clone(options) {
 	        options = options || this.options;
 	        return new this.constructor(this.models, options);
-	    };
-	    Collection.prototype.sort = function (options) {
-	        if (options === void 0) { options = {}; }
+	    }
+	    sort(options = {}) {
 	        if (!this.comparator)
 	            throw new Error('Cannot sort a set without a comparator');
 	        if (typeof this.comparator === 'string' || this.comparator.length === 1) {
@@ -269,19 +243,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!options.silent)
 	            this.trigger('sort', this, options);
 	        return this;
-	    };
-	    Collection.prototype.sortBy = function (key, context) {
+	    }
+	    sortBy(key, context) {
 	        return orange_1.sortBy(this._models, key, context);
-	    };
-	    Collection.prototype.push = function (model, options) {
-	        if (options === void 0) { options = {}; }
+	    }
+	    push(model, options = {}) {
 	        return this.add(model, orange_1.extend({ at: this.length }, options));
-	    };
-	    Collection.prototype.reset = function (models, options) {
-	        var _this = this;
-	        if (options === void 0) { options = {}; }
-	        this.forEach(function (model) {
-	            _this._removeReference(model, options);
+	    }
+	    reset(models, options = {}) {
+	        this.forEach((model) => {
+	            this._removeReference(model, options);
 	        });
 	        options.previousModels = this.models;
 	        this._reset();
@@ -289,20 +260,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!options.silent)
 	            this.trigger('reset', this, options);
 	        return models;
-	    };
-	    Collection.prototype.create = function (values, options) {
-	        if (options === void 0) { options = { add: true }; }
-	        var model = new this.Model(values, options);
+	    }
+	    create(values, options = { add: true }) {
+	        let model = new this.Model(values, options);
 	        if (options.add)
 	            this.add(model);
 	        return model;
-	    };
-	    Collection.prototype.parse = function (models, options) {
-	        if (options === void 0) { options = {}; }
+	    }
+	    parse(models, options = {}) {
 	        return models;
-	    };
-	    Collection.prototype.find = function (nidOrFn) {
-	        var model;
+	    }
+	    find(nidOrFn) {
+	        let model;
 	        if (typeof nidOrFn === 'function') {
 	            model = orange_1.find(this.models, nidOrFn);
 	        }
@@ -312,103 +281,92 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	        return model;
-	    };
-	    Collection.prototype.forEach = function (iterator, ctx) {
-	        for (var i = 0, l = this.models.length; i < l; i++) {
+	    }
+	    forEach(iterator, ctx) {
+	        for (let i = 0, l = this.models.length; i < l; i++) {
 	            iterator.call(ctx || this, this.models[i], i);
 	        }
 	        return this;
-	    };
-	    Collection.prototype.map = function (iterator, thisArgs) {
-	        var out = [];
-	        for (var i = 0, ii = this.length; i < ii; i++) {
+	    }
+	    map(iterator, thisArgs) {
+	        let out = [];
+	        for (let i = 0, ii = this.length; i < ii; i++) {
 	            out.push(iterator.call(thisArgs, this.models[i], i, this));
 	        }
 	        return out;
-	    };
-	    Collection.prototype.filter = function (fn) {
-	        var out = [];
-	        this.forEach(function (m, i) {
+	    }
+	    filter(fn) {
+	        let out = [];
+	        this.forEach((m, i) => {
 	            if (fn(m, i))
 	                out.push(m);
 	        });
 	        return out;
-	    };
-	    Collection.prototype.indexOf = function (model) {
+	    }
+	    indexOf(model) {
 	        return this.models.indexOf(model);
-	    };
-	    Collection.prototype.toJSON = function () {
+	    }
+	    toJSON() {
 	        return this.models.map(function (m) { return m.toJSON(); });
-	    };
-	    Collection.prototype._prepareModel = function (value) {
+	    }
+	    _prepareModel(value) {
 	        if (model_1.isModel(value))
 	            return value;
 	        if (orange_1.isObject(value))
 	            return new this.Model(value, { parse: true });
 	        throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
-	    };
-	    Collection.prototype._removeReference = function (model, options) {
+	    }
+	    _removeReference(model, options) {
 	        if (this === model.collection)
 	            delete model.collection;
 	        this.stopListening(model);
-	    };
-	    Collection.prototype._addReference = function (model, options) {
+	    }
+	    _addReference(model, options) {
 	        if (!model.collection)
 	            model.collection = this;
 	        this.listenTo(model, 'all', this._onModelEvent);
-	    };
-	    Collection.prototype._reset = function () {
+	    }
+	    _reset() {
 	        this._models = [];
-	    };
-	    Collection.prototype._onModelEvent = function (event, model, collection, options) {
+	    }
+	    _onModelEvent(event, model, collection, options) {
 	        if ((event === 'add' || event === 'remove') && collection !== this)
 	            return;
 	        if (event === 'destroy')
 	            this.remove(model, options);
 	        orange_1.callFunc(this.trigger, this, orange_1.slice(arguments));
-	    };
-	    Collection.prototype.destroy = function () {
-	        var _this = this;
-	        this.models.forEach(function (m) {
+	    }
+	    destroy() {
+	        this.models.forEach(m => {
 	            if (typeof m.destroy === 'function' &&
-	                m.collection == _this)
+	                m.collection == this)
 	                m.destroy();
 	        });
-	        _super.prototype.destroy.call(this);
-	    };
-	    return Collection;
-	}(object_1.BaseObject));
+	        super.destroy();
+	    }
+	}
 	exports.Collection = Collection;
 
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	const eventsjs_1 = __webpack_require__(3);
+	const orange_1 = __webpack_require__(4);
+	class BaseObject extends eventsjs_1.EventEmitter {
+	}
+	BaseObject.extend = function (proto, stat) {
+	    return orange_1.inherits(this, proto, stat);
 	};
-	var eventsjs_1 = __webpack_require__(3);
-	var orange_1 = __webpack_require__(4);
-	var BaseObject = (function (_super) {
-	    __extends(BaseObject, _super);
-	    function BaseObject() {
-	        _super.apply(this, arguments);
-	    }
-	    BaseObject.extend = function (proto, stat) {
-	        return orange_1.inherits(this, proto, stat);
-	    };
-	    return BaseObject;
-	}(eventsjs_1.EventEmitter));
 	exports.BaseObject = BaseObject;
 
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
@@ -795,9 +753,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.EventEmitter = EventEmitter;
 
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -812,15 +770,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(7));
 	__export(__webpack_require__(10));
 	__export(__webpack_require__(8));
-	__export(__webpack_require__(11));
+	//export * from './map';
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	function isObject(obj) {
 	    return obj === Object(obj);
@@ -856,7 +814,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return { string }
 	 */
 	function uniqueId() {
-	    var prefix = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+	    var prefix = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 	    return prefix + ++idCounter;
 	}
@@ -1036,9 +994,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	;
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -1076,7 +1034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.bind = bind;
 	function callFunc(fn, ctx) {
-	    var args = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+	    var args = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
 	    switch (args.length) {
 	        case 0:
@@ -1138,112 +1096,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.inherits = inherits;
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
-	/*class KeyValuePair<K, V> {
-	    key: K;
-	    value: V;
-	    constructor(key: K, value: V) {
-	        this.key = key;
-	        this.value = value;
-	    }
-	}
-	export class Map<K, V> { // class MapDDD<K,V> implements Map
-	    // -------------- Fields -----------------------
-	    private keyAndValues: Array<KeyValuePair<K, V>>;
-	    // ---------------------------------------------
-	    constructor() {
-	        this.keyAndValues = [];
-	    }
-	    // --- Public Methods ---
-	    getKeysOfValue(value: V) {
-	        var keysToReturn: Array<K> = [];
-	        var valueToFind = value;
-	        this.keyAndValues.forEach(function (value: KeyValuePair<K, V>, index: number, array: KeyValuePair<K, V>[]): void {
-	            if (value.value === valueToFind) {
-	                keysToReturn.push(value.key);
-	            }
-	        });
-	        return keysToReturn;
-	    }
-
-	    // Standard:
-	    clear(): void {
-	        this.keyAndValues = [];
-	    }
-	    delete(key: K): boolean {
-	        var found = false;
-	        this.keyAndValues.forEach(function (value: KeyValuePair<K, V>, index: number, array: KeyValuePair<K, V>[]): void {
-	            if (found) return;
-	            if (key === value.key) {
-	                array = array.slice(0, index).concat(array.slice(index + 1));
-	                found = true;
-	            }
-	        });
-	        return found;
-	    }
-	    forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {
-	        this.keyAndValues.forEach(function (value: KeyValuePair<K, V>, index: number, array: KeyValuePair<K, V>[]): void {
-	            callbackfn.apply(thisArg, [value.value, value.key, this]);
-	        }, this);
-	    }
-	    get(key: K): V {
-	        var valueToReturn: V = undefined;
-	        this.keyAndValues.forEach(function (value: KeyValuePair<K, V>, index: number, array: KeyValuePair<K, V>[]): void {
-	            if (valueToReturn !== undefined) return;
-	            if (key === value.key) {
-	                valueToReturn = value.value;
-	            }
-	        });
-	        return valueToReturn;
-	    }
-	    has(key: K): boolean {
-	        var found = false;
-	        this.keyAndValues.forEach(function (value: KeyValuePair<K, V>, index: number, array: KeyValuePair<K, V>[]): void {
-	            if (found) return;
-	            if (key === value.key) {
-	                found = true;
-	            }
-	        });
-	        return found;
-	    }
-	    set(key: K, value: V): Map<K, V> {
-	        var found = false;
-	        var valueToSet = value;
-	        this.keyAndValues.forEach(function (value: KeyValuePair<K, V>, index: number, array: KeyValuePair<K, V>[]): void {
-	            if (found) return;
-	            if (key === value.key) {
-	                found = true;
-	                value.value = valueToSet;
-	            }
-	        });
-	        if (!found) {
-	            this.keyAndValues.push(new KeyValuePair<K, V>(key, valueToSet));
-	        }
-	        return this;
-	    }
-	    // ----------------------
-
-	    // Getters:
-	    // Standard:
-	    get size() {
-	        return this.keyAndValues.length;
-	    }
-	}*/
 	// Return a new array with duplicates removed
 
 	function unique(array) {
 	    var seen = new Map();
 	    return array.filter(function (e, i) {
 	        if (seen.has(e)) return false;
-	        /*for (i += 1; i < array.length; i += 1) {
-	          if (equal(e, array[i])) {
-	            return false;
-	          }
-	        }*/
 	        seen.set(e, true);
 	        return true;
 	    });
@@ -1304,9 +1167,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.sortBy = sortBy;
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -1323,7 +1186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.truncate = truncate;
 	function humanFileSize(bytes) {
-	    var si = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+	    var si = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
 	    var thresh = si ? 1000 : 1024;
 	    if (Math.abs(bytes) < thresh) {
@@ -1339,9 +1202,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.humanFileSize = humanFileSize;
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -1355,7 +1218,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Object}      Shallow object with path names e.g. { 'level1.level2': 'value' }
 	 */
 	function objToPaths(obj) {
-	    var separator = arguments.length <= 1 || arguments[1] === undefined ? "." : arguments[1];
+	    var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ".";
 
 	    var ret = {};
 	    for (var key in obj) {
@@ -1543,9 +1406,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.intersection = intersection;
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {"use strict";
 
@@ -1666,7 +1529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.delay = delay;
 	;
 	function eachAsync(array, iterator, context) {
-	    var accumulate = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+	    var accumulate = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
 	    return mapAsync(array, iterator, context, accumulate).then(function () {
 	        return void 0;
@@ -1674,7 +1537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.eachAsync = eachAsync;
 	function mapAsync(array, iterator, context) {
-	    var accumulate = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+	    var accumulate = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
 	    return new exports.Promise(function (resolve, reject) {
 	        var i = 0,
@@ -1702,207 +1565,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.mapAsync = mapAsync;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {"use strict";
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var self = typeof window === 'undefined' ? global : window;
-	var iterable = 'Symbol' in self && 'iterator' in Symbol;
-	// Build a destructive iterator for the value list
-	function iteratorFor(items) {
-	    var iterator = {
-	        next: function next() {
-	            var value = items.shift();
-	            return { done: value === undefined, value: value };
-	        }
-	    };
-	    if (iterable) {
-	        iterator[Symbol.iterator] = function () {
-	            return iterator;
-	        };
-	    }
-	    return iterator;
-	}
-
-	var KeyValuePair = function KeyValuePair(key, value) {
-	    _classCallCheck(this, KeyValuePair);
-
-	    this.key = key;
-	    this.value = value;
-	};
-
-	var MapShim = function () {
-	    // ---------------------------------------------
-	    function MapShim() {
-	        _classCallCheck(this, MapShim);
-
-	        this.keyAndValues = [];
-	    }
-	    // --- Public Methods ---
-
-
-	    _createClass(MapShim, [{
-	        key: 'getKeysOfValue',
-	        value: function getKeysOfValue(value) {
-	            var keysToReturn = [];
-	            var valueToFind = value;
-	            this.keyAndValues.forEach(function (value, index, array) {
-	                if (value.value === valueToFind) {
-	                    keysToReturn.push(value.key);
-	                }
-	            });
-	            return keysToReturn;
-	        }
-	        // Standard:
-
-	    }, {
-	        key: 'clear',
-	        value: function clear() {
-	            this.keyAndValues = [];
-	        }
-	    }, {
-	        key: 'delete',
-	        value: function _delete(key) {
-	            var found = false;
-	            this.keyAndValues.forEach(function (value, index, array) {
-	                if (found) return;
-	                if (key === value.key) {
-	                    array = array.slice(0, index).concat(array.slice(index + 1));
-	                    found = true;
-	                }
-	            });
-	            return found;
-	        }
-	    }, {
-	        key: 'forEach',
-	        value: function forEach(callbackfn, thisArg) {
-	            this.keyAndValues.forEach(function (value, index, array) {
-	                callbackfn.apply(thisArg, [value.value, value.key, this]);
-	            }, this);
-	        }
-	    }, {
-	        key: 'get',
-	        value: function get(key) {
-	            var valueToReturn = undefined;
-	            this.keyAndValues.forEach(function (value, index, array) {
-	                if (valueToReturn !== undefined) return;
-	                if (key === value.key) {
-	                    valueToReturn = value.value;
-	                }
-	            });
-	            return valueToReturn;
-	        }
-	    }, {
-	        key: 'has',
-	        value: function has(key) {
-	            var found = false;
-	            this.keyAndValues.forEach(function (value, index, array) {
-	                if (found) return;
-	                if (key === value.key) {
-	                    found = true;
-	                }
-	            });
-	            return found;
-	        }
-	    }, {
-	        key: 'set',
-	        value: function set(key, value) {
-	            var found = false;
-	            var valueToSet = value;
-	            this.keyAndValues.forEach(function (value, index, array) {
-	                if (found) return;
-	                if (key === value.key) {
-	                    found = true;
-	                    value.value = valueToSet;
-	                }
-	            });
-	            if (!found) {
-	                this.keyAndValues.push(new KeyValuePair(key, valueToSet));
-	            }
-	            return this;
-	        }
-	    }, {
-	        key: 'keys',
-	        value: function keys() {
-	            var items = [];
-	            this.forEach(function (value, name) {
-	                items.push(name);
-	            });
-	            return iteratorFor(items);
-	        }
-	    }, {
-	        key: 'values',
-	        value: function values() {
-	            var items = [];
-	            this.forEach(function (value) {
-	                items.push(value);
-	            });
-	            return iteratorFor(items);
-	        }
-	    }, {
-	        key: 'entries',
-	        value: function entries() {
-	            var items = [];
-	            this.forEach(function (value, name) {
-	                items.push([name, value]);
-	            });
-	            return iteratorFor(items);
-	        }
-	        // ----------------------
-	        // Getters:
-	        // Standard:
-
-	    }, {
-	        key: Symbol.iterator,
-	        value: function value() {
-	            return this.entries();
-	        }
-	    }, {
-	        key: 'size',
-	        get: function get() {
-	            return this.keyAndValues.length;
-	        }
-	    }]);
-
-	    return MapShim;
-	}();
-
-	if (!self.Map) {
-	    self.Map = MapShim;
-	}
-	exports.Map = self.Map;
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var object_1 = __webpack_require__(2);
-	var orange_1 = __webpack_require__(4);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	const object_1 = __webpack_require__(2);
+	const orange_1 = __webpack_require__(4);
 	function isModel(a) {
 	    if (a == null)
 	        return false;
 	    return (a instanceof Model) || a.__classType === 'Model' || a.__classType === 'RestModel';
 	}
 	exports.isModel = isModel;
-	var Model = (function (_super) {
-	    __extends(Model, _super);
-	    function Model(attributes, options) {
-	        if (attributes === void 0) { attributes = {}; }
-	        if (options === void 0) { options = {}; }
-	        _super.call(this);
+	class Model extends object_1.BaseObject {
+	    get __classType() { return 'Model'; }
+	    ;
+	    get id() {
+	        if (this.idAttribute in this._attributes)
+	            return this._attributes[this.idAttribute];
+	    }
+	    get isNew() {
+	        return this.id == null;
+	    }
+	    get isDirty() {
+	        return this.hasChanged();
+	    }
+	    constructor(attributes = {}, options = {}) {
+	        super();
 	        options = options || {};
 	        this._attributes = {};
 	        this.options = options;
@@ -1914,36 +1605,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.collection = options.collection;
 	        this.idAttribute = options.idAttribute || this.idAttribute || 'id';
 	    }
-	    Object.defineProperty(Model.prototype, "__classType", {
-	        get: function () { return 'Model'; },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    ;
-	    Object.defineProperty(Model.prototype, "id", {
-	        get: function () {
-	            if (this.idAttribute in this._attributes)
-	                return this._attributes[this.idAttribute];
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Model.prototype, "isNew", {
-	        get: function () {
-	            return this.id == null;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Model.prototype, "isDirty", {
-	        get: function () {
-	            return this.hasChanged();
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Model.prototype.set = function (key, val, options) {
-	        if (options === void 0) { options = {}; }
+	    set(key, val, options = {}) {
 	        var attr, attrs = {}, unset, changes, silent, changing, prev, current;
 	        if (key == null)
 	            return this;
@@ -1996,35 +1658,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._pending = false;
 	        this._changing = false;
 	        return this;
-	    };
-	    Model.prototype.get = function (key) {
+	    }
+	    get(key) {
 	        return this._attributes[key];
-	    };
-	    Model.prototype.unset = function (key, options) {
+	    }
+	    unset(key, options) {
 	        this.set(key, void 0, orange_1.extend({}, options, { unset: true }));
-	    };
-	    Model.prototype.has = function (attr) {
+	    }
+	    has(attr) {
 	        return this.get(attr) != null;
-	    };
-	    Model.prototype.hasChanged = function (attr) {
+	    }
+	    hasChanged(attr) {
 	        if (attr == null)
 	            return !!Object.keys(this.changed).length;
 	        return orange_1.has(this.changed, attr);
-	    };
-	    Model.prototype.clear = function (options) {
-	        var attrs = {};
-	        for (var key in this._attributes)
+	    }
+	    clear(options) {
+	        let attrs = {};
+	        for (let key in this._attributes)
 	            attrs[key] = void 0;
 	        return this.set(attrs, orange_1.extend({}, options, { unset: true }));
-	    };
-	    Object.defineProperty(Model.prototype, "changed", {
-	        get: function () {
-	            return orange_1.extend({}, this._changed);
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Model.prototype.changedAttributes = function (diff) {
+	    }
+	    get changed() {
+	        return orange_1.extend({}, this._changed);
+	    }
+	    changedAttributes(diff) {
 	        if (!diff)
 	            return this.hasChanged() ? orange_1.extend(Object.create(null), this.changed) : false;
 	        var val, changed = {};
@@ -2035,32 +1693,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            (changed || (changed = {}))[attr] = val;
 	        }
 	        return changed;
-	    };
-	    Model.prototype.previous = function (attr) {
+	    }
+	    previous(attr) {
 	        if (attr == null || !this._previousAttributes)
 	            return null;
 	        return this._previousAttributes[attr];
-	    };
-	    Model.prototype.previousAttributes = function () {
+	    }
+	    previousAttributes() {
 	        return orange_1.extend(Object.create(null), this._previousAttributes);
-	    };
-	    Model.prototype.toJSON = function () {
+	    }
+	    toJSON() {
 	        return JSON.parse(JSON.stringify(this._attributes));
-	    };
-	    Model.prototype.clone = function () {
+	    }
+	    clone() {
 	        return new (this.constructor)(this._attributes, this.options);
-	    };
-	    Model.prototype.parse = function (attr, options) {
+	    }
+	    parse(attr, options) {
 	        return attr;
-	    };
-	    Model.prototype.remove = function (options) {
+	    }
+	    remove(options) {
 	        this.trigger('remove', this, this.collection, options);
-	    };
-	    Model.prototype.pick = function (attr) {
-	        var attrs = [];
-	        for (var _i = 1; _i < arguments.length; _i++) {
-	            attrs[_i - 1] = arguments[_i];
-	        }
+	    }
+	    pick(attr, ...attrs) {
 	        if (arguments.length === 1) {
 	            if (!Array.isArray(attr)) {
 	                attrs = [attr];
@@ -2072,33 +1726,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else {
 	            attrs = [attr].concat(attrs);
 	        }
-	        var out = {};
-	        for (var i = 0, ii = attrs.length; i < ii; i++) {
+	        let out = {};
+	        for (let i = 0, ii = attrs.length; i < ii; i++) {
 	            if (this.has(attrs[i]))
 	                out[attrs[i]] = this.get(attrs[i]);
 	        }
 	        return out;
-	    };
-	    return Model;
-	}(object_1.BaseObject));
+	    }
+	}
 	exports.Model = Model;
 
 
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var orange_1 = __webpack_require__(4);
-	var model_1 = __webpack_require__(12);
-	function objToPaths(obj, separator, array) {
-	    if (separator === void 0) { separator = "."; }
-	    if (array === void 0) { array = true; }
+	Object.defineProperty(exports, "__esModule", { value: true });
+	const orange_1 = __webpack_require__(4);
+	const model_1 = __webpack_require__(11);
+	function objToPaths(obj, separator = ".", array = true) {
 	    var ret = {};
 	    if (!obj)
 	        return obj;
@@ -2118,13 +1765,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ret;
 	}
 	exports.objToPaths = objToPaths;
-	function isOnNestedModel(obj, path, separator) {
-	    if (separator === void 0) { separator = "."; }
+	function isOnNestedModel(obj, path, separator = ".") {
 	    var fields = path ? path.split(separator) : [];
 	    if (!obj)
 	        return false;
 	    var result = obj;
-	    for (var i = 0, n = fields.length; i < n; i++) {
+	    for (let i = 0, n = fields.length; i < n; i++) {
 	        if (model_1.isModel(result))
 	            return true;
 	        if (!result)
@@ -2133,8 +1779,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return false;
 	}
-	function getNested(obj, path, return_exists, separator) {
-	    if (separator === void 0) { separator = "."; }
+	function getNested(obj, path, return_exists, separator = ".") {
 	    if (!obj)
 	        return null;
 	    var fields = path ? path.split(separator) : [];
@@ -2184,7 +1829,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            result = result[field];
 	            if (model_1.isModel(result)) {
-	                var rest = fields.slice(i + 1);
+	                let rest = fields.slice(i + 1);
 	                return result.set(rest.join('.'), val, options);
 	            }
 	        }
@@ -2195,16 +1840,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        unset: true
 	    });
 	}
-	var NestedModel = (function (_super) {
-	    __extends(NestedModel, _super);
-	    function NestedModel() {
-	        _super.apply(this, arguments);
-	    }
-	    NestedModel.prototype.get = function (attr) {
+	class NestedModel extends model_1.Model {
+	    get(attr) {
 	        return getNested(this._attributes, attr);
-	    };
-	    NestedModel.prototype.set = function (key, val, options) {
-	        var _this = this;
+	    }
+	    set(key, val, options) {
 	        var attr, attrs, unset, changes, silent, changing, prev, current;
 	        if (key == null)
 	            return this;
@@ -2233,7 +1873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._nestedListener = {};
 	        for (attr in attrs) {
 	            val = attrs[attr];
-	            var curVal = getNested(current, attr);
+	            let curVal = getNested(current, attr);
 	            if (!orange_1.equal(curVal, val)) {
 	                changes.push(attr);
 	                this._changed[attr] = val;
@@ -2245,7 +1885,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                deleteNested(this.changed, attr);
 	            }
 	            if (model_1.isModel(curVal)) {
-	                var fn = this._nestedListener[attr];
+	                let fn = this._nestedListener[attr];
 	                if (fn) {
 	                    curVal.off('change', fn);
 	                    delete this._nestedListener[attr];
@@ -2257,14 +1897,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            else {
 	                if (!isOnNestedModel(current, attr, separator)) {
 	                    if (model_1.isModel(val)) {
-	                        var fn = function (model) {
+	                        let fn = (model) => {
 	                            if (model.changed == undefined || orange_1.isEmpty(model.changed))
 	                                return;
-	                            for (var key_1 in model.changed) {
-	                                _this._changed[attr + separator + key_1] = model.changed[key_1];
-	                                _this.trigger('change:' + attr + separator + key_1, model.changed[key_1]);
+	                            for (let key in model.changed) {
+	                                this._changed[attr + separator + key] = model.changed[key];
+	                                this.trigger('change:' + attr + separator + key, model.changed[key]);
 	                            }
-	                            _this.trigger('change', _this, options);
+	                            this.trigger('change', this, options);
 	                        };
 	                        this._nestedListener[attr] = fn;
 	                        val.on('change', fn);
@@ -2280,12 +1920,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (changes.length)
 	                this._pending = true;
 	            for (var i = 0, l = changes.length; i < l; i++) {
-	                var key_2 = changes[i];
-	                if (!alreadyTriggered.hasOwnProperty(key_2) || !alreadyTriggered[key_2]) {
-	                    alreadyTriggered[key_2] = true;
-	                    this.trigger('change:' + key_2, this, getNested(current, key_2), options);
+	                let key = changes[i];
+	                if (!alreadyTriggered.hasOwnProperty(key) || !alreadyTriggered[key]) {
+	                    alreadyTriggered[key] = true;
+	                    this.trigger('change:' + key, this, getNested(current, key), options);
 	                }
-	                var fields = key_2.split(separator);
+	                var fields = key.split(separator);
 	                for (var n = fields.length - 1; n > 0; n--) {
 	                    var parentKey = fields.slice(0, n).join(separator), wildcardKey = parentKey + separator + '*';
 	                    if (!alreadyTriggered.hasOwnProperty(wildcardKey) || !alreadyTriggered[wildcardKey]) {
@@ -2310,8 +1950,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._pending = false;
 	        this._changing = false;
 	        return this;
-	    };
-	    NestedModel.prototype.clear = function (options) {
+	    }
+	    clear(options) {
 	        var attrs = {};
 	        var shallowAttributes = objToPaths(this._attributes);
 	        for (var key in shallowAttributes)
@@ -2319,14 +1959,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.set(attrs, orange_1.extend({}, options, {
 	            unset: true
 	        }));
-	    };
-	    NestedModel.prototype.hasChanged = function (attr) {
+	    }
+	    hasChanged(attr) {
 	        if (attr == null) {
 	            return !Object.keys(this.changed).length;
 	        }
 	        return getNested(this.changed, attr) !== undefined;
-	    };
-	    NestedModel.prototype.changedAttributes = function (diff) {
+	    }
+	    changedAttributes(diff) {
 	        if (!diff)
 	            return this.hasChanged() ? objToPaths(this.changed) : false;
 	        var old = this._changing ? this._previousAttributes : this._attributes;
@@ -2339,114 +1979,97 @@ return /******/ (function(modules) { // webpackBootstrap
 	            (changed || (changed = {}))[attr] = val;
 	        }
 	        return changed;
-	    };
-	    NestedModel.prototype.previous = function (attr) {
+	    }
+	    previous(attr) {
 	        if (attr == null || !this._previousAttributes) {
 	            return null;
 	        }
 	        return getNested(this._previousAttributes, attr);
-	    };
-	    NestedModel.prototype.previousAttributes = function () {
+	    }
+	    previousAttributes() {
 	        return orange_1.extend({}, this._previousAttributes);
-	    };
-	    NestedModel.prototype.pick = function (attr) {
-	        var attrs = [];
-	        for (var _i = 1; _i < arguments.length; _i++) {
-	            attrs[_i - 1] = arguments[_i];
-	        }
+	    }
+	    pick(attr, ...attrs) {
 	        if (arguments.length === 1) {
 	            attr = !Array.isArray(attr) ? [attr] : attr;
 	        }
 	        else {
 	            attrs = [attr].concat(attrs);
 	        }
-	        var out = {};
-	        for (var i = 0, ii = attrs.length; i < ii; i++) {
+	        let out = {};
+	        for (let i = 0, ii = attrs.length; i < ii; i++) {
 	            if (this.has(attrs[i])) {
 	                setNested(out, attrs[i], this.get(attrs[i]));
 	            }
 	        }
 	        return out;
-	    };
-	    NestedModel.prototype.destroy = function () {
-	        for (var key in this._nestedListener) {
-	            var fn = this._nestedListener[key];
+	    }
+	    destroy() {
+	        for (let key in this._nestedListener) {
+	            let fn = this._nestedListener[key];
 	            if (fn) {
-	                var m = this.get(key);
+	                let m = this.get(key);
 	                if (m)
 	                    m.off(key, fn);
 	            }
 	        }
-	        _super.prototype.destroy.call(this);
-	    };
-	    NestedModel.keyPathSeparator = '.';
-	    return NestedModel;
-	}(model_1.Model));
+	        super.destroy();
+	    }
+	}
+	NestedModel.keyPathSeparator = '.';
 	exports.NestedModel = NestedModel;
 
 
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var orange_1 = __webpack_require__(4);
-	var collection_1 = __webpack_require__(1);
-	var rest_model_1 = __webpack_require__(15);
-	var persistence_1 = __webpack_require__(16);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	const orange_1 = __webpack_require__(4);
+	const collection_1 = __webpack_require__(1);
+	const rest_model_1 = __webpack_require__(14);
+	const persistence_1 = __webpack_require__(15);
 	function isRestCollection(a) {
 	    if (a == null)
 	        return false;
 	    return (a instanceof RestCollection) || a.__classType == 'RestCollection';
 	}
 	exports.isRestCollection = isRestCollection;
-	var RestCollection = (function (_super) {
-	    __extends(RestCollection, _super);
-	    function RestCollection(models, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, models, options);
+	class RestCollection extends collection_1.Collection {
+	    constructor(models, options = {}) {
+	        super(models, options);
 	        this.Model = rest_model_1.RestModel;
 	        if (options.url)
 	            this.url = options.url;
 	        this.options.queryParameter = this.options.queryParameter || 'q';
 	    }
-	    Object.defineProperty(RestCollection.prototype, "__classType", {
-	        get: function () { return 'RestCollection'; },
-	        enumerable: true,
-	        configurable: true
-	    });
+	    get __classType() { return 'RestCollection'; }
 	    ;
-	    RestCollection.prototype.getURL = function () {
+	    getURL() {
 	        return typeof this.url === 'function' ? this.url() : this.url;
-	    };
-	    RestCollection.prototype.fetch = function (options) {
-	        var _this = this;
+	    }
+	    fetch(options) {
 	        options = options ? orange_1.extend({}, options) : {};
-	        var url = this.getURL();
+	        let url = this.getURL();
 	        if (url == null)
 	            return orange_1.Promise.reject(new Error('Url or rootURL no specified'));
 	        options.url = url;
 	        this.trigger('before:fetch');
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (results) {
-	            _this[options.reset ? 'reset' : 'set'](results.content, options);
-	            _this.trigger('fetch');
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
+	            .then((results) => {
+	            this[options.reset ? 'reset' : 'set'](results.content, options);
+	            this.trigger('fetch');
+	            return this;
+	        }).catch((e) => {
+	            this.trigger('error', e);
 	            throw e;
 	        });
-	    };
-	    RestCollection.prototype.create = function (value, options) {
-	        var _this = this;
+	    }
+	    create(value, options) {
 	        options = options ? orange_1.extend({}, options) : {};
-	        var model;
-	        var url = this.getURL();
+	        let model;
+	        let url = this.getURL();
 	        if (url == null)
 	            throw new Error('Url or rootURL no specified');
 	        options.url = url;
@@ -2461,24 +2084,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!options.wait)
 	            this.add(model, options);
 	        this.trigger('before:create', this, model, value, options);
-	        model.save().then(function () {
+	        model.save().then(() => {
 	            if (!options.wait)
-	                _this.add(model, options);
-	            _this.trigger('create', _this, model, value, options);
+	                this.add(model, options);
+	            this.trigger('create', this, model, value, options);
 	            if (options.complete)
 	                options.complete(null, model);
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
+	        }).catch((e) => {
+	            this.trigger('error', e);
 	            if (options.complete)
 	                options.complete(e, null);
 	        });
 	        return model;
-	    };
-	    RestCollection.prototype.query = function (term, options) {
-	        var _this = this;
-	        if (options === void 0) { options = {}; }
-	        var params = (_a = {}, _a[this.options.queryParameter] = term, _a);
-	        var url = this.getURL();
+	    }
+	    query(term, options = { merge: true }) {
+	        let params = { [this.options.queryParameter]: term };
+	        let url = this.getURL();
 	        if (url == null)
 	            return orange_1.Promise.reject(new Error('Url or rootURL no specified'));
 	        options.url = url;
@@ -2487,38 +2108,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	        orange_1.extend(options.params, params);
 	        this.trigger('before:query');
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (results) {
-	            _this.reset(results.content, options);
-	            _this.trigger('query');
-	            return _this.models;
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
+	            .then((results) => {
+	            let models = this.add(results.content, options);
+	            this.trigger('query');
+	            return models;
+	        }).catch((e) => {
+	            this.trigger('error', e);
 	            throw e;
 	        });
-	        var _a;
-	    };
-	    RestCollection.prototype.sync = function (method, model, options) {
+	    }
+	    sync(method, model, options) {
 	        return persistence_1.sync(method, model, options);
-	    };
-	    return RestCollection;
-	}(collection_1.Collection));
+	    }
+	}
 	exports.RestCollection = RestCollection;
 
 
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var orange_1 = __webpack_require__(4);
-	var model_1 = __webpack_require__(12);
-	var nested_model_1 = __webpack_require__(13);
-	var persistence_1 = __webpack_require__(16);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	const orange_1 = __webpack_require__(4);
+	const model_1 = __webpack_require__(11);
+	const nested_model_1 = __webpack_require__(12);
+	const persistence_1 = __webpack_require__(15);
 	function isRestModel(a) {
 	    if (a == null)
 	        return false;
@@ -2526,7 +2141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isRestModel = isRestModel;
 	function normalize_path(url, id) {
-	    var i, p = "";
+	    let i, p = "";
 	    if ((i = url.indexOf('?')) >= 0) {
 	        p = url.substr(i);
 	        url = url.substr(0, i);
@@ -2536,24 +2151,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return url + id + p;
 	}
 	exports.normalize_path = normalize_path;
-	var RestModel = (function (_super) {
-	    __extends(RestModel, _super);
-	    function RestModel(attr, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, attr, options);
+	class RestModel extends nested_model_1.NestedModel {
+	    constructor(attr, options = {}) {
+	        super(attr, options);
 	        this.idAttribute = 'id';
 	        if (options.url) {
 	            this.rootURL = options.url;
 	        }
 	    }
-	    Object.defineProperty(RestModel.prototype, "__classType", {
-	        get: function () { return 'RestModel'; },
-	        enumerable: true,
-	        configurable: true
-	    });
+	    get __classType() { return 'RestModel'; }
 	    ;
-	    RestModel.prototype.getURL = function (id) {
-	        var url = this.rootURL;
+	    getURL(id) {
+	        let url = this.rootURL;
 	        if (this.collection && this.collection.getURL()) {
 	            url = this.collection.getURL();
 	        }
@@ -2562,114 +2171,104 @@ return /******/ (function(modules) { // webpackBootstrap
 	            url = normalize_path(url, this.id);
 	        }
 	        return url;
-	    };
-	    RestModel.prototype.fetch = function (options) {
-	        var _this = this;
+	    }
+	    fetch(options) {
 	        options = options ? orange_1.extend({}, options) : {};
-	        var url = this.getURL();
+	        let url = this.getURL();
 	        if (url == null)
 	            return orange_1.Promise.reject(new Error('Url or rootURL no specified'));
 	        options.url = url;
 	        this.trigger('before:fetch', this, options);
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (result) {
+	            .then((result) => {
 	            if (result)
-	                _this.set(_this.parse(result.content, options), options);
-	            _this.trigger('fetch', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
+	                this.set(this.parse(result.content, options), options);
+	            this.trigger('fetch', this, result, options);
+	            return this;
+	        }).catch((e) => {
+	            this.trigger('error', this, e);
 	            if (e) {
 	                throw e;
 	            }
-	            return _this;
+	            return this;
 	        });
-	    };
-	    RestModel.prototype.save = function (options) {
-	        var _this = this;
+	    }
+	    save(options) {
 	        options = options ? orange_1.extend({}, options) : {};
 	        this.trigger('before:save', this, options);
-	        var method = persistence_1.RestMethod[this.isNew ? 'Create' : options.changed ? 'Patch' : "Update"];
-	        var url = this.getURL(this.id);
+	        let method = persistence_1.RestMethod[this.isNew ? 'Create' : options.changed ? 'Patch' : "Update"];
+	        let url = this.getURL(this.id);
 	        if (url == null)
 	            return orange_1.Promise.reject(new Error('Url or rootURL no specified'));
 	        options.url = url;
 	        return this.sync(method, this, options)
-	            .then(function (result) {
-	            _this.set(result.content, options);
-	            _this.trigger('save', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
+	            .then((result) => {
+	            this.set(result.content, options);
+	            this.trigger('save', this, result, options);
+	            return this;
+	        }).catch((e) => {
+	            this.trigger('error', this, e);
 	            throw e;
 	        });
-	    };
-	    RestModel.prototype.remove = function (options) {
-	        var _this = this;
+	    }
+	    remove(options) {
 	        options = options ? orange_1.extend({}, options) : {};
 	        if (this.isNew) {
-	            _super.prototype.remove.call(this, options);
+	            super.remove(options);
 	            return orange_1.Promise.resolve(this);
 	        }
-	        var url = this.getURL(this.id);
+	        let url = this.getURL(this.id);
 	        if (url == null)
 	            return orange_1.Promise.reject(new Error('Url or rootURL no specified'));
 	        this.trigger('before:remove', this, options);
 	        if (!options.wait)
-	            _super.prototype.remove.call(this, options);
+	            super.remove(options);
 	        options.url = url;
 	        return this.sync(persistence_1.RestMethod.Delete, this, options)
-	            .then(function (result) {
+	            .then((result) => {
 	            if (options.wait)
-	                _super.prototype.remove.call(_this, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
+	                super.remove(options);
+	            return this;
+	        }).catch((e) => {
+	            this.trigger('error', this, e);
 	            throw e;
 	        });
-	    };
-	    RestModel.prototype.sync = function (method, model, options) {
+	    }
+	    sync(method, model, options) {
 	        return persistence_1.sync(method, model, options);
-	    };
-	    return RestModel;
-	}(nested_model_1.NestedModel));
+	    }
+	}
 	exports.RestModel = RestModel;
 
 
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var orange_1 = __webpack_require__(4);
-	var orange_request_1 = __webpack_require__(17);
-	var HttpError = (function (_super) {
-	    __extends(HttpError, _super);
-	    function HttpError(status, message, body) {
-	        _super.call(this, message);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	const orange_1 = __webpack_require__(4);
+	const orange_request_1 = __webpack_require__(16);
+	class HttpError extends Error {
+	    constructor(status, message, body) {
+	        super(message);
 	        this.message = message;
 	        this.status = status;
 	        this.body = body;
 	    }
-	    return HttpError;
-	}(Error));
+	}
 	exports.HttpError = HttpError;
+	var RestMethod;
 	(function (RestMethod) {
 	    RestMethod[RestMethod["Create"] = 0] = "Create";
 	    RestMethod[RestMethod["Update"] = 1] = "Update";
 	    RestMethod[RestMethod["Read"] = 2] = "Read";
 	    RestMethod[RestMethod["Patch"] = 3] = "Patch";
 	    RestMethod[RestMethod["Delete"] = 4] = "Delete";
-	})(exports.RestMethod || (exports.RestMethod = {}));
-	var RestMethod = exports.RestMethod;
+	})(RestMethod = exports.RestMethod || (exports.RestMethod = {}));
 	;
-	var xmlRe = /^(?:application|text)\/xml/;
-	var jsonRe = /^application\/json/;
+	const xmlRe = /^(?:application|text)\/xml/;
+	const jsonRe = /^application\/json/;
 	var getData = function (accepts, xhr) {
 	    if (accepts == null)
 	        accepts = xhr.getResponseHeader('content-type');
@@ -2689,7 +2288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        (xhr.status === 0 && window.location.protocol === 'file:');
 	};
 	function sync(method, model, options) {
-	    var http;
+	    let http;
 	    switch (method) {
 	        case RestMethod.Create:
 	            http = orange_request_1.HttpMethod.POST;
@@ -2707,9 +2306,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            http = orange_request_1.HttpMethod.GET;
 	            break;
 	        default:
-	            return orange_1.Promise.reject(new Error("Sync: does not recognise method: " + method));
+	            return orange_1.Promise.reject(new Error(`Sync: does not recognise method: ${method}`));
 	    }
-	    var request = new orange_request_1.HttpRequest(http, options.url);
+	    let request = new orange_request_1.HttpRequest(http, options.url);
 	    if (options.params)
 	        request.params(options.params);
 	    if (options.headers)
@@ -2720,17 +2319,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (options.beforeSend)
 	        options.beforeSend(request);
-	    var data = undefined;
+	    let data = undefined;
 	    if (http == orange_request_1.HttpMethod.PATCH || http === orange_request_1.HttpMethod.PUT || http === orange_request_1.HttpMethod.POST) {
 	        data = JSON.stringify(model.toJSON());
 	    }
 	    return request.end(data)
-	        .then(function (res) {
+	        .then(res => {
 	        if (!res.isValid) {
-	            return res.text().then(function (t) { throw new HttpError(res.status, res.statusText, t); });
+	            return res.text().then(t => { throw new HttpError(res.status, res.statusText, t); });
 	        }
 	        return res.json()
-	            .then(function (json) {
+	            .then(json => {
 	            return {
 	                method: method,
 	                status: res.status,
@@ -2743,9 +2342,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.sync = sync;
 
 
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -2762,8 +2361,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	    }
 	}
-	var base_http_request_1 = __webpack_require__(18);
-	var browser_fetch_1 = __webpack_require__(22);
+	var base_http_request_1 = __webpack_require__(17);
+	var browser_fetch_1 = __webpack_require__(21);
 
 	var HttpRequest = function (_base_http_request_1$) {
 	    _inherits(HttpRequest, _base_http_request_1$);
@@ -2785,18 +2384,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	}(base_http_request_1.BaseHttpRequest);
 
 	exports.HttpRequest = HttpRequest;
-	var utils_1 = __webpack_require__(19);
+	var utils_1 = __webpack_require__(18);
 	exports.queryStringToParams = utils_1.queryStringToParams;
 	exports.isValid = utils_1.isValid;
 	exports.isNode = utils_1.isNode;
 	exports.queryParam = utils_1.queryParam;
-	__export(__webpack_require__(23));
-	__export(__webpack_require__(20));
-	__export(__webpack_require__(25));
-	var base_http_request_2 = __webpack_require__(18);
+	__export(__webpack_require__(22));
+	__export(__webpack_require__(19));
+	__export(__webpack_require__(24));
+	var base_http_request_2 = __webpack_require__(17);
 	exports.HttpMethod = base_http_request_2.HttpMethod;
 	exports.HttpError = base_http_request_2.HttpError;
-	var base_http_request_3 = __webpack_require__(18);
+	var base_http_request_3 = __webpack_require__(17);
 	function get(url) {
 	    return new HttpRequest(base_http_request_3.HttpMethod.GET, url);
 	}
@@ -2822,9 +2421,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.head = head;
 
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -2837,8 +2436,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var orange_1 = __webpack_require__(4);
-	var utils_1 = __webpack_require__(19);
-	var header_1 = __webpack_require__(20);
+	var utils_1 = __webpack_require__(18);
+	var header_1 = __webpack_require__(19);
 	(function (HttpMethod) {
 	    HttpMethod[HttpMethod["GET"] = 0] = "GET";
 	    HttpMethod[HttpMethod["PUT"] = 1] = "PUT";
@@ -3002,9 +2601,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.BaseHttpRequest = BaseHttpRequest;
 
-/***/ },
-/* 19 */
-/***/ function(module, exports) {
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -3046,9 +2645,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isValid = isValid;
 	;
 
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3056,7 +2655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var support_1 = __webpack_require__(21);
+	var support_1 = __webpack_require__(20);
 	function normalizeName(name) {
 	    if (typeof name !== 'string') {
 	        name = String(name);
@@ -3199,13 +2798,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.Headers = Headers;
 
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {"use strict";
 
-	var utils_1 = __webpack_require__(19);
+	var utils_1 = __webpack_require__(18);
 	var self = utils_1.isNode ? global : window;
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = {
@@ -3224,9 +2823,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3239,10 +2838,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var orange_1 = __webpack_require__(4);
-	var header_1 = __webpack_require__(20);
-	var request_1 = __webpack_require__(23);
-	var base_response_1 = __webpack_require__(24);
-	var support_1 = __webpack_require__(21);
+	var header_1 = __webpack_require__(19);
+	var request_1 = __webpack_require__(22);
+	var base_response_1 = __webpack_require__(23);
+	var support_1 = __webpack_require__(20);
 	function headers(xhr) {
 	    var head = new header_1.Headers();
 	    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n');
@@ -3336,9 +2935,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.fetch = fetch;
 
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3346,7 +2945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var header_1 = __webpack_require__(20);
+	var header_1 = __webpack_require__(19);
 	// HTTP methods whose capitalization should be normalized
 	var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT'];
 	function normalizeMethod(method) {
@@ -3402,9 +3001,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.Request = Request;
 
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3412,11 +3011,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var header_1 = __webpack_require__(20);
-	var support_1 = __webpack_require__(21);
+	var header_1 = __webpack_require__(19);
+	var support_1 = __webpack_require__(20);
 	var orange_1 = __webpack_require__(4);
-	var utils_1 = __webpack_require__(19);
-	var types_1 = __webpack_require__(25);
+	var utils_1 = __webpack_require__(18);
+	var types_1 = __webpack_require__(24);
 	function decode(body) {
 	    var form = new FormData();
 	    body.trim().split('&').forEach(function (bytes) {
@@ -3582,9 +3181,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.BaseResponse = BaseResponse;
 
-/***/ },
-/* 25 */
-/***/ function(module, exports) {
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -3598,23 +3197,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	var BodyType = exports.BodyType;
 	;
 
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var collection_1 = __webpack_require__(1);
-	var rest_collection_1 = __webpack_require__(14);
-	var orange_1 = __webpack_require__(4);
-	var persistence_1 = __webpack_require__(16);
-	var orange_request_1 = __webpack_require__(17);
-	var PARAM_TRIM_RE = /[\s'"]/g;
-	var URL_TRIM_RE = /[<>\s'"]/g;
+	Object.defineProperty(exports, "__esModule", { value: true });
+	const collection_1 = __webpack_require__(1);
+	const rest_collection_1 = __webpack_require__(13);
+	const orange_1 = __webpack_require__(4);
+	const persistence_1 = __webpack_require__(15);
+	const orange_request_1 = __webpack_require__(16);
+	const PARAM_TRIM_RE = /[\s'"]/g;
+	const URL_TRIM_RE = /[<>\s'"]/g;
 	function queryStringToParams(qs) {
 	    var kvp, k, v, ls, params = {}, decode = decodeURIComponent;
 	    var kvps = qs.split('&');
@@ -3633,11 +3228,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return params;
 	}
-	var PaginatedCollection = (function (_super) {
-	    __extends(PaginatedCollection, _super);
-	    function PaginatedCollection(models, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, models, options);
+	class PaginatedCollection extends rest_collection_1.RestCollection {
+	    constructor(models, options = {}) {
+	        super(models, options);
 	        this._state = { first: 1, last: -1, current: 1, size: 10 };
 	        this._link = {};
 	        this.queryParams = {
@@ -3655,36 +3248,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._page = new collection_1.Collection();
 	        this._page.Model = this.Model;
 	    }
-	    Object.defineProperty(PaginatedCollection.prototype, "page", {
-	        get: function () {
-	            return this._page;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    PaginatedCollection.prototype.hasNext = function () {
+	    get page() {
+	        return this._page;
+	    }
+	    hasNext() {
 	        return this.hasPage(this._state.current + 1);
-	    };
-	    PaginatedCollection.prototype.hasPrevious = function () {
+	    }
+	    hasPrevious() {
 	        return this.hasPage(this._state.current - 1);
-	    };
-	    PaginatedCollection.prototype.hasPage = function (page) {
+	    }
+	    hasPage(page) {
 	        if (this._state.last > -1) {
 	            return page <= this._state.last;
 	        }
 	        return false;
-	    };
-	    PaginatedCollection.prototype.getPreviousPage = function (options) {
+	    }
+	    getPreviousPage(options) {
 	        options = options ? orange_1.extend({}, options) : {};
 	        options.page = this._state.current - 1;
 	        return this.getPage(options);
-	    };
-	    PaginatedCollection.prototype.getNextPage = function (options) {
+	    }
+	    getNextPage(options) {
 	        options = options ? orange_1.extend({}, options) : {};
 	        options.page = this._state.current + 1;
 	        return this.getPage(options);
-	    };
-	    PaginatedCollection.prototype.getPage = function (options) {
+	    }
+	    getPage(options) {
 	        options = options ? orange_1.extend({}, options) : {};
 	        if (options.page === void 0)
 	            return orange_1.Promise.reject(new Error("No page"));
@@ -3695,16 +3284,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            options.page = this._state.first;
 	        }
 	        return this.fetch(options);
-	    };
-	    PaginatedCollection.prototype.fetch = function (options) {
-	        var _this = this;
-	        if (options === void 0) { options = {}; }
+	    }
+	    fetch(options = {}) {
 	        options = options ? orange_1.extend({}, options) : {};
-	        var url;
+	        let url;
 	        if (!orange_1.has(options, 'page')) {
 	            options.page = this._state.current;
 	        }
-	        var params = options.params ? orange_1.extend({}, options.params) : {};
+	        let params = options.params ? orange_1.extend({}, options.params) : {};
 	        if (orange_1.has(params, this.queryParams.page))
 	            delete params[this.queryParams.page];
 	        url = this._link[options.page];
@@ -3713,7 +3300,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        if (!url)
 	            return orange_1.Promise.reject(new Error("no url specified"));
-	        var idx = url.indexOf('?');
+	        let idx = url.indexOf('?');
 	        if (idx > -1) {
 	            params = orange_1.extend(params, queryStringToParams(url.substr(idx + 1)));
 	            url = url.substr(0, idx);
@@ -3729,18 +3316,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._link[options.page] = url + '?' + orange_request_1.queryParam({ page: options.page });
 	        }
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (resp) {
-	            _this._processResponse(resp, options);
-	            _this.trigger('fetch', _this, resp, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
+	            .then((resp) => {
+	            this._processResponse(resp, options);
+	            this.trigger('fetch', this, resp, options);
+	            return this;
+	        }).catch((e) => {
+	            this.trigger('error', e);
 	            throw e;
 	        });
-	    };
-	    PaginatedCollection.prototype._processResponse = function (resp, options) {
-	        var currentPage = options.page;
-	        var links = this._parseLinkHeaders(resp);
+	    }
+	    _processResponse(resp, options) {
+	        let currentPage = options.page;
+	        let links = this._parseLinkHeaders(resp);
 	        if (links.first)
 	            this._link[this._state.first] = links.first;
 	        if (links.prev)
@@ -3748,10 +3335,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (links.next)
 	            this._link[currentPage + 1] = links.next;
 	        if (links.last) {
-	            var last = links.last;
-	            var idx = last.indexOf('?');
+	            let last = links.last;
+	            let idx = last.indexOf('?');
 	            if (idx > -1) {
-	                var params = queryStringToParams(last.substr(idx + 1));
+	                let params = queryStringToParams(last.substr(idx + 1));
 	                if (orange_1.has(params, this.queryParams.page)) {
 	                    this._link[params[this.queryParams.page]] = last;
 	                    this._state.last = parseInt(params[this.queryParams.page]);
@@ -3759,46 +3346,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        this._state.current = currentPage;
-	        var data = resp.content;
+	        let data = resp.content;
 	        if (data && !Array.isArray(data))
 	            data = [data];
 	        if (!data)
 	            return this;
 	        data = this.parse(data);
-	        for (var i = 0, ii = data.length; i < ii; i++) {
+	        for (let i = 0, ii = data.length; i < ii; i++) {
 	            data[i] = this._prepareModel(data[i]);
 	        }
 	        this.add(data);
 	        return this;
-	    };
-	    PaginatedCollection.prototype._parseLinkHeaders = function (resp) {
+	    }
+	    _parseLinkHeaders(resp) {
 	        var link = {};
-	        var linkHeader = resp.headers.get('Link');
+	        let linkHeader = resp.headers.get('Link');
 	        if (!linkHeader)
 	            return link;
 	        linkHeader = linkHeader.split(',');
-	        var relations = ['first', 'prev', 'next', 'last'];
-	        for (var i = 0, ii = linkHeader.length; i < ii; i++) {
-	            var linkParts = linkHeader[i].split(';'), url = linkParts[0].replace(URL_TRIM_RE, ''), params = linkParts.slice(1);
-	            for (var x = 0, xx = params.length; x < xx; x++) {
-	                var paramParts = params[x].split('='), key = paramParts[0].replace(PARAM_TRIM_RE, ''), value = paramParts[1].replace(PARAM_TRIM_RE, '');
+	        let relations = ['first', 'prev', 'next', 'last'];
+	        for (let i = 0, ii = linkHeader.length; i < ii; i++) {
+	            let linkParts = linkHeader[i].split(';'), url = linkParts[0].replace(URL_TRIM_RE, ''), params = linkParts.slice(1);
+	            for (let x = 0, xx = params.length; x < xx; x++) {
+	                let paramParts = params[x].split('='), key = paramParts[0].replace(PARAM_TRIM_RE, ''), value = paramParts[1].replace(PARAM_TRIM_RE, '');
 	                if (key == 'rel' && !!~relations.indexOf(value))
 	                    link[value] = url;
 	            }
 	        }
 	        return link;
-	    };
-	    PaginatedCollection.prototype._reset = function () {
-	        _super.prototype._reset.call(this);
+	    }
+	    _reset() {
+	        super._reset();
 	        this._state = { first: 1, last: -1, current: 1, size: this._state.size };
 	        this._link = {};
-	    };
-	    return PaginatedCollection;
-	}(rest_collection_1.RestCollection));
+	    }
+	}
 	exports.PaginatedCollection = PaginatedCollection;
 
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;

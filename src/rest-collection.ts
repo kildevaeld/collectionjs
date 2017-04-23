@@ -25,6 +25,10 @@ export interface CollectionFetchOptions extends CollectionSetOptions, SyncOption
   reset?: boolean;
 }
 
+export interface CollectionQueryOptions<T extends IPersistableModel> extends CollectionFetchOptions {
+  predicate?: (model: T) => boolean;
+}
+
 export interface RestCollectionCreateOptions extends CollectionCreateOptions, SyncOptions {
   wait?: boolean;
   complete?: (error: Error, model: IPersistableModel) => void;
@@ -59,7 +63,7 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
     this.trigger('before:fetch');
     return this.sync(RestMethod.Read, this, options)
       .then((results) => {
-        this[options.reset ? 'reset' : 'set'](results.content, options);
+        (<any>this[options.reset ? 'reset' : 'set'])(results.content, options);
         this.trigger('fetch');
         return this;
       }).catch((e) => {
@@ -106,7 +110,7 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
     return model;
   }
 
-  query(term: string, options: CollectionFetchOptions = {}): IPromise<T[]> {
+  query(term: string, options: CollectionFetchOptions = {merge:true}): IPromise<T[]> {
 
     let params = { [this.options.queryParameter]: term };
 
@@ -119,9 +123,9 @@ export class RestCollection<T extends IPersistableModel> extends Collection<T> i
     this.trigger('before:query');
     return <any>this.sync(RestMethod.Read, this, options)
       .then((results) => {
-        this.reset(results.content, options);
+        let models = this.add(results.content, options);
         this.trigger('query');
-        return this.models;
+        return models;
       }).catch((e) => {
         this.trigger('error', e);
         throw e;

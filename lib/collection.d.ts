@@ -33,15 +33,15 @@ export declare class Collection<U extends IModel> extends BaseObject implements 
     comparator: string | SortFunction;
     options: CollectionOptions<U>;
     constructor(models?: U[] | Object[], options?: CollectionOptions<U>);
-    add(models: U | U[] | Object | Object[], options?: CollectionSetOptions): void;
+    add(models: U | U[] | Object | Object[], options?: CollectionSetOptions): U | U[];
     protected set(items: U | U[], options?: CollectionSetOptions): U | U[];
     remove(models: U[] | U, options?: CollectionRemoveOptions): U | U[];
     get(id: any): U;
     at(index: any): U;
     clone(options?: CollectionOptions<U>): any;
     sort(options?: CollectionSortOptions): this;
-    sortBy(key: string | Function, context?: any): U[];
-    push(model: any, options?: {}): void;
+    sortBy(key: string | ((m: U, i: number, a: U[]) => boolean), context?: any): U[];
+    push(model: any, options?: {}): U | U[];
     reset(models: any, options?: CollectionResetOptions): any;
     create(values?: any, options?: CollectionCreateOptions): IModel;
     parse(models: U | U[], options?: CollectionSetOptions): U | U[];

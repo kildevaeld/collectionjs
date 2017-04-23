@@ -12,6 +12,9 @@ export interface CollectionFetchOptions extends CollectionSetOptions, SyncOption
     parse?: boolean;
     reset?: boolean;
 }
+export interface CollectionQueryOptions<T extends IPersistableModel> extends CollectionFetchOptions {
+    predicate?: (model: T) => boolean;
+}
 export interface RestCollectionCreateOptions extends CollectionCreateOptions, SyncOptions {
     wait?: boolean;
     complete?: (error: Error, model: IPersistableModel) => void;

@@ -156,7 +156,7 @@ export interface NestedModelSetOptions extends ModelSetOptions {
 export class NestedModel extends Model {
   static keyPathSeparator = '.'
 
-  private _nestedListener: { [key: string]: Function }
+  private _nestedListener: { [key: string]: (...args:any[]) => void }
   // Override get
   // Supports nested attributes via the syntax 'obj.attr' e.g. 'author.user.name'
   get(attr) {

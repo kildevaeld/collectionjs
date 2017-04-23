@@ -85,7 +85,6 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
       this.Model = this.options.model
     }
 
-
     //this._byId = {};
     if (models) {
       this.add(models);
@@ -103,7 +102,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
         return (item instanceof this.Model) ? item : <any>(this._prepareModel(item));
       });
     }
-    this.set(<U | U[]>models, extend({ merge: false }, options, addOptions));
+    return this.set(<U | U[]>models, extend({ merge: false }, options, addOptions));
   }
 
   protected set(items: U | U[], options: CollectionSetOptions = {}) {
@@ -248,7 +247,7 @@ export class Collection<U extends IModel> extends BaseObject implements ICollect
     return this;
   }
 
-  sortBy(key: string | Function, context?: any): U[] {
+  sortBy(key: string | ((m:U, i:number, a:U[]) => boolean), context?: any): U[] {
     return sortBy(this._models, key, context)
   }
 
