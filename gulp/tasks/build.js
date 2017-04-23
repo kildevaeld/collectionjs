@@ -5,7 +5,8 @@ const gulp = require('gulp'),
 	concat = require('gulp-concat'),
 	merge = require('merge2'),
 	sq = require('streamqueue'),
-	webpack = require('gulp-webpack');
+	webpack = require('gulp-webpack'),
+	babel = require('gulp-babel');
 	
 const project = typescript.createProject('tsconfig.json', {
 	 declaration: true,
@@ -18,7 +19,7 @@ gulp.task('typescript', function () {
 	.pipe(typescript(project))
 	
 	return merge([
-		result.js.pipe(gulp.dest('lib')),
+		result.js.pipe(babel()).pipe(gulp.dest('lib')),
 		result.dts.pipe(gulp.dest('lib'))
 	]);
 	
